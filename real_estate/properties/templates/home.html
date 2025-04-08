@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Hero Section -->
+<div class="hero-section position-relative" style="height: 70vh; background: linear-gradient(135deg, rgba(26, 43, 76, 0.7), rgba(212, 175, 55, 0.3)), url('{% static "hero-bg.png" %}'); background-size: cover; background-position: center;">
+    <div class="position-absolute top-50 start-50 translate-middle text-center text-white">
+        <h1 class="display-3 fw-bold" style="text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4); letter-spacing: 2px; font-size: 3.5rem;">Discover Luxury Living</h1>
+        <p class="lead mt-3" style="text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3); font-size: 1.5rem; font-weight: 300;">Your gateway to exquisite properties with Real Estate Pro</p>
+        <a href="#" class="btn btn-primary btn-lg mt-4" data-bs-toggle="modal" data-bs-target="#searchModal" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Explore Properties</a>
+    </div>
+</div>
+
+<!-- Featured Properties -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Featured Listings</h2>
+    <div class="row g-5" id="featured-properties">
+        {% for property in properties|slice:":6" %}
+        {% if user.is_authenticated and user != property.seller %}
+        <div class="col-md-4">
+            <div class="card h-100" style="overflow: hidden; border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+                {% if property.images.first %}
+                <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; border-bottom: 2px solid #d4af37;">
+                {% else %}
+                <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; border-bottom: 2px solid #d4af37;">No Image Available</div>
+                {% endif %}
+                <div class="card-body p-4">
+                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">
+                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c;">{{ property.title }}</a>
+                    </h5>
+                    <p class="card-text" style="color: #6c757d; font-size: 1rem;">{{ property.description|truncatewords:15 }}</p>
+                    <p><strong>Price:</strong> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ property.price }}</span> - {{ property.city }}</p>
+                    <p style="font-size: 0.95rem; color: #6c757d;">{{ property.bedrooms }} Beds | {{ property.bathrooms }} Baths</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
+                        {% if property.id in interested_property_ids %}
+                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Remove Interest</a>
+                        {% else %}
+                        <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Interested</a>
+                        {% endif %}
+                        <!-- Potential Update: Add 'Contact an Agent' button here to trigger agent assignment request -->
+                        {% endif %}
+                        <a href="{% url 'property_detail' property.id %}" class="btn btn-info btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #1a2b4c; border-color: #1a2b4c; color: #fff;">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% empty %}
+        <div class="col-12">
+            <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+                <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No properties available.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if properties|length > 6 %}
+    <div class="text-center mt-5">
+        <button id="show-more-btn" class="btn btn-primary" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Show More Properties</button>
+    </div>
+    <div class="row g-5" id="more-properties" style="display: none;">
+        {% for property in properties|slice:"6:12" %}
+        {% if user.is_authenticated and user != property.seller %}
+        <div class="col-md-4">
+            <div class="card h-100" style="overflow: hidden; border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+                {% if property.images.first %}
+                <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; border-bottom: 2px solid #d4af37;">
+                {% else %}
+                <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; border-bottom: 2px solid #d4af37;">No Image Available</div>
+                {% endif %}
+                <div class="card-body p-4">
+                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">
+                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c;">{{ property.title }}</a>
+                    </h5>
+                    <p class="card-text" style="color: #6c757d; font-size: 1rem;">{{ property.description|truncatewords:15 }}</p>
+                    <p><strong>Price:</strong> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ property.price }}</span> - {{ property.city }}</p>
+                    <p style="font-size: 0.95rem; color: #6c757d;">{{ property.bedrooms }} Beds | {{ property.bathrooms }} Baths</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
+                        {% if property.id in interested_property_ids %}
+                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Remove Interest</a>
+                        {% else %}
+                        <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Interested</a>
+                        {% endif %}
+                        <!-- Potential Update: Add 'Contact an Agent' button here to trigger agent assignment request -->
+                        {% endif %}
+                        <a href="{% url 'property_detail' property.id %}" class="btn btn-info btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #1a2b4c; border-color: #1a2b4c; color: #fff;">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- List Your Property Section -->
+<div class="bg-light py-5">
+    <div class="container text-center">
+        <h3 class="mb-4" style="color: #1a2b4c; font-weight: 600; font-size: 2rem; letter-spacing: 1px;">List Your Property Today</h3>
+        <p style="color: #6c757d; font-size: 1.1rem; max-width: 700px; margin: 0 auto; font-weight: 300;">Showcase your exquisite property to a discerning clientele. Partner with Real Estate Pro to find the perfect buyer and elevate your selling experience.</p>
+        <a href="{% if user.is_authenticated %}{% url 'create_property' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary mt-4" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Add Property</a>
+    </div>
+</div>
+
+<style>
+    /* General Button Styles */
+    .btn-primary, .btn-outline-primary, .btn-info {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Explore Properties, Show More, Add Property Buttons */
+    .btn-primary {
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Interested Button */
+    .btn-outline-primary {
+        color: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-outline-primary:hover {
+        background: #d4af37;
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* View Details Button */
+    .btn-info {
+        background: #1a2b4c;
+        border-color: #1a2b4c;
+    }
+    .btn-info:hover {
+        background: #14213d;
+        border-color: #14213d;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Card Hover Effects (Unchanged) */
+    .card-img-top {
+        transition: transform 0.3s ease;
+    }
+    .card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+    .card-title a:hover {
+        color: #d4af37;
+    }
+</style>
+
+<script>
+    document.getElementById('show-more-btn')?.addEventListener('click', function() {
+        document.getElementById('more-properties').style.display = 'flex';
+        this.style.display = 'none';
+    });
+</script>
+{% endblock %}

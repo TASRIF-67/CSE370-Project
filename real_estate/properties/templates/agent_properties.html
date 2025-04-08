@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Agent Properties Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Assigned Properties</h2>
+    {% if assigned_properties %}
+    <div class="row g-5">
+        {% for property in assigned_properties %}
+        <div class="col-md-12">
+            <div class="card" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+                <div class="card-body p-4">
+                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">{{ property.title }}</h5>
+                    <p><strong>Price:</strong> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ property.price }}</span> - {{ property.city }}</p>
+                    <h6 style="color: #1a2b4c; font-weight: 600; font-size: 1.2rem;">Interested Users:</h6>
+                    <ul>
+                        {% for interest in property.interest_set.all %}
+                        {% if interest.assigned_agent == user and interest.status == 'assigned' %}
+                        <li style="color: #6c757d; font-size: 1rem;">
+                            {{ interest.interested_user.username }} | 
+                            Phone: {{ interest.interested_user.phone_number }} | 
+                            Location: {{ interest.interested_user.address }}
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="interest_id" value="{{ interest.id }}">
+                                <button type="submit" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Remove</button>
+                            </form>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <!-- Updated: Add 'Confirm Deal' button to request transaction -->
+                    <a href="{% url 'request_transaction' property.id %}" class="btn btn-primary btn-sm mt-3" style="border-radius: 25px; padding: 8px 20px; background: #d4af37; border-color: #d4af37; color: #fff;">Confirm Deal</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No properties assigned to you yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Sync with home.html styling */
+    .btn-primary, .btn-outline-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .btn-primary {
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    .btn-outline-primary {
+        color: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-outline-primary:hover {
+        background: #d4af37;
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+{% endblock %}

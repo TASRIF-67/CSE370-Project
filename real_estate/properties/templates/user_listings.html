@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Your Listings</h2>
+    <div class="row g-4">
+        {% for property in properties %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                {% if property.images.first %}
+                <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5>{{ property.title }}</h5>
+                    <p>Status: {{ property.status|title }}</p>
+                    {% if property.assigned_agent %}
+                    <p>Agent: {{ property.assigned_agent.username }}</p>
+                    {% else %}
+                    <p>Agent: Not Assigned</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No listings found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

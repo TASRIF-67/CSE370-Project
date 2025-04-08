@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5" style="max-width: 900px;">
+    <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+        {% if property.images.first %}
+        <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image in property.images.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ property.title }}" style="height: 400px; object-fit: cover;">
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        {% endif %}
+        <div class="card-body p-4">
+            <h2 class="card-title text-center mb-3" style="color: #2c3e50;">{{ property.title }}</h2>
+            <p class="text-center text-muted mb-4">{{ property.property_type|title }} | {{ property.status|title }}</p>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <p><strong>Price:</strong> <span class="text-success fw-bold">${{ property.price }}</span></p>
+                    <p><strong>Location:</strong> {{ property.city }}{% if property.street %}, {{ property.street }}{% endif %}{% if property.zip_code %}, {{ property.zip_code }}{% endif %}</p>
+                    <p><strong>Bedrooms:</strong> {{ property.bedrooms }}</p>
+                    <p><strong>Bathrooms:</strong> {{ property.bathrooms }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Square Footage:</strong> {{ property.square_footage }} sq ft</p>
+                    {% if property.year_built %}
+                    <p><strong>Year Built:</strong> {{ property.year_built }}</p>
+                    {% endif %}
+                    <p><strong>Seller:</strong> {{ property.seller.username }}</p>
+                    <p><strong>Agent:</strong> {{ property.assigned_agent.username|default:"Not Assigned" }}</p>
+                </div>
+            </div>
+            <hr>
+            <p class="mt-3">{{ property.description }}</p>
+            <div class="text-center mt-4">
+                {% if user.is_authenticated %}
+                    {% if user != property.seller and user.role == 'normal' and property.status == 'approved' %}
+                    <a href="{% url 'express_interest' property.id %}" class="btn btn-primary btn-lg px-5">Express Interest</a>
+                    {% endif %}
+                    {% if user.role == 'admin' %}
+                    <!-- Changed: Remove edit option for admin -->
+                    <div class="mt-3">
+                        <a href="{% url 'admin_delete_property' property.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+                    {% endif %}
+                    {% if request.user.role == 'normal' %}
+                    <a href="{% url 'user_properties' %}" class="btn btn-primary">Back to Properties</a>
+                    {% elif request.user.role == 'admin' %}
+                    <a href="{% url 'admin_properties' %}" class="btn btn-primary">Back to All Properties</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

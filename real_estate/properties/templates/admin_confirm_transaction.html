@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Admin Confirm Transaction Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Confirm Transaction</h2>
+    <div class="card p-4" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+        <p><strong>Property:</strong> {{ transaction.property.title }}</p>
+        <p><strong>Agent:</strong> {{ transaction.agent.username }}</p>
+        <p><strong>Buyer:</strong> {{ transaction.buyer.username }}</p>
+        <p><strong>Seller:</strong> {{ transaction.property.seller.username }}</p>
+        <p><strong>Amount:</strong> ${{ transaction.amount }}</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Confirm Transaction</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Sync with home.html styling */
+    .btn-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+{% endblock %}

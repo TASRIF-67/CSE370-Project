@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Admin Transactions Dashboard -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Pending Transactions</h2>
+    {% if transactions %}
+    <div class="row g-5">
+        {% for transaction in transactions %}
+        <div class="col-md-12">
+            <div class="card" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+                <div class="card-body p-4">
+                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">{{ transaction.property.title }}</h5>
+                    <p><strong>Agent:</strong> {{ transaction.agent.username }}</p>
+                    <p><strong>Buyer:</strong> {{ transaction.buyer.username }}</p>
+                    <p><strong>Seller:</strong> {{ transaction.property.seller.username }}</p>
+                    <p><strong>Amount:</strong> ${{ transaction.amount }}</p>
+                    <a href="{% url 'admin_confirm_transaction' transaction.id %}" class="btn btn-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #d4af37; border-color: #d4af37; color: #fff;">Review & Confirm</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No pending transactions.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Sync with home.html styling */
+    .btn-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+{% endblock %}

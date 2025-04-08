@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">Your Interests</h2>
+    <div class="card shadow-lg p-4" style="border-radius: 15px; background: linear-gradient(135deg, #fff, #f8f9fa);">
+        <table class="table table-hover">
+            <thead style="background: #1a2b4c; color: #f8f9fa;">
+                <tr>
+                    <th>Property</th>
+                    <th>Agent Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for interest in interests %}
+                <tr>
+                    <td style="font-weight: 500;">{{ interest.property.title }}</td>
+                    <td>
+                        {% if interest.status == 'pending' %}
+                            <span class="badge bg-secondary" style="padding: 6px 12px; font-size: 0.9rem;">Pending</span>
+                        {% elif interest.status == 'assigning' %}
+                            <span class="badge bg-warning text-dark" style="padding: 6px 12px; font-size: 0.9rem;">Assigning…</span>
+                        {% elif interest.status == 'assigned' %}
+                            <a href="{% url 'admin_view_property' interest.property.id %}" class="btn btn-sm btn-outline-teal" style="border-radius: 20px; color: #00c4b4; border-color: #00c4b4;">View {{ interest.assigned_agent.username }}'s Details</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ interest.created_at|date:"Y-m-d" }}</td>
+                    <td>
+                        {% if interest.status == 'pending' %}
+                        <a href="{% url 'contact_agent' interest.id %}" class="btn btn-primary btn-sm" style="border-radius: 20px; padding: 6px 18px;">Contact Agent</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted" style="padding: 2rem;">No interests expressed yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<style>
+    .table-hover tr:hover {
+        background: #e9ecef;
+        transition: background 0.3s;
+    }
+    .btn-outline-teal:hover {
+        background: #00c4b4;
+        color: #fff;
+    }
+</style>
+{% endblock %}

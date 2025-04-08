@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Pro</title>
+    {% load django_bootstrap5 %}
+    {% load static %}
+    {% bootstrap_css %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #1a2b4c;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background: #1a2b4c;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand, .nav-link {
+            color: #f8f9fa !important;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .nav-link:hover, .navbar-brand:hover {
+            color: #00c4b4 !important;
+        }
+        .dropdown-menu {
+            background: #1a2b4c;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .dropdown-item {
+            color: #f8f9fa;
+            font-weight: 400;
+        }
+        .dropdown-item:hover {
+            background: #00c4b4;
+            color: #fff;
+        }
+        .profile-pic {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #00c4b4;
+        }
+        .content {
+            flex: 1 0 auto;
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+        }
+        footer {
+            background: #1a2b4c;
+            color: #f8f9fa;
+            padding: 2rem 0;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        footer a {
+            color: #00c4b4;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        footer a:hover {
+            color: #fff;
+        }
+        .btn-primary {
+            background: #00c4b4;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #009a8e;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                <img src="{% static 'logo.png' %}" alt="Logo" style="width: 45px; height: 45px; margin-right: 15px; border-radius: 50%;">
+                Real Estate Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i> Search</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="dashboardDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="Profile" class="profile-pic">
+                            {% else %}
+                            <i class="fas fa-tachometer-alt"></i>
+                            {% endif %}
+                            Dashboards
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dashboardDropdown">
+                            {% if user.role == 'normal' %}
+                            <li><a class="dropdown-item" href="{% url 'user_properties' %}">Your Properties</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user_transactions' %}">Your Transactions</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user_interests' %}">Your Interests</a></li>
+                            {% elif user.role == 'agent' %}
+                            <li><a class="dropdown-item" href="{% url 'agent_properties' %}">Assigned Properties</a></li>
+                            <li><a class="dropdown-item" href="{% url 'agent_transactions' %}">Your Transactions</a></li>
+                            <li><a class="dropdown-item" href="{% url 'agent_interests' %}">Interested Buyers</a></li>
+                            {% elif user.role == 'admin' %}
+                            <li><a class="dropdown-item" href="{% url 'admin_properties' %}">All Properties</a></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_pending_properties' %}">Pending Properties</a></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_agent_requests' %}">Agent Applications</a></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_interests' %}">New Interests</a></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_transactions' %}">Transactions</a></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_agent_assignments' %}">Agent Assignments</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'create_property' %}">List Property</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="Profile" class="profile-pic">
+                            {% else %}
+                            <i class="fas fa-user"></i>
+                            {% endif %}
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            {% if user.role == 'normal' or user.role == 'agent' %}
+                            <li><a class="dropdown-item" href="{% url 'update_profile' %}">Manage Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        {% elif user.role == 'admin' %}
+
+                            <li><a class="dropdown-item" href="{% url 'update_profile' %}">Manage Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'manage_users' %}">User Management</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            {%endif%}
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'normal_signup' %}">Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="content">
+        <div class="container">
+            {% bootstrap_messages %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Real Estate Pro. All Rights Reserved.</p>
+            <p>
+                <a href="{% url 'about_us' %}">About Us</a> |
+                <a href="#">Terms</a> |
+                <a href="#">Privacy</a> |
+                <a href="#">Contact</a>
+            </p>
+        </div>
+    </footer>
+    <!-- Search Modal -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px; background: #fff;">
+                <div class="modal-header" style="background: #1a2b4c; color: #f8f9fa;">
+                    <h5 class="modal-title" id="searchModalLabel">Search Properties</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form method="get" action="{% url 'home' %}">
+                        <div class="mb-3">
+                            <label for="query" class="form-label">Keyword</label>
+                            <input type="text" class="form-control" id="query" name="q" placeholder="e.g., Modern House" style="border-radius: 10px;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="property_type" class="form-label">Property Type</label>
+                            <select class="form-select" id="property_type" name="property_type" style="border-radius: 10px;">
+                                <option value="">Any</option>
+                                <option value="house">House</option>
+                                <option value="apartment">Apartment</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" placeholder="e.g., New York" style="border-radius: 10px;">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="min_price" class="form-label">Min Price</label>
+                                <input type="number" class="form-control" id="min_price" name="min_price" placeholder="0" style="border-radius: 10px;">
+                            </div>
+                            <div class="col">
+                                <label for="max_price" class="form-label">Max Price</label>
+                                <input type="number" class="form-control" id="max_price" name="max_price" placeholder="1000000" style="border-radius: 10px;">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 25px;">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% bootstrap_javascript %}
+</body>
+</html>

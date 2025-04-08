@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="mb-4 text-center">User Details</h2>
+    <div class="card shadow-sm p-4">
+        <h3>{{ user.username }}</h3>
+        <p><strong>Role:</strong> {{ user.role|title }}</p>
+        <p><strong>Email:</strong> {{ user.email|default:"Not provided" }}</p>
+        <p><strong>Phone Number:</strong> {{ user.phone_number|default:"Not provided" }}</p>
+        <p><strong>Address:</strong> {{ user.address|default:"Not provided" }}</p>
+        {% if user.profile_picture %}
+        <p><strong>Profile Picture:</strong><br><img src="{{ user.profile_picture.url }}" alt="Profile" style="max-width: 200px; border-radius: 5px;"></p>
+        {% endif %}
+        {% if user.role == 'agent' %}
+        <p><strong>License Number:</strong> {{ user.license_number|default:"N/A" }}</p>
+        <p><strong>Experience Years:</strong> {{ user.experience_years|default:"N/A" }}</p>
+        <p><strong>Total Listings:</strong> {{ user.total_listings }}</p>
+        <p><strong>Average Rating:</strong> {{ user.average_rating|floatformat:1 }}</p>
+        {% endif %}
+        <div class="text-center mt-3">
+            <a href="{% url 'edit_user' user.id %}" class="btn btn-primary">Edit User</a>
+            <a href="{% url 'delete_user' user.id %}" class="btn btn-danger">Delete User</a>
+            <a href="{% url 'manage_users' %}" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Interested Buyers</h2>
+    {% for property in properties %}
+    <div class="card shadow-sm p-4 mb-4">
+        <h3>{{ property.title }}</h3>
+        <p>Current Status: {{ property.status|title }}</p>
+        <p><strong>Interested Buyers:</strong>
+            {% for interest in property.interest_set.all %}
+            {{ interest.interested_user.username }} (Phone: {{ interest.interested_user.phone_number|default:"N/A" }})
+            {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <!-- Changed: Removed 'sold' option -->
+        {% if property.status != 'sold' %}
+        <form method="post" class="mb-3">
+            {% csrf_token %}
+            <input type="hidden" name="property_id" value="{{ property.id }}">
+            <select name="status" class="form-select d-inline w-auto">
+                <option value="pending" {% if property.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="approved" {% if property.status == 'approved' %}selected{% endif %}>Approved</option>
+            </select>
+            <button type="submit" class="btn btn-primary ms-2">Update Status</button>
+        </form>
+        {% else %}
+        <p class="text-muted">Status cannot be changed once sold (admin approval required).</p>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div class="card shadow-sm p-4">
+        <p class="text-center">No properties with interested buyers.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

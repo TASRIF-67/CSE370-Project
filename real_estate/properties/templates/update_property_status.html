@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="text-center mb-4">Update Property Status</h2>
+    <div class="card shadow-sm p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="status" class="form-label fw-bold">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="pending" {% if property.status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="approved" {% if property.status == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="sold" {% if property.status == 'sold' %}selected{% endif %}>Sold</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Update Status</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

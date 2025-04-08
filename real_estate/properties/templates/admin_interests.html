@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">New Interested Buyers</h2>
+    <div class="card shadow-lg p-4" style="border-radius: 15px; background: linear-gradient(135deg, #fff, #f8f9fa);">
+        <table class="table table-hover">
+            <thead style="background: #1a2b4c; color: #f8f9fa;">
+                <tr>
+                    <th>Property</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Assign Agent</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for interest in unassigned_interests %}
+                <tr>
+                    <td style="font-weight: 500;">{{ interest.property.title }}</td>
+                    <td>{{ interest.interested_user.username }}</td>
+                    <td>
+                        <span class="badge {% if interest.status == 'assigning' %}bg-warning text-dark{% else %}bg-secondary{% endif %}" style="padding: 6px 12px; font-size: 0.9rem;">{{ interest.status|title }}</span>
+                    </td>
+                    <td>
+                        <form method="post" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <input type="hidden" name="interest_id" value="{{ interest.id }}">
+                            <select name="agent_id" class="form-select me-2" style="border-radius: 20px; max-width: 200px; font-size: 0.9rem;">
+                                <option value="">Select Agent</option>
+                                {% for agent in agents %}
+                                <option value="{{ agent.id }}">{{ agent.username }} ({{ agent.active_properties }}/5)</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm" style="border-radius: 20px; padding: 6px 18px;">Assign</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted" style="padding: 2rem;">No new interests.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<style>
+    .table-hover tr:hover {
+        background: #e9ecef;
+        transition: background 0.3s;
+    }
+</style>
+{% endblock %}

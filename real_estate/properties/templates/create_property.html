@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+    <h2 class="text-center mb-4">List a New Property</h2>
+    <div class="card shadow-sm p-4" style="border-radius: 10px; background-color: #fff;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+                <!-- Left Column -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label fw-bold">Property Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label fw-bold">Description</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_price" class="form-label fw-bold">Price ($)</label>
+                        {{ form.price }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_city" class="form-label fw-bold">City</label>
+                        {{ form.city }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_street" class="form-label fw-bold">Street (Optional)</label>
+                        {{ form.street }}
+                    </div>
+                </div>
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="id_property_type" class="form-label fw-bold">Property Type</label>
+                        {{ form.property_type }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_bedrooms" class="form-label fw-bold">Bedrooms</label>
+                        {{ form.bedrooms }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_bathrooms" class="form-label fw-bold">Bathrooms</label>
+                        {{ form.bathrooms }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_square_footage" class="form-label fw-bold">Square Footage (sq ft)</label>
+                        {{ form.square_footage }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_year_built" class="form-label fw-bold">Year Built (Optional)</label>
+                        {{ form.year_built }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_zip_code" class="form-label fw-bold">Zip Code (Optional)</label>
+                        {{ form.zip_code }}
+                    </div>
+                </div>
+                <!-- Full Width for Images -->
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Upload Images</label>
+                        {{ formset.management_form }}
+                        {% for image_form in formset %}
+                        <div class="mb-2">
+                            {{ image_form.image }}
+                        </div>
+                        {% endfor %}
+                        <small class="form-text text-muted">Upload up to 3 images (e.g., JPG, PNG).</small>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary px-5 py-2" style="font-size: 1.1rem;">Submit Listing</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

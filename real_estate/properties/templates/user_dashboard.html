@@ -1,0 +1,83 @@
+<!-- user_dashboard.html -->
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">User Dashboard</h2>
+    <div class="row">
+        <!-- Existing Properties and Transactions -->
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4">
+                <h3>Your Properties</h3>
+                <table class="table table-hover">
+                    <thead><tr><th>Title</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for property in properties %}
+                        <tr><td>{{ property.title }}</td><td>{{ property.status|title }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="2">No properties listed.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4">
+                <h3>Your Transactions</h3>
+                <table class="table table-hover">
+                    <thead><tr><th>Property</th><th>Agent</th><th>Amount</th><th>Date</th></tr></thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.property.title }}</td>
+                            <td>{{ transaction.agent.username|default:"N/A" }}</td>
+                            <td>${{ transaction.amount }}</td>
+                            <td>{{ transaction.date|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No transactions.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- New Interested Properties -->
+        <div class="col-md-12 mt-4">
+            <div class="card shadow-sm p-4">
+                <h3>Properties You're Interested In</h3>
+                <table class="table table-hover">
+                    <thead><tr><th>Property</th><th>Assigned Agent</th><th>Date</th></tr></thead>
+                    <tbody>
+                        {% for interest in interests %}
+                        <tr>
+                            <td>{{ interest.property.title }}</td>
+                            <td>{{ interest.assigned_agent.username|default:"Not Assigned" }}</td>
+                            <td>{{ interest.created_at|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">No interests expressed.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if feedbacks %}
+        <div class="col-md-12 mt-4">
+            <div class="card shadow-sm p-4">
+                <h3>Your Feedback</h3>
+                <table class="table table-hover">
+                    <thead><tr><th>Comment</th><th>Date</th></tr></thead>
+                    <tbody>
+                        {% for feedback in feedbacks %}
+                        <tr><td>{{ feedback.comment }}</td><td>{{ feedback.created_at|date:"Y-m-d" }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="2">No feedback submitted.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Request Transaction Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Request Transaction for {{ property.title }}</h2>
+    <div class="card p-4" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="buyer_id" style="color: #1a2b4c; font-weight: 600;">Select Buyer:</label>
+                <select name="buyer_id" id="buyer_id" class="form-select" style="border-radius: 10px;">
+                    {% for interest in interested_users %}
+                    <option value="{{ interest.interested_user.id }}">{{ interest.interested_user.username }} ({{ interest.interested_user.phone_number }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="amount" style="color: #1a2b4c; font-weight: 600;">Amount ($):</label>
+                <input type="number" name="amount" id="amount" step="0.01" class="form-control" value="{{ property.price }}" style="border-radius: 10px;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Submit Request</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Sync with home.html styling */
+    .btn-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+{% endblock %}

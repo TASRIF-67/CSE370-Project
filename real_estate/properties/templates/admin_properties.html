@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">All Properties</h2>
+    <div class="card shadow-lg p-4" style="border-radius: 15px; background: linear-gradient(135deg, #fff, #f8f9fa);">
+        <table class="table table-hover">
+            <thead style="background: #1a2b4c; color: #f8f9fa;">
+                <tr>
+                    <th>Title</th>
+                    <th>Seller</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for property in properties %}
+                <tr>
+                    <td style="font-weight: 500;">{{ property.title }}</td>
+                    <td>{{ property.seller.username }}</td>
+                    <td>{{ property.status|title }}</td>
+                    <td>
+                        <a href="{% url 'admin_view_property' property.id %}" class="btn btn-outline-teal btn-sm me-2" style="border-radius: 20px; color: #00c4b4; border-color: #00c4b4;">View</a>
+                        {% if property.status != 'sold' %}
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="property_id" value="{{ property.id }}">
+                            <input type="hidden" name="action" value="update_status">
+                            <select name="status" class="form-select d-inline w-auto me-2" style="border-radius: 20px; font-size: 0.9rem;" onchange="this.form.submit()">
+                                <option value="pending" {% if property.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="approved" {% if property.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="sold">Sold</option>
+                            </select>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">Sold</span>
+                        {% endif %}
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="property_id" value="{{ property.id }}">
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 20px; padding: 6px 18px;" onclick="return confirm('Are you sure?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted" style="padding: 2rem;">No properties listed.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<style>
+    .table-hover tr:hover {
+        background: #e9ecef;
+        transition: background 0.3s;
+    }
+    .btn-outline-teal:hover {
+        background: #00c4b4;
+        color: #fff;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+<div class="container mt-5" style="max-width: 500px;">
+    <h2 class="text-center mb-4">Confirm Transaction</h2>
+    <div class="card shadow-sm p-4">
+        <p>Property: {{ property.title }}</p>
+        <p>Price: ${{ property.price }}</p>
+        <p>Commission: {{ property.commission_rate }}%</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="buyer" class="form-label">Select Buyer</label>
+                <select name="buyer" id="buyer" class="form-select">
+                    {% for user in users %}
+                    {% if user.role == 'normal' %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Confirm Sale</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
