@@ -5,31 +5,77 @@
 
 <!-- Admin Confirm Transaction Section -->
 <div class="container py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Confirm Transaction</h2>
-    <div class="card p-4" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
-        <p><strong>Property:</strong> {{ transaction.property.title }}</p>
-        <p><strong>Agent:</strong> {{ transaction.agent.username }}</p>
-        <p><strong>Buyer:</strong> {{ transaction.buyer.username }}</p>
-        <p><strong>Seller:</strong> {{ transaction.property.seller.username }}</p>
-        <p><strong>Amount:</strong> ${{ transaction.amount }}</p>
-        <form method="post">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 2.5rem; font-family: 'Playfair Display', serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">Confirm Transaction</h2>
+    <div class="card p-5" style="border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); max-width: 600px; margin: 0 auto;">
+        <div class="transaction-details">
+            <p class="detail-item"><span class="label">Property:</span> <span class="value">{{ transaction.property.title }}</span></p>
+            <p class="detail-item"><span class="label">Agent:</span> <span class="value">{{ transaction.agent.username }}</span></p>
+            <p class="detail-item"><span class="label">Buyer:</span> <span class="value">{{ transaction.buyer.username }}</span></p>
+            <p class="detail-item"><span class="label">Seller:</span> <span class="value">{{ transaction.property.seller.username }}</span></p>
+            <p class="detail-item"><span class="label">Amount:</span> <span class="value">${{ transaction.amount }}</span></p>
+        </div>
+        <form method="post" class="mt-4 text-center">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Confirm Transaction</button>
+            <button type="submit" class="btn btn-danger" style="border-radius: 30px; padding: 12px 40px; font-size: 1.1rem; font-weight: 600; letter-spacing: 1px;">Confirm Transaction</button>
         </form>
     </div>
 </div>
 
 <style>
-    /* Sync with home.html styling */
-    .btn-primary {
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-        background: #d4af37;
-        border-color: #d4af37;
+    /* Elegant Styling */
+    .transaction-details {
+        padding: 20px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.8);
     }
-    .btn-primary:hover {
-        background: #b8962e;
+
+    .detail-item {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        font-family: 'Roboto', sans-serif;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .label {
+        font-weight: 700;
+        color: #1a2b4c;
+        display: inline-block;
+        min-width: 100px;
+    }
+
+    .value {
+        color: #555;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        border-color: #dc3545;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        border-color: #c82333;
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+    }
+
+    /* Optional: Add subtle animation */
+    .card {
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
     }
 </style>
 

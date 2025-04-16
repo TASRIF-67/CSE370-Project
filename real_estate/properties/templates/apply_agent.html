@@ -12,18 +12,30 @@
             <div class="mb-3">
                 <label for="id_license_number" class="form-label fw-bold">License Number</label>
                 {{ form.license_number }}
+                {% if form.license_number.errors %}
+                <div class="text-danger">{{ form.license_number.errors }}</div>
+                {% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_experience_years" class="form-label fw-bold">Years of Experience</label>
                 {{ form.experience_years }}
+                {% if form.experience_years.errors %}
+                <div class="text-danger">{{ form.experience_years.errors }}</div>
+                {% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_phone_number" class="form-label fw-bold">Phone Number</label>
                 {{ form.phone_number }}
+                {% if form.phone_number.errors %}
+                <div class="text-danger">{{ form.phone_number.errors }}</div>
+                {% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_address" class="form-label fw-bold">Address</label>
                 {{ form.address }}
+                {% if form.address.errors %}
+                <div class="text-danger">{{ form.address.errors }}</div>
+                {% endif %}
             </div>
             <button type="submit" class="btn btn-primary w-100">Apply Now</button>
         </form>

@@ -1,42 +1,152 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
+{% load static %}
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Manage Users</h2>
+
+<div class="container py-5" style="background: #fff; min-height: 100vh;">
+    <h1 class="fw-bold text-center mb-5" style="color: #1a2b4c; font-size: 2.25rem; letter-spacing: 1px;">Manage Users</h1>
+
     <div class="row g-4">
-        {% for role in roles %}
+        <!-- Agents Table -->
         <div class="col-md-6">
-            <div class="card shadow-sm p-4">
-                <h3>{{ role|title }} Users</h3>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in users %}
-                            {% if user.role == role %}
-                            <tr>
-                                <td>{{ user.username }}</td>
-                                <td>
-                                    <a href="{% url 'user_detail' user.id %}" class="btn btn-info btn-sm">Details</a>
-                                    <a href="{% url 'edit_user' user.id %}" class="btn btn-primary btn-sm">Edit</a>
-                                    <a href="{% url 'delete_user' user.id %}" class="btn btn-danger btn-sm">Delete</a>
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% empty %}
-                            <tr><td colspan="2">No {{ role }} users.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
+                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Agents</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% if agents %}
+                    <div class="table-responsive">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for agent in agents %}
+                                <tr>
+                                    <td>{{ agent.username }}</td>
+                                    <td class="text-end">
+                                        <a href="{% url 'user_detail' agent.id %}" class="btn btn-sm btn-gold">Details</a>
+                                        {% if agent != current_user %}
+                                        <form method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ agent.username }}?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user_id" value="{{ agent.id }}">
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Delete</button>
+                                        </form>
+                                        {% else %}
+                                        <span class="text-muted" style="font-size: 0.9rem;">Self</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No agents available.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        {% endfor %}
+
+        <!-- Normal Users Table -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
+                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Normal Users</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% if normal_users %}
+                    <div class="table-responsive">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in normal_users %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td class="text-end">
+                                        <a href="{% url 'user_detail' user.id %}" class="btn btn-sm btn-gold">Details</a>
+                                        {% if user != current_user %}
+                                        <form method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ user.username }}?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Delete</button>
+                                        </form>
+                                        {% else %}
+                                        <span class="text-muted" style="font-size: 0.9rem;">Self</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No normal users available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    .custom-table {
+        border: 1px solid #d4af37;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+
+    .custom-table td {
+        border-top: 1px solid #f0e6c5;
+        color: #1a2b4c;
+        vertical-align: middle;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f9f6ee;
+    }
+
+    .btn-gold {
+        background-color: #d4af37;
+        color: white;
+        border-radius: 20px;
+        padding: 6px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gold:hover {
+        background-color: #c9a025;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-danger {
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    .card {
+        background: #fff;
+    }
+
+    .table-responsive {
+        border-radius: 10px;
+        overflow-x: auto;
+    }
+</style>
+
 {% endblock %}

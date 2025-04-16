@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Admin Transaction Detail Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 2.5rem; position: relative;">
+        Transaction Details
+    </h2>
+
+    <!-- Main Transaction Card -->
+    <div class="card mb-5" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);">
+        <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 15px 20px;">
+            <h3 class="mb-0" style="font-weight: 600; font-size: 1.8rem; letter-spacing: 0.5px;">{{ transaction.property.title }}</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Location:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.property.city }}</span></p>
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Selling Price:</span> <span style="color: #d4af37; font-weight: 600; font-size: 1.2rem;">${{ transaction.amount }}</span></p>
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Date:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.date|date:"Y-m-d" }}</span></p>
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Agent:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.agent.username }}</span></p>
+                    <p class="mb-0"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Status:</span> 
+                        <span class="badge" style="background: {% if transaction.payment_status == 'approved' %}#28a745{% else %}#d4af37{% endif %}; color: #fff; font-size: 0.9rem; padding: 6px 12px; border-radius: 12px;">
+                            {{ transaction.payment_status|capfirst }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buyer and Seller Sections -->
+    <div class="row g-4">
+        <!-- Seller Card -->
+        <div class="col-md-6">
+            <div class="card" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);">
+                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 15px 20px;">
+                    <h4 class="mb-0" style="font-weight: 600; font-size: 1.5rem; letter-spacing: 0.5px;">Seller Information</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Name:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.property.seller.username }}</span></p>
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Phone:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.property.seller.phone_number|default:"Not provided" }}</span></p>
+                    <p class="mb-0"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Location:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.property.seller.address|default:"Not provided" }}</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buyer Card -->
+        <div class="col-md-6">
+            <div class="card" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);">
+                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 15px 20px;">
+                    <h4 class="mb-0" style="font-weight: 600; font-size: 1.5rem; letter-spacing: 0.5px;">Buyer Information</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Name:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.buyer.username }}</span></p>
+                    <p class="mb-3"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Phone:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.buyer.phone_number|default:"Not provided" }}</span></p>
+                    <p class="mb-0"><span class="fw-bold" style="color: #1a2b4c; font-size: 1rem;">Location:</span> <span style="color: #555; font-size: 1rem;">{{ transaction.buyer.address|default:"Not provided" }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-5">
+        <a href="{% url 'admin_transactions' %}" class="btn btn-primary" style="border-radius: 25px; padding: 10px 25px; background: #d4af37; border-color: #d4af37; font-weight: 600;">Back to Transactions</a>
+    </div>
+</div>
+
+<style>
+    /* Card Styling */
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        padding: 15px 20px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-body p {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    /* Button Styling */
+    .btn-primary {
+        background: #d4af37;
+        border-color: #d4af37;
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Status Badge */
+    .badge {
+        display: inline-block;
+        transition: background 0.3s ease;
+    }
+</style>
+
+{% endblock %}

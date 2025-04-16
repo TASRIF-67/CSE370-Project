@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Property Details Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Property Details</h2>
+ 
+
+    <div class="card" style="border: 1px solidrgb(250, 249, 248); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+        <div class="card-body p-4">
+            <h3 style="color: #1a2b4c; font-weight: 600; font-size: 1.8rem;">{{ property.title }}</h3>
+            <p><strong>Price:</strong> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ property.price }}</span></p>
+            <p><strong>City:</strong> {{ property.city }}</p>
+            <p><strong>Seller:</strong> {{ property.seller.username }}</p>
+
+            <!-- Interested Buyers -->
+            <h4 style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem; margin-top: 20px;">Interested Buyers</h4>
+            {% if interests %}
+            <div class="table-responsive">
+                <table class="table table-hover" style="border: 1px solid #d4af37; border-radius: 10px; overflow: hidden;">
+                    <thead style="background: #1a2b4c; color: #fff;">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Phone</th>
+                            <th scope="col">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interest in interests %}
+                        <tr>
+                            <td style="color: #6c757d;">{{ interest.interested_user.username }}</td>
+                            <td style="color: #6c757d;">{{ interest.interested_user.phone_number }}</td>
+                            <td style="color: #6c757d;">{{ interest.interested_user.address }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="color: #6c757d; font-style: italic;">No interested buyers yet.</p>
+            {% endif %}
+
+            <!-- Transaction Status and Confirm Deal -->
+            {% if transaction %}
+                {% if transaction.payment_status == 'approved' and property.status == 'sold' %}
+                <p style="color: #28a745; font-weight: 600; font-size: 1.2rem; margin-top: 20px;">Status: Sold</p>
+                <p><strong>Buyer:</strong> {{ transaction.buyer.username }}</p>
+                <p><strong>Selling Price:</strong> <span style="color: #d4af37; font-weight: bold;">${{ transaction.amount }}</span></p>
+                {% elif transaction.payment_status == 'pending' %}
+                <p style="color: #d4af37; font-weight: 600; font-size: 1.2rem; margin-top: 20px;">Status: Pending</p>
+                {% endif %}
+            {% else %}
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="buyer_id" class="form-label" style="color: #1a2b4c; font-weight: 600;">Select Buyer</label>
+                    <select name="buyer_id" id="buyer_id" class="form-select" style="border-radius: 10px;">
+                        {% for interest in interests %}
+                        <option value="{{ interest.interested_user.id }}">{{ interest.interested_user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="selling_price" class="form-label" style="color: #1a2b4c; font-weight: 600;">Selling Price</label>
+                    <input type="number" name="selling_price" id="selling_price" class="form-control" step="0.01" required style="border-radius: 10px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="border-radius: 25px; padding: 10px 25px; background: #d4af37; border-color: #d4af37;">Confirm Deal</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    .table-hover tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .form-select, .form-control {
+        border: 1px solid #d4af37;
+    }
+</style>
+
+{% endblock %}

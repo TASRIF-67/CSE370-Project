@@ -1,33 +1,136 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Your Properties</h2>
-    <div class="card shadow-sm p-4">
-        <table class="table table-hover">
-            <thead><tr><th>Title</th><th>Status</th><th>Actions</th></tr></thead>
+
+<div class="container mt-5 py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 2.5rem;">
+        Your Properties
+    </h2>
+    <div class="card shadow-lg p-4" style="border: none; border-radius: 20px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);">
+        <table class="table table-hover table-borderless">
+            <thead style="background: #1a2b4c; color: #fff;">
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
             <tbody>
                 {% for property in properties %}
                 <tr>
                     <td>{{ property.title }}</td>
-                    <td>{{ property.status|title }}</td>
                     <td>
-                        <a href="{% url 'view_property' property.id %}" class="btn btn-info btn-sm">View</a>
-                        <!-- Changed: Hide edit/delete for sold properties -->
+                        <span class="badge" style="background: {% if property.status == 'sold' %}#dc3545{% elif property.status == 'pending' %}#d4af37{% else %}#28a745{% endif %}; color: #fff; font-size: 0.9rem; padding: 6px 12px; border-radius: 12px;">
+                            {{ property.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'view_property' property.id %}" class="btn btn-info btn-sm custom-btn">View</a>
                         {% if property.status != 'sold' %}
-                        <a href="{% url 'edit_property' property.id %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'edit_property' property.id %}" class="btn btn-warning btn-sm custom-btn" style="background: #d4af37; border-color: #d4af37;">Edit</a>
                         <form method="post" action="{% url 'delete_property' property.id %}" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm custom-btn" onclick="return confirm('Are you sure?');">Delete</button>
                         </form>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3">No properties listed.</td></tr>
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No properties listed.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<style>
+    /* Elegant Table Styling */
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .table {
+        font-size: 1.1rem;
+    }
+
+    .thead th {
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 15px;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .table td {
+        padding: 20px;
+        color: #333;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(212, 175, 55, 0.1);
+        transition: background 0.3s ease;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .text-muted {
+        font-style: italic;
+        color: #6c757d !important;
+    }
+
+    /* Button Styling */
+    .custom-btn {
+        border-radius: 20px;
+        padding: 6px 20px;
+        font-size: 0.9rem;
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-info {
+        background: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    .btn-info:hover {
+        background: #138496;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
+    }
+
+    .btn-warning {
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+
+    .btn-warning:hover {
+        background: #b8962e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+</style>
+
 {% endblock %}

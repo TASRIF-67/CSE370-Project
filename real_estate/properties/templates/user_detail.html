@@ -1,28 +1,127 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
+{% load static %}
 {% block content %}
-<div class="container mt-5" style="max-width: 600px;">
-    <h2 class="mb-4 text-center">User Details</h2>
-    <div class="card shadow-sm p-4">
-        <h3>{{ user.username }}</h3>
-        <p><strong>Role:</strong> {{ user.role|title }}</p>
-        <p><strong>Email:</strong> {{ user.email|default:"Not provided" }}</p>
-        <p><strong>Phone Number:</strong> {{ user.phone_number|default:"Not provided" }}</p>
-        <p><strong>Address:</strong> {{ user.address|default:"Not provided" }}</p>
-        {% if user.profile_picture %}
-        <p><strong>Profile Picture:</strong><br><img src="{{ user.profile_picture.url }}" alt="Profile" style="max-width: 200px; border-radius: 5px;"></p>
-        {% endif %}
-        {% if user.role == 'agent' %}
-        <p><strong>License Number:</strong> {{ user.license_number|default:"N/A" }}</p>
-        <p><strong>Experience Years:</strong> {{ user.experience_years|default:"N/A" }}</p>
-        <p><strong>Total Listings:</strong> {{ user.total_listings }}</p>
-        <p><strong>Average Rating:</strong> {{ user.average_rating|floatformat:1 }}</p>
-        {% endif %}
-        <div class="text-center mt-3">
-            <a href="{% url 'edit_user' user.id %}" class="btn btn-primary">Edit User</a>
-            <a href="{% url 'delete_user' user.id %}" class="btn btn-danger">Delete User</a>
-            <a href="{% url 'manage_users' %}" class="btn btn-secondary">Back</a>
+
+<div class="container py-5" style="background: #fff; min-height: 100vh;">
+    <h1 class="fw-bold text-center mb-5" style="color: #1a2b4c; font-size: 2.25rem; letter-spacing: 1px;">{{ viewed_user.username }}</h1>
+    
+   
+
+    <!-- User Info Section -->
+    <div class="card mb-5" style="border: 1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); max-width: 600px; margin: 0 auto;">
+        <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
+            <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Profile</h2>
+        </div>
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Username:</dt>
+                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.username }}</dd>
+                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Email:</dt>
+                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.email|default:"Not provided" }}</dd>
+                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Role:</dt>
+                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.role|capfirst }}</dd>
+                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Phone:</dt>
+                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.phone_number|default:"Not provided" }}</dd>
+                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Location:</dt>
+                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.address|default:"Not provided" }}</dd>
+            </dl>
         </div>
     </div>
+
+    <!-- Normal User: Properties Bought and Sold -->
+    {% if viewed_user.role == 'normal' %}
+    <div class="row g-4 mb-5" style="max-width: 1200px; margin: 0 auto;">
+        <!-- Properties Bought -->
+        <div class="col-md-6">
+            <div class="card" style="border: 1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
+                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Properties Bought ({{ properties_bought.count }})</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% if properties_bought %}
+                    <ul class="list-group list-group-flush">
+                        {% for transaction in properties_bought %}
+                        <li class="list-group-item d-flex justify-content-between" style="border: none; padding: 10px 0; color: #333;">
+                            {{ transaction.property.title }}
+                            <span style="color: #d4af37;">${{ transaction.amount }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center" style="font-size: 1rem;">No properties bought.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Properties Sold -->
+        <div class="col-md-6">
+            <div class="card" style="border:  1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+                <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
+                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Properties Sold ({{ properties_sold.count }})</h2>
+                </div>
+                <div class="card-body p-4">
+                    {% if properties_sold %}
+                    <ul class="list-group list-group-flush">
+                        {% for property in properties_sold %}
+                        <li class="list-group-item d-flex justify-content-between" style="border: none; padding: 10px 0; color: #333;">
+                            {{ property.title }}
+                            <span style="color: #d4af37;">${{ property.price }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center" style="font-size: 1rem;">No properties sold.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Agent: Total Workings -->
+    {% if viewed_user.role == 'agent' %}
+    <div class="card mb-5" style="border:  1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); max-width: 600px; margin: 0 auto;">
+        <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
+            <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Total Workings: {{ total_workings }}</h2>
+        </div>
+        <div class="card-body p-4">
+            {% if agent_workings %}
+            <ul class="list-group list-group-flush">
+                {% for transaction in agent_workings %}
+                <li class="list-group-item d-flex justify-content-between" style="border: none; padding: 10px 0; color: #333;">
+                    {{ transaction.property.title }}
+                    <span style="color: #d4af37;">${{ transaction.amount }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted text-center" style="font-size: 1rem;">No properties worked on.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center">
+        <a href="{% url 'manage_users' %}" class="btn" style="background: #d4af37; color: #fff; border-radius: 20px; padding: 10px 24px;">Back to Manage Users</a>
+    </div>
 </div>
+
+<style>
+    .card-header { padding: 1rem 1.5rem; }
+    .card-body { font-size: 1rem; }
+    .list-group-item:hover { background: #f5f7fa; }
+    .btn {
+        transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .card { background: #fff; }
+    dl dt, dl dd { margin-bottom: 0.75rem; }
+</style>
+
 {% endblock %}

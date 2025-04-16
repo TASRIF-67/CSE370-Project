@@ -55,8 +55,8 @@ class PropertyForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control', 'placeholder': 'Provide a detailed description'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Cozy Downtown Apartment'}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 250000', 'step': '0.01'}),
-            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., New York, NY'}),
-            'street': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 123 Main St'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Dhaka'}),
+            'street': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 151, Badda'}),
             'zip_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 10001'}),
             'property_type': forms.Select(attrs={'class': 'form-select'}),
             'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 2', 'min': '0'}),
@@ -78,8 +78,8 @@ class AgentApplicationForm(forms.ModelForm):
         widgets = {
             'license_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., ABC123'}),
             'experience_years': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 5', 'min': '0'}),
-            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 123-456-7890'}),
-            'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 123 Main St, New York, NY'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 01234567891'}),
+            'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 151, Badda, Dhaka'}),
         }
 
 class PropertyImageForm(forms.ModelForm):

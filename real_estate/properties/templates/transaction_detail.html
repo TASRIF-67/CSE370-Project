@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Transaction Detail Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Transaction Details</h2>
+    
+
+    <!-- Main Transaction Card -->
+    <div class="card mb-4" style="border: 1px solidrgb(235, 233, 228); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+        <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+            <h3 class="mb-0" style="font-weight: 600; font-size: 1.8rem;">{{ transaction.property.title }}</h3>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Location:</span> <span style="color: #6c757d;">{{ transaction.property.city }}</span></p>
+                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Selling Price:</span> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ transaction.amount }}</span></p>
+                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Date:</span> <span style="color: #6c757d;">{{ transaction.date }}</span></p>
+                    <p><span class="fw-bold" style="color: #1a2b4c;">Status:</span> <span style="color: #28a745; font-weight: 600;">Sold</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buyer and Seller Sections -->
+    <div class="row g-4">
+        <!-- Seller Card -->
+        <div class="col-md-6">
+            <div class="card" style="border: 1px solidrgb(240, 239, 235); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h4 class="mb-0" style="font-weight: 600; font-size: 1.5rem;">Seller Information</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Name:</span> <span style="color: #6c757d;">{{ transaction.property.seller.username }}</span></p>
+                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Phone:</span> <span style="color: #6c757d;">{{ transaction.property.seller.phone_number|default:"Not provided" }}</span></p>
+                    <p><span class="fw-bold" style="color: #1a2b4c;">Location:</span> <span style="color: #6c757d;">{{ transaction.property.seller.address|default:"Not provided" }}</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buyer Card -->
+        <div class="col-md-6">
+            <div class="card" style="border: 1px solidrgb(233, 230, 222); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h4 class="mb-0" style="font-weight: 600; font-size: 1.5rem;">Buyer Information</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Name:</span> <span style="color: #6c757d;">{{ transaction.buyer.username }}</span></p>
+                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Phone:</span> <span style="color: #6c757d;">{{ transaction.buyer.phone_number|default:"Not provided" }}</span></p>
+                    <p><span class="fw-bold" style="color: #1a2b4c;">Location:</span> <span style="color: #6c757d;">{{ transaction.buyer.address|default:"Not provided" }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a href="{% url 'agent_interests' %}" class="btn btn-primary" style="border-radius: 25px; padding: 10px 25px; background: #d4af37; border-color: #d4af37;">Back to Completed Tasks</a>
+    </div>
+</div>
+
+<style>
+    .card-header {
+        padding: 15px;
+    }
+    .card-body p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    .btn-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+{% endblock %}

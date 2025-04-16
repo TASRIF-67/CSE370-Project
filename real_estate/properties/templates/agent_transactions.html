@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Agent Transactions Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Transaction History</h2>
+    
+
+    {% if transactions %}
+    <div class="table-responsive">
+        <table class="table table-hover" style="border: 1px solid #d4af37; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: linear-gradient(135deg, #fff, #f9f5e8);">
+            <thead style="background: #1a2b4c; color: #fff;">
+                <tr>
+                    <th scope="col" style="padding: 15px;">Serial No.</th>
+                    <th scope="col">Property</th>
+                    <th scope="col">Buyer</th>
+                    <th scope="col">Seller</th>
+                    <th scope="col">Selling Price</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr style="transition: background 0.3s ease;">
+                    <td style="padding: 15px; color: #6c757d;">{{ forloop.counter }}</td>
+                    <td style="color: #1a2b4c; font-weight: 500;">{{ transaction.property.title }}</td>
+                    <td style="color: #6c757d;">{{ transaction.buyer.username }}</td>
+                    <td style="color: #6c757d;">{{ transaction.property.seller.username }}</td>
+                    <td style="color: #d4af37; font-weight: bold;">${{ transaction.amount }}</td>
+                    <td>
+                        <span style="font-weight: 600; {% if transaction.payment_status == 'approved' %}color: #28a745;{% else %}color: #d4af37;{% endif %}">
+                            {{ transaction.payment_status|capfirst }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: linear-gradient(135deg, #fff, #f9f5e8);">
+        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No transactions to display.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .table-hover tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .btn-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Pending Transaction Requests Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Pending Transaction Requests</h2>
+    
+    
+
+
+    {% if pending_transactions %}
+    <div class="row g-5">
+        {% for transaction in pending_transactions %}
+        <div class="col-md-4">
+            <div class="card h-100" style="border: 1px solidrgb(238, 237, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h5 class="mb-0" style="font-weight: 600; font-size: 1.5rem;">{{ transaction.property.title }}</h5>
+                </div>
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Agent:</span> <span style="color: #6c757d;">{{ transaction.agent.username }}</span></p>
+                        <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Buyer:</span> <span style="color: #6c757d;">{{ transaction.buyer.username }}</span></p>
+                        <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Amount:</span> <span style="color: #d4af37; font-weight: bold;">${{ transaction.amount }}</span></p>
+                        <p><span class="fw-bold" style="color: #1a2b4c;">Status:</span> <span style="color: #d4af37; font-weight: 600;">Pending</span></p>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'admin_transaction_detail' transaction.id %}" class="btn btn-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #d4af37; border-color: #d4af37;">View Details</a>
+                        <a href="{% url 'admin_confirm_transaction' transaction.id %}" class="btn btn-success btn-sm" style="border-radius: 25px; padding: 8px 20px;">Confirm</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card p-5 text-center" style="border: 1px solidrgb(233, 233, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No pending transaction requests available.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .card-header { padding: 15px; }
+    .card-body p { font-size: 1.1rem; line-height: 1.6; }
+    .btn-primary, .btn-success {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .btn-primary {
+        background: #d4af37; border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    .btn-success {
+        background: #28a745; border-color: #28a745;
+    }
+    .btn-success:hover {
+        background: #218838; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+{% endblock %}

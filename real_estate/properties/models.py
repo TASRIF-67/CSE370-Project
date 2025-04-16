@@ -54,7 +54,7 @@ class Property(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=15, decimal_places=2)
-    city = models.CharField(max_length=100, default='Unknown')
+    city = models.CharField(max_length=100)
     street = models.CharField(max_length=255, blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     property_type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
@@ -64,7 +64,6 @@ class Property(models.Model):
     year_built = models.PositiveIntegerField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     seller = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='properties')
-    # Fixed: Unique related_name for Property.assigned_agent
     assigned_agent = models.ForeignKey('CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_properties')
     commission_rate = models.FloatField(default=0.0)
     

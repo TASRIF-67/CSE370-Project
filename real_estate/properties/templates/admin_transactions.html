@@ -3,44 +3,152 @@
 {% load static %}
 {% block content %}
 
-<!-- Admin Transactions Dashboard -->
+<!-- Transaction Table Section -->
 <div class="container py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Pending Transactions</h2>
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; font-size: 2.5rem; position: relative;">
+        Transaction History
+        <span style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 100px; height: 3px; background: #d4af37; border-radius: 2px;"></span>
+    </h2>
+
     {% if transactions %}
-    <div class="row g-5">
-        {% for transaction in transactions %}
-        <div class="col-md-12">
-            <div class="card" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
-                <div class="card-body p-4">
-                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">{{ transaction.property.title }}</h5>
-                    <p><strong>Agent:</strong> {{ transaction.agent.username }}</p>
-                    <p><strong>Buyer:</strong> {{ transaction.buyer.username }}</p>
-                    <p><strong>Seller:</strong> {{ transaction.property.seller.username }}</p>
-                    <p><strong>Amount:</strong> ${{ transaction.amount }}</p>
-                    <a href="{% url 'admin_confirm_transaction' transaction.id %}" class="btn btn-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #d4af37; border-color: #d4af37; color: #fff;">Review & Confirm</a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+    <div class="table-responsive">
+        <table class="table luxury-table text-center align-middle" style="border-radius: 15px; overflow: hidden;">
+            <thead style="background: linear-gradient(135deg, #1a2b4c, #223558); color: #fff;">
+                <tr>
+                    <th scope="col" style="font-weight: 600; padding: 15px;">Property Title</th>
+                    <th scope="col" style="font-weight: 600; padding: 15px;">Status</th>
+                    <th scope="col" style="font-weight: 600; padding: 15px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr style="background: #fff; transition: background 0.3s ease;">
+                    <td style="color: #1a2b4c; font-weight: 600; font-size: 1rem;">{{ transaction.property.title }}</td>
+                    <td>
+                        <span class="badge luxury-badge" style="background: {% if transaction.payment_status == 'approved' %}#28a745{% else %}#d4af37{% endif %}; color: #fff; font-size: 0.9rem; padding: 6px 15px; border-radius: 20px; font-weight: 600; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+                            {{ transaction.payment_status|capfirst }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'admin_transaction_detail' transaction.id %}" class="btn luxury-view-btn" style="font-size: 0.9rem; padding: 10px 25px;">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     {% else %}
-    <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
-        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No pending transactions.</p>
+    <div class="card p-5 text-center luxury-card" style="border: none; border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); background: linear-gradient(145deg, #ffffff, #f8f9fa); max-width: 600px; margin: 0 auto;">
+        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300; font-style: italic; color: #666;">No transactions available.</p>
     </div>
     {% endif %}
 </div>
 
 <style>
-    /* Sync with home.html styling */
-    .btn-primary {
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-        background: #d4af37;
-        border-color: #d4af37;
+    .luxury-table {
+        border-collapse: separate;
+        border-spacing: 0 12px;
     }
-    .btn-primary:hover {
-        background: #b8962e;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+
+    .luxury-table thead tr {
+        border: none;
+    }
+
+    .luxury-table tbody tr {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+    }
+
+    .luxury-table tbody tr:hover {
+        background: #f9f9f9;
+    }
+
+    .luxury-table td, .luxury-table th {
+        border: none;
+    }
+
+    .luxury-badge {
+        display: inline-block;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .luxury-table tr:hover .luxury-badge {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .luxury-view-btn {
+        background: linear-gradient(90deg, #d4af37, #b8962e);
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    .luxury-view-btn:hover {
+        background: linear-gradient(90deg, #b8962e, #d4af37);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(212, 175, 55, 0.6);
+        color: #fff;
+    }
+
+    .luxury-view-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.3s ease;
+    }
+
+    .luxury-view-btn:hover::before {
+        left: 100%;
+    }
+
+    @media (max-width: 767px) {
+        .luxury-view-btn {
+            padding: 8px 20px;
+            font-size: 0.85rem;
+        }
+
+        .luxury-table thead {
+            display: none;
+        }
+
+        .luxury-table, .luxury-table tbody, .luxury-table tr, .luxury-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .luxury-table tr {
+            margin-bottom: 15px;
+        }
+
+        .luxury-table td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+        }
+
+        .luxury-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 20px;
+            width: 45%;
+            font-weight: bold;
+            color: #1a2b4c;
+            text-align: left;
+        }
     }
 </style>
 

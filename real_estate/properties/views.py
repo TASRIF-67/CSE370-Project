@@ -15,14 +15,14 @@ def about_us(request):
 
 def home(request):
     # Base query excludes sold properties for all users
-    properties = Property.objects.exclude(status='sold')
+    properties = Property.objects.filter(status='approved')
+
     interested_property_ids = set()
     
     if request.user.is_authenticated:
         # Exclude user's own listings and get interested property IDs
         properties = properties.exclude(seller=request.user)
         interested_property_ids = set(request.user.interests.values_list('property_id', flat=True))
-    # Else: Unauthenticated users see all non-sold properties (no further filtering)
 
     # Search and filter logic
     query = request.GET.get('q', '')
@@ -52,6 +52,7 @@ def home(request):
         'properties': properties,
         'interested_property_ids': interested_property_ids
     })
+
 
 def normal_signup(request):
     if request.method == 'POST':
@@ -164,16 +165,41 @@ def admin_dashboard(request):
     return render(request, 'admin_dashboard.html', context)
 
 #USER DETAIL
+import logging
+logger = logging.getLogger(__name__)  # Setup logging
+
 @login_required
 def user_detail(request, user_id):
     if request.user.role != 'admin':
-        messages.error(request, "Only admins can view user details.")
-        return redirect('dashboard')
-    user = get_object_or_404(CustomUser, id=user_id)
-    if user.role == 'admin':
-        messages.error(request, "Admins cannot view other admin details here.")
+        messages.error(request, "Only admins can access this page.")
+        return redirect('home')
+    
+    if user_id == request.user.id:
+        messages.error(request, "You cannot view your own details here.")
         return redirect('manage_users')
-    return render(request, 'user_detail.html', {'user': user})
+    
+    viewed_user = get_object_or_404(CustomUser, id=user_id)
+    
+    context = {
+        'viewed_user': viewed_user
+    }
+    
+    # For normal users: properties bought and sold
+    if viewed_user.role == 'normal':
+        properties_bought = Transaction.objects.filter(buyer=viewed_user, payment_status='approved')
+        properties_sold = Property.objects.filter(seller=viewed_user, status='sold')
+        context['properties_bought'] = properties_bought
+        context['properties_sold'] = properties_sold
+    
+    # For agents: total workings
+    elif viewed_user.role == 'agent':
+        agent_workings = Transaction.objects.filter(agent=viewed_user, payment_status='approved')
+        total_workings = agent_workings.count()
+        context['agent_workings'] = agent_workings
+        context['total_workings'] = total_workings
+    
+    return render(request, 'user_detail.html', context)
+
 #EDIT USER
 @login_required
 def edit_user(request, user_id):
@@ -292,7 +318,7 @@ def express_interest(request, property_id):
             status='pending'  # Stays pending until "Contact an Agent"
         )
         # Updated: Notify admin of interest without agent assignment
-        messages.info(request, f"User {request.user.username} expressed interest in '{property.title}' (ID: {property.id}).", extra_tags='admin_notification')
+       
         messages.success(request, "Interest expressed successfully.")
     return redirect('user_interests')
 
@@ -342,11 +368,28 @@ def update_profile(request):
 @login_required
 def manage_users(request):
     if request.user.role != 'admin':
-        messages.error(request, "Only admins can manage users.")
-        return redirect('dashboard')
-    users = CustomUser.objects.exclude(role='admin')
-    roles = ['normal', 'agent']  # Only normal and agent roles
-    return render(request, 'manage_users.html', {'users': users, 'roles': roles})
+        messages.error(request, "Only admins can access this page.")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        user = get_object_or_404(CustomUser, id=user_id)
+        if user != request.user:
+            user.delete()
+            messages.success(request, f"User '{user.username}' deleted successfully.")
+        else:
+            messages.error(request, "You cannot delete yourself.")
+        return redirect('manage_users')
+    
+    # Split users by role
+    agents = CustomUser.objects.filter(role='agent')
+    normal_users = CustomUser.objects.filter(role='normal')
+    context = {
+        'agents': agents,
+        'normal_users': normal_users,
+        'current_user': request.user  # To disable delete for self
+    }
+    return render(request, 'manage_users.html', context)
 
 @login_required
 def approve_property(request, property_id):
@@ -432,14 +475,19 @@ def admin_delete_property(request, property_id):
 def apply_agent(request):
     if request.user.role != 'normal' or request.user.agent_application_status != 'none':
         return render(request, 'apply_agent_error.html', {'message': 'You cannot apply as an agent at this time.'})
+    
     if request.method == 'POST':
         form = AgentApplicationForm(request.POST, instance=request.user)
         if form.is_valid():
             user = form.save(commit=False)
             user.agent_application_status = 'pending'
             user.save()
-            return render(request, 'apply_agent_success.html')
+            # Updated: Add success message and redirect to home
+            messages.success(request, "The admin will review and approve your request.")
+            return redirect('home')
+        # Updated: Pass error message if form is invalid
         return render(request, 'apply_agent.html', {'form': form, 'error': 'Please correct the errors below.'})
+    
     form = AgentApplicationForm(instance=request.user)
     return render(request, 'apply_agent.html', {'form': form})
 
@@ -485,18 +533,15 @@ def rate_agent(request, agent_id):
     return render(request, 'rate_agent.html', {'form': form, 'agent': agent})
 
 @login_required
-def agent_transactions(request):
+def completed_tasks(request):
     if request.user.role != 'agent':
-        return redirect('dashboard')
-    transactions = Transaction.objects.filter(agent=request.user)
-    if request.method == 'POST':
-        transaction_id = request.POST.get('transaction_id')
-        transaction = get_object_or_404(Transaction, id=transaction_id, agent=request.user)
-        transaction.payment_status = 'approved'
-        transaction.save()
-        request.user.total_listings += 1  # Increment agent's listings
-        request.user.save()
-    return render(request, 'agent_transactions.html', {'transactions': transactions})
+        messages.error(request, "Only agents can access this page.")
+        return redirect('home')
+    
+    transactions = Transaction.objects.filter(agent=request.user, payment_status='approved').select_related('property').order_by('-created_at')
+    
+    
+    return render(request, 'completed_tasks.html', {'transactions': transactions})
 
 @login_required
 def confirm_transaction(request, property_id):
@@ -538,22 +583,19 @@ from .models import Property, Interest, Transaction
 @login_required
 def agent_interests(request):
     if request.user.role != 'agent':
+        messages.error(request, "Only agents can access this page.")
         return redirect('home')
-    properties = Property.objects.filter(assigned_agent=request.user, interest__isnull=False).distinct()
-    if request.method == 'POST':
-        property_id = request.POST.get('property_id')
-        status = request.POST.get('status')
-        property = get_object_or_404(Property, id=property_id, assigned_agent=request.user)
-        if property.status == 'sold':
-            messages.error(request, "Cannot change status of a sold property.")
-            return redirect('agent_interests')
-        # Changed: Restrict 'sold' update, limit to 'pending' or 'approved'
-        if status in ['pending', 'approved']:
-            property.status = status
-            property.save()
-            messages.success(request, f"Property status updated to {status}.")
-        return redirect('agent_interests')
-    return render(request, 'agent_interests.html', {'properties': properties})
+    
+    # Fetch only sold transactions
+    completed_tasks = Transaction.objects.filter(
+        agent=request.user,
+        payment_status='approved',
+        property__status='sold'
+    ).select_related('property').order_by('-date')
+    
+
+    
+    return render(request, 'agent_interests.html', {'completed_tasks': completed_tasks})
 
 # properties/views.py
 @login_required
@@ -607,31 +649,26 @@ def agent_properties(request):
         messages.error(request, "Only agents can access this page.")
         return redirect('home')
     
-    # Get properties assigned to this agent with interested users
+    # Fetch assigned properties (exclude sold ones)
     assigned_properties = Property.objects.filter(
         interest__assigned_agent=request.user,
         interest__status='assigned'
-    ).distinct()
-
-    if request.method == 'POST':
-        # Updated: Remove user from interest list
-        interest_id = request.POST.get('interest_id')
-        interest = get_object_or_404(Interest, id=interest_id, assigned_agent=request.user)
-        property_title = interest.property.title
-        interest.delete()  # Removes from agent's view and user's interest list
-        messages.success(request, f"Removed interest for '{property_title}'.")
-        return redirect('agent_properties')
+    ).exclude(status='sold').distinct()
 
     return render(request, 'agent_properties.html', {
         'assigned_properties': assigned_properties
     })
 
-
 @login_required
 def agent_transactions(request):
     if request.user.role != 'agent':
+        messages.error(request, "Only agents can access this page.")
         return redirect('home')
-    transactions = Transaction.objects.filter(agent=request.user) | Transaction.objects.filter(property__assigned_agent=request.user, property__status='sold')
+    
+    transactions = Transaction.objects.filter(agent=request.user).order_by('-date')  # Changed from 'created_at' to 'date'
+    
+
+    
     return render(request, 'agent_transactions.html', {'transactions': transactions})
 
 #Admin Views
@@ -735,11 +772,18 @@ def admin_interests(request):
 @login_required
 def admin_transactions(request):
     if request.user.role != 'admin':
-        messages.error(request, "Only admins can view this page.")
+        messages.error(request, "Only admins can access this page.")
         return redirect('home')
     
-    transactions = Transaction.objects.filter(payment_status='pending')
-    return render(request, 'admin_transactions.html', {'transactions': transactions})
+    transactions = Transaction.objects.all().select_related('property', 'agent', 'buyer').order_by('-date')
+    
+ 
+    
+    # Clear messages after rendering to prevent duplication
+    # Added to ensure messages don’t persist across requests
+    context = {'transactions': transactions}
+    return render(request, 'admin_transactions.html', context)
+
 
 @login_required
 def admin_view_property(request, property_id):
@@ -859,12 +903,79 @@ def admin_confirm_transaction(request, transaction_id):
     
     transaction = get_object_or_404(Transaction, id=transaction_id, payment_status='pending')
     if request.method == 'POST':
-        # Updated: Confirm transaction and mark property as sold
         transaction.payment_status = 'approved'
         transaction.property.status = 'sold'
         transaction.property.save()
+        Interest.objects.filter(property=transaction.property).delete()
         transaction.save()
         messages.success(request, f"Transaction for '{transaction.property.title}' confirmed.")
-        return redirect('admin_transactions')
+        return redirect('admin_pending_transactions')
     
     return render(request, 'admin_confirm_transaction.html', {'transaction': transaction})
+
+@login_required
+def property_details_agent(request, property_id):
+    if request.user.role != 'agent':
+        messages.error(request, "Only agents can access this page.")
+        return redirect('home')
+    
+    property = get_object_or_404(Property, id=property_id, interest__assigned_agent=request.user)
+    interests = Interest.objects.filter(property=property, assigned_agent=request.user, status='assigned')
+    transaction = Transaction.objects.filter(property=property, agent=request.user).first()
+
+    if request.method == 'POST' and not transaction:
+        buyer_id = request.POST.get('buyer_id')
+        selling_price = request.POST.get('selling_price')
+        buyer = get_object_or_404(CustomUser, id=buyer_id)
+        
+        Transaction.objects.create(
+            property=property,
+            agent=request.user,
+            buyer=buyer,
+            amount=selling_price,
+            payment_status='pending'
+        )
+        messages.success(request, f"Transaction request sent for '{property.title}'.")
+        return redirect('property_details_agent', property_id=property_id)
+
+    return render(request, 'property_details_agent.html', {  # Updated template name
+        'property': property,
+        'interests': interests,
+        'transaction': transaction
+    })
+
+login_required
+def transaction_detail(request, transaction_id):
+    if request.user.role != 'agent':
+        messages.error(request, "Only agents can access this page.")
+        return redirect('home')
+    
+    transaction = get_object_or_404(Transaction, id=transaction_id, agent=request.user, payment_status='approved', property__status='sold')
+    
+    return render(request, 'transaction_detail.html', {'transaction': transaction})
+
+
+
+@login_required
+def admin_transaction_detail(request, transaction_id):
+    if request.user.role != 'admin':
+        messages.error(request, "Only admins can access this page.")
+        return redirect('home')
+    
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    
+    return render(request, 'admin_transaction_detail.html', {'transaction': transaction})
+@login_required
+def admin_pending_transactions(request):
+    if request.user.role != 'admin':
+        messages.error(request, "Only admins can access this page.")
+        return redirect('home')
+    
+    pending_transactions = Transaction.objects.filter(payment_status='pending').select_related('property', 'agent', 'buyer').order_by('-date')
+    
+
+    
+    # Clear messages after rendering to prevent duplication
+    # Added to ensure messages don’t persist across requests
+    context = {'pending_transactions': pending_transactions}
+    return render(request, 'admin_pending_transactions.html', context)

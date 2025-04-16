@@ -4,44 +4,73 @@
 {% block content %}
 
 <!-- Hero Section -->
-<div class="hero-section position-relative" style="height: 70vh; background: linear-gradient(135deg, rgba(26, 43, 76, 0.7), rgba(212, 175, 55, 0.3)), url('{% static "hero-bg.png" %}'); background-size: cover; background-position: center;">
+<div class="hero-section position-relative" style="height: 90vh; background: linear-gradient(135deg, rgba(26, 43, 76, 0.85), rgba(212, 175, 55, 0.5)), url('{% static "hero-bg.png" %}'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <div id="particles-js" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;"></div>
     <div class="position-absolute top-50 start-50 translate-middle text-center text-white">
-        <h1 class="display-3 fw-bold" style="text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4); letter-spacing: 2px; font-size: 3.5rem;">Discover Luxury Living</h1>
-        <p class="lead mt-3" style="text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3); font-size: 1.5rem; font-weight: 300;">Your gateway to exquisite properties with Real Estate Pro</p>
-        <a href="#" class="btn btn-primary btn-lg mt-4" data-bs-toggle="modal" data-bs-target="#searchModal" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Explore Properties</a>
+        <h1 class="display-3 fw-bold mb-4 animate__animated animate__fadeInDown" style="text-shadow: 0 5px 25px rgba(0, 0, 0, 0.6); letter-spacing: 4px; font-size: 4.5rem;">Discover Luxury Living</h1>
+        <p class="lead mt-3 mb-5 animate__animated animate__fadeInUp animate__delay-1s" style="text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5); font-size: 1.8rem; font-weight: 300; max-width: 800px; margin: 0 auto;">Your gateway to exquisite properties with Real Estate Pro</p>
+        <a href="#" class="btn btn-primary btn-lg custom-btn animate__animated animate__fadeInUp animate__delay-2s floating" data-bs-toggle="modal" data-bs-target="#searchModal">Explore Properties</a>
+    </div>
+    <div class="scroll-down position-absolute bottom-0 start-50 translate-middle-x text-white" style="font-size: 1.5rem;">
+        <i class="fas fa-chevron-down animate__animated animate__bounce animate__infinite animate__slow"></i>
     </div>
 </div>
 
+<!-- Want to Work With Us Section -->
+{% if not user.is_authenticated or user.role == 'normal' %}
+<div class="py-5">
+    <div class="container text-center">
+        <span class="work-with-us glassmorphism" data-aos="fade-up" data-aos-duration="1000" style="color: #1a2b4c; font-weight: 600; font-size: 1.3rem; padding: 15px 30px; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0.2); display: inline-block; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);">
+            Want to work with us?
+            <a href="{% if user.is_authenticated %}{% url 'apply_agent' %}{% else %}{% url 'login' %}{% endif %}" 
+               class="btn btn-primary btn-sm custom-btn ms-3">Apply Now</a>
+        </span>
+    </div>
+</div>
+{% endif %}
+
 <!-- Featured Properties -->
 <div class="container py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Featured Listings</h2>
-    <div class="row g-5" id="featured-properties">
+    <h2 class="text-center mb-5" data-aos="fade-down" data-aos-duration="1000" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 2.5rem; position: relative;">
+        Featured Listings
+        <span style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 100px; height: 3px; background: #d4af37; border-radius: 2px;"></span>
+    </h2>
+    <div class="row g-4" id="featured-properties">
         {% for property in properties|slice:":6" %}
-        {% if user.is_authenticated and user != property.seller %}
+        {% if not user.is_authenticated or user != property.seller %}
         <div class="col-md-4">
-            <div class="card h-100" style="overflow: hidden; border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
-                {% if property.images.first %}
-                <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; border-bottom: 2px solid #d4af37;">
-                {% else %}
-                <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; border-bottom: 2px solid #d4af37;">No Image Available</div>
-                {% endif %}
-                <div class="card-body p-4">
-                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">
-                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c;">{{ property.title }}</a>
+            <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); background: linear-gradient(145deg, #ffffff, #f5f5f5); overflow: hidden; position: relative; transition: all 0.4s ease;">
+                <div class="image-wrapper" style="position: relative; overflow: hidden; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                    {% if property.images.first %}
+                    <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; transition: transform 0.5s ease;">
+                    <div class="image-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)); transition: opacity 0.4s ease;"></div>
+                    <div class="price-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(212, 175, 55, 0.9); color: #fff; padding: 8px 18px; border-radius: 30px; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                        ${{ property.price }} - {{ property.city }}
+                    </div>
+                    {% else %}
+                    <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; font-style: italic;">No Image Available</div>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                    <h5 class="card-title mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 1.5rem;">
+                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c; transition: color 0.3s ease;">{{ property.title }}</a>
                     </h5>
-                    <p class="card-text" style="color: #6c757d; font-size: 1rem;">{{ property.description|truncatewords:15 }}</p>
-                    <p><strong>Price:</strong> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ property.price }}</span> - {{ property.city }}</p>
-                    <p style="font-size: 0.95rem; color: #6c757d;">{{ property.bedrooms }} Beds | {{ property.bathrooms }} Baths</p>
+                    <p class="card-text mb-4" style="color: #666; font-size: 1rem; line-height: 1.6;">{{ property.description|truncatewords:15 }}</p>
+                    <div class="d-flex align-items-center mb-4" style="font-size: 0.95rem; color: #555;">
+                        <span class="me-4"><i class="fas fa-bed me-2" style="color: #d4af37;"></i>{{ property.bedrooms }} Beds</span>
+                        <span><i class="fas fa-bath me-2" style="color: #d4af37;"></i>{{ property.bathrooms }} Baths</span>
+                    </div>
                     <div class="d-flex justify-content-between align-items-center">
                         {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
                         {% if property.id in interested_property_ids %}
-                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Remove Interest</a>
+                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px;">Remove Interest</a>
                         {% else %}
-                        <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Interested</a>
+                        <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px;">Interested</a>
                         {% endif %}
-                        <!-- Potential Update: Add 'Contact an Agent' button here to trigger agent assignment request -->
+                        {% else %}
+                        <div></div>
                         {% endif %}
-                        <a href="{% url 'property_detail' property.id %}" class="btn btn-info btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #1a2b4c; border-color: #1a2b4c; color: #fff;">View Details</a>
+                        <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn" style="font-size: 0.9rem; padding: 10px 25px;">View Details</a>
                     </div>
                 </div>
             </div>
@@ -49,43 +78,52 @@
         {% endif %}
         {% empty %}
         <div class="col-12">
-            <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
-                <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No properties available.</p>
+            <div class="card p-5 text-center" data-aos="fade-up" data-aos-duration="1000" style="border: 1px solid #d4af37; border-radius: 20px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); background: #f5f5f5; max-width: 600px; margin: 0 auto;">
+                <p class="text-muted" style="font-size: 1.3rem; font-weight: 300; font-style: italic;">No properties available.</p>
             </div>
         </div>
         {% endfor %}
     </div>
     {% if properties|length > 6 %}
     <div class="text-center mt-5">
-        <button id="show-more-btn" class="btn btn-primary" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Show More Properties</button>
+        <button id="show-more-btn" class="btn btn-primary btn-lg custom-btn" data-aos="fade-up" data-aos-duration="1000">Show More Properties</button>
     </div>
-    <div class="row g-5" id="more-properties" style="display: none;">
+    <div class="row g-4" id="more-properties" style="display: none;">
         {% for property in properties|slice:"6:12" %}
         {% if user.is_authenticated and user != property.seller %}
         <div class="col-md-4">
-            <div class="card h-100" style="overflow: hidden; border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
-                {% if property.images.first %}
-                <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; border-bottom: 2px solid #d4af37;">
-                {% else %}
-                <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; border-bottom: 2px solid #d4af37;">No Image Available</div>
-                {% endif %}
-                <div class="card-body p-4">
-                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">
-                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c;">{{ property.title }}</a>
+            <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); background: linear-gradient(145deg, #ffffff, #f5f5f5); overflow: hidden; position: relative; transition: all 0.4s ease;">
+                <div class="image-wrapper" style="position: relative; overflow: hidden; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                    {% if property.images.first %}
+                    <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; transition: transform 0.5s ease;">
+                    <div class="image-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)); transition: opacity 0.4s ease;"></div>
+                    <div class="price-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(212, 175, 55, 0.9); color: #fff; padding: 8px 18px; border-radius: 30px; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                        ${{ property.price }} - {{ property.city }}
+                    </div>
+                    {% else %}
+                    <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; font-style: italic;">No Image Available</div>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+                    <h5 class="card-title mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 1.5rem;">
+                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c; transition: color 0.3s ease;">{{ property.title }}</a>
                     </h5>
-                    <p class="card-text" style="color: #6c757d; font-size: 1rem;">{{ property.description|truncatewords:15 }}</p>
-                    <p><strong>Price:</strong> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ property.price }}</span> - {{ property.city }}</p>
-                    <p style="font-size: 0.95rem; color: #6c757d;">{{ property.bedrooms }} Beds | {{ property.bathrooms }} Baths</p>
+                    <p class="card-text mb-4" style="color: #666; font-size: 1rem; line-height: 1.6;">{{ property.description|truncatewords:15 }}</p>
+                    <div class="d-flex align-items-center mb-4" style="font-size: 0.95rem; color: #555;">
+                        <span class="me-4"><i class="fas fa-bed me-2" style="color: #d4af37;"></i>{{ property.bedrooms }} Beds</span>
+                        <span><i class="fas fa-bath me-2" style="color: #d4af37;"></i>{{ property.bathrooms }} Baths</span>
+                    </div>
                     <div class="d-flex justify-content-between align-items-center">
                         {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
                         {% if property.id in interested_property_ids %}
-                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Remove Interest</a>
+                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px;">Remove Interest</a>
                         {% else %}
-                        <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; color: #d4af37; border-color: #d4af37; font-weight: 600;">Interested</a>
+                        <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px;">Interested</a>
                         {% endif %}
-                        <!-- Potential Update: Add 'Contact an Agent' button here to trigger agent assignment request -->
+                        {% else %}
+                        <div></div>
                         {% endif %}
-                        <a href="{% url 'property_detail' property.id %}" class="btn btn-info btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #1a2b4c; border-color: #1a2b4c; color: #fff;">View Details</a>
+                        <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn" style="font-size: 0.9rem; padding: 10px 25px;">View Details</a>
                     </div>
                 </div>
             </div>
@@ -97,71 +135,282 @@
 </div>
 
 <!-- List Your Property Section -->
-<div class="bg-light py-5">
+<div class="bg-light py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%), url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png'); background-blend-mode: overlay;">
     <div class="container text-center">
-        <h3 class="mb-4" style="color: #1a2b4c; font-weight: 600; font-size: 2rem; letter-spacing: 1px;">List Your Property Today</h3>
-        <p style="color: #6c757d; font-size: 1.1rem; max-width: 700px; margin: 0 auto; font-weight: 300;">Showcase your exquisite property to a discerning clientele. Partner with Real Estate Pro to find the perfect buyer and elevate your selling experience.</p>
-        <a href="{% if user.is_authenticated %}{% url 'create_property' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary mt-4" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Add Property</a>
+        <h3 class="mb-4" data-aos="fade-down" data-aos-duration="1000" style="color: #1a2b4c; font-weight: 600; font-size: 2.2rem; letter-spacing: 1px; position: relative;">
+            List Your Property Today
+            <span style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 80px; height: 3px; background: #d4af37; border-radius: 2px;"></span>
+        </h3>
+        <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200" style="color: #555; font-size: 1.1rem; max-width: 700px; margin: 0 auto; font-weight: 300; line-height: 1.8;">Showcase your exquisite property to a discerning clientele. Partner with Real Estate Pro to find the perfect buyer and elevate your selling experience.</p>
+        <a href="{% if user.is_authenticated %}{% url 'create_property' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary btn-lg mt-4 custom-btn" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">Add Property</a>
     </div>
 </div>
 
 <style>
-    /* General Button Styles */
-    .btn-primary, .btn-outline-primary, .btn-info {
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    /* Hero Section */
+    .hero-section {
+        transition: background 0.5s ease;
+    }
+    .hero-section:hover {
+        background: linear-gradient(135deg, rgba(26, 43, 76, 0.95), rgba(212, 175, 55, 0.6)), url('{% static "hero-bg.png" %}');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    .scroll-down {
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+    }
+    .scroll-down:hover {
+        opacity: 0.7;
+    }
+    .floating {
+        animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
     }
 
-    /* Explore Properties, Show More, Add Property Buttons */
-    .btn-primary {
-        background: #d4af37;
-        border-color: #d4af37;
+    /* Luxury Card Styling */
+    .luxury-card {
+        background: linear-gradient(145deg, #ffffff, #f5f5f5);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        position: relative;
     }
-    .btn-primary:hover {
-        background: #b8962e;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    .luxury-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), 0 0 25px rgba(212, 175, 55, 0.3);
     }
-
-    /* Interested Button */
-    .btn-outline-primary {
+    .luxury-card .image-wrapper {
+        position: relative;
+    }
+    .luxury-card .card-img-top {
+        transition: transform 0.5s ease;
+    }
+    .luxury-card:hover .card-img-top {
+        transform: scale(1.08);
+    }
+    .luxury-card .image-overlay {
+        opacity: 0.9;
+    }
+    .luxury-card:hover .image-overlay {
+        opacity: 0.7;
+    }
+    .luxury-card .card-title a:hover {
         color: #d4af37;
-        border-color: #d4af37;
     }
-    .btn-outline-primary:hover {
+    .luxury-card .card-body {
+        padding: 25px;
+        background: #fff;
+        transition: background 0.3s ease;
+    }
+    .luxury-card:hover .card-body {
+        background: #fafafa;
+    }
+
+    /* Luxury Button Styling */
+    .luxury-btn {
+        border-radius: 25px;
+        padding: 8px 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #d4af37;
+        border: 2px solid #d4af37;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .luxury-btn:hover {
         background: #d4af37;
         color: #fff;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
     }
 
-    /* View Details Button */
-    .btn-info {
-        background: #1a2b4c;
-        border-color: #1a2b4c;
+    /* Redesigned View Details Button */
+    .luxury-view-btn {
+        background: linear-gradient(90deg, #d4af37, #b8962e);
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
     }
-    .btn-info:hover {
-        background: #14213d;
-        border-color: #14213d;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    .luxury-view-btn:hover {
+        background: linear-gradient(90deg, #b8962e, #d4af37);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(212, 175, 55, 0.6);
+    }
+    .luxury-view-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.3s ease;
+    }
+    .luxury-view-btn:hover::before {
+        left: 100%;
     }
 
-    /* Card Hover Effects (Unchanged) */
-    .card-img-top {
-        transition: transform 0.3s ease;
+    /* Custom Button Styling */
+    .custom-btn {
+        border-radius: 25px;
+        padding: 12px 35px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    .card:hover .card-img-top {
-        transform: scale(1.05);
+    .custom-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.3s ease;
     }
-    .card-title a:hover {
-        color: #d4af37;
+    .custom-btn:hover::before {
+        left: 100%;
+    }
+    .custom-btn.btn-primary {
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .custom-btn.btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    /* Particle.js Styling */
+    #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* AOS Animations */
+    [data-aos] {
+        opacity: 0;
+        transition-property: transform, opacity;
+    }
+    [data-aos].aos-animate {
+        opacity: 1;
     }
 </style>
 
+<!-- External Libraries -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
 <script>
+    // Initialize AOS
+    AOS.init();
+
+    // Initialize Particles.js
+    particlesJS('particles-js', {
+        "particles": {
+            "number": {
+                "value": 80,
+                "density": {
+                    "enable": true,
+                    "value_area": 800
+                }
+            },
+            "color": {
+                "value": "#d4af37"
+            },
+            "shape": {
+                "type": "circle",
+                "stroke": {
+                    "width": 0,
+                    "color": "#000000"
+                }
+            },
+            "opacity": {
+                "value": 0.5,
+                "random": true,
+                "anim": {
+                    "enable": false
+                }
+            },
+            "size": {
+                "value": 3,
+                "random": true,
+                "anim": {
+                    "enable": false
+                }
+            },
+            "line_linked": {
+                "enable": true,
+                "distance": 150,
+                "color": "#d4af37",
+                "opacity": 0.4,
+                "width": 1
+            },
+            "move": {
+                "enable": true,
+                "speed": 2,
+                "direction": "none",
+                "random": false,
+                "straight": false,
+                "out_mode": "out",
+                "bounce": false
+            }
+        },
+        "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+                "onhover": {
+                    "enable": true,
+                    "mode": "repulse"
+                },
+                "onclick": {
+                    "enable": true,
+                    "mode": "push"
+                },
+                "resize": true
+            },
+            "modes": {
+                "repulse": {
+                    "distance": 100,
+                    "duration": 0.4
+                },
+                "push": {
+                    "particles_nb": 4
+                }
+            }
+        },
+        "retina_detect": true
+    });
+
+    // Show More Button
     document.getElementById('show-more-btn')?.addEventListener('click', function() {
         document.getElementById('more-properties').style.display = 'flex';
         this.style.display = 'none';
+    });
+
+    // Smooth Scroll to Featured Properties
+    document.querySelector('.scroll-down')?.addEventListener('click', function() {
+        document.querySelector('#featured-properties').scrollIntoView({ behavior: 'smooth' });
     });
 </script>
 {% endblock %}

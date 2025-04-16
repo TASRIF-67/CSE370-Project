@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% block content %}
+
+<!-- Error Section -->
+<div class="container py-5">
+    <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
+        <h3 class="mb-4" style="color: #1a2b4c; font-weight: 600; font-size: 2rem; letter-spacing: 1px;">Application Error</h3>
+        <p style="color: #6c757d; font-size: 1.3rem; font-weight: 300;">{{ message }}</p>
+        <a href="{% url 'home' %}" class="btn btn-primary mt-4" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Back to Home</a>
+    </div>
+</div>
+
+<style>
+    /* Sync with home.html styling */
+    .btn-primary {
+        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: #d4af37;
+        border-color: #d4af37;
+    }
+    .btn-primary:hover {
+        background: #b8962e;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+{% endblock %}
