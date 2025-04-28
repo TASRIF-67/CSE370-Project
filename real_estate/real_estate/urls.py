@@ -34,6 +34,8 @@ urlpatterns = [
     path('users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
     path('admin/create/', views.create_admin, name='create_admin'),
     path('admin/agent-assignments/', views.admin_agent_assignments, name='admin_agent_assignments'),
+    path('admin/feedbacks/', views.admin_feedbacks, name='admin_feedbacks'),
+    path('admin/feedback/<int:feedback_id>/mark-read/', views.mark_feedback_read, name='mark_feedback_read'),
 
     path('property/<int:property_id>/express-interest/', views.express_interest, name='express_interest'),
     path('property/<int:property_id>/remove-interest/', views.remove_interest, name='remove_interest'),

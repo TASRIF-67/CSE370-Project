@@ -20,19 +20,26 @@
                 <tr>
                     <td>{{ property.title }}</td>
                     <td>
-                        <span class="badge" style="background: {% if property.status == 'sold' %}#dc3545{% elif property.status == 'pending' %}#d4af37{% else %}#28a745{% endif %}; color: #fff; font-size: 0.9rem; padding: 6px 12px; border-radius: 12px;">
+                        <span class="badge" style="background: {% if property.status == 'sold' %}#dc3545{% elif property.status == 'pending' %}#d4af37{% elif property.status == 'rejected' %}#6c757d{% else %}#28a745{% endif %}; color: #fff; font-size: 0.9rem; padding: 6px 12px; border-radius: 12px;">
                             {{ property.status|title }}
                         </span>
+                        {% if property.status == 'rejected' %}
+                            <div class="text-muted mt-1" style="font-size: 0.85rem;">This property was rejected. You can edit and resubmit it.</div>
+                        {% endif %}
                     </td>
                     <td>
-                        <a href="{% url 'view_property' property.id %}" class="btn btn-info btn-sm custom-btn">View</a>
-                        {% if property.status != 'sold' %}
-                        <a href="{% url 'edit_property' property.id %}" class="btn btn-warning btn-sm custom-btn" style="background: #d4af37; border-color: #d4af37;">Edit</a>
-                        <form method="post" action="{% url 'delete_property' property.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm custom-btn" onclick="return confirm('Are you sure?');">Delete</button>
-                        </form>
-                        {% endif %}
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{% url 'view_property' property.id %}" class="btn btn-info btn-sm custom-btn">View</a>
+                            {% if property.status == 'rejected' %}
+                                <a href="{% url 'edit_property' property.id %}" class="btn btn-warning btn-sm custom-btn">Edit and Resubmit</a>
+                            {% elif property.status != 'sold' %}
+                                <a href="{% url 'edit_property' property.id %}" class="btn btn-warning btn-sm custom-btn">Edit</a>
+                                <form method="post" action="{% url 'delete_property' property.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm custom-btn" onclick="return confirm('Are you sure?');">Delete</button>
+                                </form>
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
@@ -75,6 +82,7 @@
         padding: 20px;
         color: #333;
         border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        vertical-align: middle; /* Ensure vertical alignment of content */
     }
 
     .table tbody tr:hover {
@@ -89,6 +97,7 @@
     .text-muted {
         font-style: italic;
         color: #6c757d !important;
+        margin-top: 5px; /* Add spacing above the rejection message */
     }
 
     /* Button Styling */
@@ -97,6 +106,7 @@
         padding: 6px 20px;
         font-size: 0.9rem;
         transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        white-space: nowrap; /* Prevent button text from wrapping */
     }
 
     .btn-info {
@@ -130,6 +140,16 @@
         background: #c82333;
         transform: translateY(-2px);
         box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+
+    /* Align buttons horizontally with consistent spacing */
+    .d-flex {
+        display: flex;
+        align-items: center; /* Vertically center buttons */
+    }
+
+    .gap-2 {
+        gap: 10px; /* Add spacing between buttons */
     }
 </style>
 

@@ -50,6 +50,7 @@ class Property(models.Model):
         ('approved', 'Approved'),
         ('sold', 'Sold'),
         ('under_review', 'Under Review'),
+        ('rejected', 'Rejected'), #newly added
     )
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -129,10 +130,18 @@ class Transaction(models.Model):
     payment_status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('approved', 'Approved')], default='pending')
 
 class Feedback(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    STATUS_CHOICES = (
+        ('new', 'New'),
+        ('read', 'Read'),
+    )
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     feedback_text = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='new')
 
+    def __str__(self):
+        return f"Feedback from {self.user.username} on {self.date}"
+    
 class AgentRating(models.Model):
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='ratings_given')
     agent = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='ratings_received')
