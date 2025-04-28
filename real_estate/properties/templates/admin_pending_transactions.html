@@ -14,7 +14,7 @@
     <div class="row g-5">
         {% for transaction in pending_transactions %}
         <div class="col-md-4">
-            <div class="card h-100" style="border: 1px solidrgb(238, 237, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+            <div class="card h-100" style="border: 1px solid rgb(238, 237, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
                 <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
                     <h5 class="mb-0" style="font-weight: 600; font-size: 1.5rem;">{{ transaction.property.title }}</h5>
                 </div>
@@ -28,17 +28,18 @@
                     <div class="d-flex justify-content-between">
                         <a href="{% url 'admin_transaction_detail' transaction.id %}" class="btn btn-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #d4af37; border-color: #d4af37;">View Details</a>
                         <a href="{% url 'admin_confirm_transaction' transaction.id %}" class="btn btn-success btn-sm" style="border-radius: 25px; padding: 8px 20px;">Confirm</a>
+                        <a href="{% url 'admin_reject_transaction' transaction.id %}" class="btn btn-danger btn-sm" style="border-radius: 25px; padding: 8px 20px;">Reject</a>
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
-    {% else %}
-    <div class="card p-5 text-center" style="border: 1px solidrgb(233, 233, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
+{% else %}
+    <div class="card p-5 text-center" style="border: 1px solid rgb(233, 233, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
         <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No pending transaction requests available.</p>
     </div>
-    {% endif %}
+{% endif %}
 </div>
 
 <style>

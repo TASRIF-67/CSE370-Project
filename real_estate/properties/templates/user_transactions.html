@@ -2,77 +2,104 @@
 {% load django_bootstrap5 %}
 {% block content %}
 
-<div class="container mt-5 py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2rem;">Your Transactions</h2>
-    <div class="row">
-        <!-- Buying History Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card p-4" style="border: 1px solid #e0e0e0; border-radius: 10px; background: #fff;">
-                <h3 class="text-center mb-4" style="color:rgb(46, 69, 116); font-weight: 600; font-size: 1.5rem;">Buying History</h3>
-                <table class="table table-striped">
-                    <thead style="background: #f5f5f5; color: #333;">
-                        <tr>
-                            <th scope="col">Property</th>
-                            <th scope="col">Seller</th>
-                            <th scope="col">Amount</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for transaction in transactions %}
-                        {% if transaction.buyer == user %}
-                        <tr>
-                            <td>{{ transaction.property.title }}</td>
-                            <td>{{ transaction.property.seller.username }}</td>
-                            <td>${{ transaction.amount }}</td>
-                            <td>{{ transaction.date|date:"Y-m-d" }}</td>
-                        </tr>
-                        {% endif %}
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">No buying transactions found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="d-flex flex-column">
 
-        <!-- Selling History Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card p-4" style="border: 1px solid #e0e0e0; border-radius: 10px; background: #fff;">
-                <h3 class="text-center mb-4" style="color:rgb(46, 69, 116); font-weight: 600; font-size: 1.5rem;">Selling History</h3>
-                <table class="table table-striped">
-                    <thead style="background: #f5f5f5; color: #333;">
-                        <tr>
-                            <th scope="col">Property</th>
-                            <th scope="col">Buyer</th>
-                            <th scope="col">Amount</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for transaction in transactions %}
-                        {% if transaction.property.seller == user %}
-                        <tr>
-                            <td>{{ transaction.property.title }}</td>
-                            <td>{{ transaction.buyer.username }}</td>
-                            <td>${{ transaction.amount }}</td>
-                            <td>{{ transaction.date|date:"Y-m-d" }}</td>
-                        </tr>
-                        {% endif %}
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">No selling transactions found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <div class="container mt-5 py-5 flex-grow-1">
+        <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2rem;">Your Transactions</h2>
+        <div class="row g-4">
+            <!-- Buying History Section -->
+            <div class="col-lg-6">
+                <div class="card p-4 h-100" style="border: 1px solid #e0e0e0; border-radius: 10px; background: #fff;">
+                    <h3 class="text-center mb-4" style="color:rgb(46, 69, 116); font-weight: 600; font-size: 1.5rem;">Buying History</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead style="background: #f5f5f5; color: #333;">
+                                <tr>
+                                    <th scope="col">Property</th>
+                                    <th scope="col">Seller</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in transactions_with_rating_status %}
+                                {% if item.transaction.buyer == user %}
+                                <tr>
+                                    <td>{{ item.transaction.property.title }}</td>
+                                    <td>{{ item.transaction.property.seller.username }}</td>
+                                    <td>${{ item.transaction.amount }}</td>
+                                    <td>{{ item.transaction.date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        {% if item.transaction.payment_status == 'approved' and item.transaction.agent %}
+                                            {% if not item.has_rated %}
+                                                <a href="{% url 'submit_rating' item.transaction.id %}" class="btn btn-primary btn-sm custom-btn">Rate Agent</a>
+                                            {% else %}
+                                                <span class="text-muted">Rated</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No buying transactions found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Selling History Section -->
+            <div class="col-lg-6">
+                <div class="card p-4 h-100" style="border: 1px solid #e0e0e0; border-radius: 10px; background: #fff;">
+                    <h3 class="text-center mb-4" style="color:rgb(46, 69, 116); font-weight: 600; font-size: 1.5rem;">Selling History</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead style="background: #f5f5f5; color: #333;">
+                                <tr>
+                                    <th scope="col">Property</th>
+                                    <th scope="col">Buyer</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in transactions_with_rating_status %}
+                                {% if item.transaction.property.seller == user %}
+                                <tr>
+                                    <td>{{ item.transaction.property.title }}</td>
+                                    <td>{{ item.transaction.buyer.username }}</td>
+                                    <td>${{ item.transaction.amount }}</td>
+                                    <td>{{ item.transaction.date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        {% if item.transaction.payment_status == 'approved' and item.transaction.agent %}
+                                            {% if not item.has_rated %}
+                                                <a href="{% url 'submit_rating' item.transaction.id %}" class="btn btn-primary btn-sm custom-btn">Rate Agent</a>
+                                            {% else %}
+                                                <span class="text-muted">Rated</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No selling transactions found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+</div>
 <style>
     /* Professional Table Styling */
     .card {
@@ -115,6 +142,25 @@
     .text-muted {
         font-style: italic;
         color: #6c757d !important;
+    }
+
+    .custom-btn {
+        border-radius: 20px;
+        padding: 6px 20px;
+        font-size: 0.9rem;
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
     }
 
     /* Ensure responsiveness */

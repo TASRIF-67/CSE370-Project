@@ -264,6 +264,9 @@
                             <li><a class="dropdown-item" href="{% url 'agent_properties' %}">Assigned Properties</a></li>
                             <li><a class="dropdown-item" href="{% url 'agent_transactions' %}">My Transactions</a></li>
                             <li><a class="dropdown-item" href="{% url 'agent_interests' %}">Completed Assignments</a></li>
+                            <li><a class="dropdown-item" href="{% url 'agent_ratings' %}">See Your Ratings</a></li>
+
+
                             {% elif request.user.role == 'admin' %}
                             <li><a class="dropdown-item" href="{% url 'admin_properties' %}">All Properties</a></li>
                             <li><a class="dropdown-item" href="{% url 'admin_pending_properties' %}">Pending Properties</a></li>
@@ -272,7 +275,7 @@
                             <li><a class="dropdown-item" href="{% url 'admin_feedbacks' %}">View Feedbacks</a></li>
                             <li><a class="dropdown-item" href="{% url 'admin_transactions' %}">Transactions History</a></li>
                             <li><a class="dropdown-item" href="{% url 'admin_pending_transactions' %}">Pending Transactions</a></li>
-                            <li><a class="dropdown-item" href="{% url 'admin_agent_assignments' %}">Agent Assignments</a></li>
+                            {% comment %} <li><a class="dropdown-item" href="{% url 'admin_agent_assignments' %}">Agent Assignments</a></li> {% endcomment %}
                             {% endif %}
                         </ul>
                     </li>

@@ -9,6 +9,7 @@ from .forms import NormalUserSignUpForm, AgentRatingForm, PropertyForm, AdminCre
 from .models import Property, PropertyImage, Interest, Transaction, CustomUser, Feedback, AgentApplication
 from django.forms import modelformset_factory
 from .forms import PropertyForm, PropertyImageForm
+from django.core.paginator import Paginator
 
 def about_us(request):
     return render(request, 'about_us.html')
@@ -361,11 +362,21 @@ def delete_property(request, property_id):
     return render(request, 'delete_property.html', {'property': property})
 
 #=========PROPERTY DETAIL============
+
 @login_required
 def property_detail(request, property_id):
-    # SELECT * FROM properties_property WHERE id = <property_id>;
     property = get_object_or_404(Property, id=property_id)
-    return render(request, 'property_detail.html', {'property': property})
+    
+    # Check if the logged-in user already expressed interest
+    has_expressed_interest = Interest.objects.filter(
+        property=property,
+        interested_user=request.user
+    ).exists()
+    
+    return render(request, 'property_detail.html', {
+        'property': property,
+        'has_expressed_interest': has_expressed_interest,
+    })
 
 #=========EXPRESS INTEREST============
 @login_required
@@ -778,14 +789,39 @@ def user_transactions(request):
     # SELECT role FROM properties_customuser WHERE id = <request.user.id>;
     if request.user.role != 'normal':
         return redirect('home')
-    # (Using UNION for the OR condition)
-    # SELECT t.* FROM properties_transaction t WHERE t.buyer_id = <request.user.id>
+    
+    # Fetch transactions where the user is the buyer or seller
+    # SELECT t.* FROM properties_transaction t 
+    # JOIN properties_property p ON t.property_id = p.id 
+    # JOIN properties_customuser b ON t.buyer_id = b.id 
+    # JOIN properties_customuser a ON t.agent_id = a.id 
+    # WHERE t.buyer_id = <request.user.id>
     # UNION
     # SELECT t.* FROM properties_transaction t 
     # JOIN properties_property p ON t.property_id = p.id 
+    # JOIN properties_customuser s ON p.seller_id = s.id 
+    # JOIN properties_customuser b ON t.buyer_id = b.id 
+    # JOIN properties_customuser a ON t.agent_id = a.id 
     # WHERE p.seller_id = <request.user.id>;
-    transactions = Transaction.objects.filter(buyer=request.user) | Transaction.objects.filter(property__seller=request.user)
-    return render(request, 'user_transactions.html', {'transactions': transactions})
+    transactions = (
+        Transaction.objects.filter(buyer=request.user) | 
+        Transaction.objects.filter(property__seller=request.user)
+    ).select_related('property__seller', 'buyer', 'agent').order_by('-date')
+
+    # Annotate each transaction with whether the user has rated it
+    transactions_with_rating_status = []
+    for transaction in transactions:
+        # SELECT COUNT(*) FROM properties_agentrating 
+        # WHERE transaction_id = <transaction.id> AND user_id = <request.user.id>;
+        has_rated = transaction.ratings.filter(user=request.user).exists()
+        transactions_with_rating_status.append({
+            'transaction': transaction,
+            'has_rated': has_rated
+        })
+
+    return render(request, 'user_transactions.html', {
+        'transactions_with_rating_status': transactions_with_rating_status
+    })
 
 #=========USER INTERESTS============
 @login_required
@@ -1081,28 +1117,44 @@ def remove_interest(request, property_id):
 #=========REQUEST TRANSACTION============
 @login_required
 def request_transaction(request, property_id):
-    # SELECT role FROM properties_customuser WHERE id = <request.user.id>;
     if request.user.role != 'agent':
         messages.error(request, "Only agents can request transactions.")
         return redirect('home')
     
-    # SELECT p.* FROM properties_property p 
-    # JOIN properties_interest i ON p.id = i.property_id 
-    # WHERE p.id = <property_id> AND i.assigned_agent_id = <request.user.id>;
-    property = get_object_or_404(Property, id=property_id, interest__assigned_agent=request.user)
-    # SELECT status FROM properties_property WHERE id = <property_id>;
+    property = get_object_or_404(Property, id=property_id, assigned_agent=request.user)
     if property.status == 'sold':
         messages.error(request, "This property is already sold.")
         return redirect('agent_properties')
-
+    
+    if Transaction.objects.filter(property=property, payment_status='pending').exists():
+        messages.error(request, "A pending transaction already exists for this property.")
+        return redirect('agent_properties')
+    
     if request.method == 'POST':
         buyer_id = request.POST.get('buyer_id')
-        # SELECT * FROM properties_customuser WHERE id = <buyer_id>;
-        buyer = get_object_or_404(CustomUser, id=buyer_id)
         amount = request.POST.get('amount')
         
-        # INSERT INTO properties_transaction (buyer_id, property_id, agent_id, amount, payment_status) 
-        # VALUES (<buyer.id>, <property.id>, <request.user.id>, <amount>, 'pending');
+        buyer = get_object_or_404(CustomUser, id=buyer_id)
+        
+        try:
+            amount = float(amount) if amount else None
+            if amount is None:
+                raise ValueError("Amount is required.")
+            if amount <= 0:
+                raise ValueError("Amount must be positive.")
+            if amount > 9999999999.99:
+                raise ValueError("Amount exceeds maximum allowed value (9999999999.99).")
+        except (ValueError, TypeError) as e:
+            # logger.error(f"Invalid amount for property {property_id}: {amount}, error: {str(e)}")
+            messages.error(request, f"Invalid amount: {str(e)}")
+            interested_users = Interest.objects.filter(property=property, assigned_agent=request.user, status='assigned')
+            return render(request, 'request_transaction.html', {
+                'property': property,
+                'interested_users': interested_users
+            })
+        
+        # logger.debug(f"Creating transaction for property {property_id} with amount: {amount}")
+        
         transaction = Transaction.objects.create(
             buyer=buyer,
             property=property,
@@ -1110,6 +1162,7 @@ def request_transaction(request, property_id):
             amount=amount,
             payment_status='pending'
         )
+        
         messages.info(
             request,
             f"Transaction request for '{property.title}': Agent: {request.user.username}, Buyer: {buyer.username}, Seller: {property.seller.username}, Amount: ${amount}",
@@ -1117,8 +1170,7 @@ def request_transaction(request, property_id):
         )
         messages.success(request, "Transaction request submitted to admin.")
         return redirect('agent_properties')
-
-    # SELECT * FROM properties_interest WHERE property_id = <property.id> AND assigned_agent_id = <request.user.id> AND status = 'assigned';
+    
     interested_users = Interest.objects.filter(property=property, assigned_agent=request.user, status='assigned')
     return render(request, 'request_transaction.html', {
         'property': property,
@@ -1271,3 +1323,121 @@ def mark_feedback_read(request, feedback_id):
         messages.success(request, "Feedback marked as read.")
         return redirect('admin_feedbacks')
     return redirect('admin_feedbacks')
+
+
+#=========SUBMIT RATING============
+#=========SUBMIT RATING============
+@login_required
+def submit_rating(request, transaction_id):
+    # SELECT * FROM properties_transaction WHERE id = <transaction_id>;
+    transaction = get_object_or_404(Transaction, id=transaction_id, payment_status='approved')
+    
+    # Determine rater type and validate eligibility
+    rater_type = None
+    if request.user == transaction.buyer:
+        rater_type = 'buyer'
+    elif request.user == transaction.property.seller:
+        rater_type = 'seller'
+    else:
+        messages.error(request, "You are not eligible to rate this transaction.")
+        return redirect('user_transactions')
+    
+    if request.user == transaction.agent:
+        messages.error(request, "Agents cannot rate themselves.")
+        return redirect('user_transactions')
+    
+    # Check if the user already rated this transaction
+    # SELECT COUNT(*) FROM properties_agentrating 
+    # WHERE transaction_id = <transaction.id> AND user_id = <request.user.id>;
+    if AgentRating.objects.filter(transaction=transaction, user=request.user).exists():
+        messages.error(request, "You have already rated this transaction.")
+        return redirect('user_transactions')
+    
+    if request.method == 'POST':
+        rating = int(request.POST.get('rating', 0))
+        review = request.POST.get('review', '')
+        if 1 <= rating <= 5:
+            # INSERT INTO properties_agentrating (user_id, agent_id, rating, review, date, transaction_id)
+            # VALUES (<request.user.id>, <transaction.agent.id>, <rating>, <review>, NOW(), <transaction.id>);
+            AgentRating.objects.create(
+                user=request.user,
+                agent=transaction.agent,
+                rating=rating,
+                review=review,
+                transaction=transaction
+            )
+            messages.success(request, "Rating submitted successfully.")
+            return redirect('user_transactions')
+        messages.error(request, "Please select a valid rating (1-5 stars).")
+    
+    return render(request, 'submit_rating.html', {'transaction': transaction})
+
+#=========AGENT RATINGS============
+@login_required
+def agent_ratings(request):
+    if request.user.role != 'agent':
+        messages.error(request, "Only agents can access this page.")
+        return redirect('home')
+    
+    # SELECT * FROM properties_agentrating WHERE agent_id = <request.user.id>;
+    ratings = AgentRating.objects.filter(agent=request.user).select_related('transaction__property', 'user')
+    
+    # Sorting
+    sort_by = request.GET.get('sort', 'date_desc')
+    if sort_by == 'rating_asc':
+        ratings = ratings.order_by('rating')
+    elif sort_by == 'rating_desc':
+        ratings = ratings.order_by('-rating')
+    else:  # Default: date_desc
+        ratings = ratings.order_by('-date')
+    
+    # Pagination
+    paginator = Paginator(ratings, 10)  # 10 ratings per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Annotate ratings with rater type
+    ratings_with_rater_type = []
+    for rating in page_obj:
+        rater_type = 'Unknown'
+        if rating.user == rating.transaction.buyer:
+            rater_type = 'Buyer'
+        elif rating.user == rating.transaction.property.seller:
+            rater_type = 'Seller'
+        ratings_with_rater_type.append({
+            'rating': rating,
+            'rater_type': rater_type
+        })
+    
+    return render(request, 'agent_ratings.html', {
+        'page_obj': page_obj,
+        'ratings_with_rater_type': ratings_with_rater_type,
+        'average_rating': request.user.average_rating or 0.0,
+        'sort_by': sort_by,
+    })
+
+#=========ADMIN REJECT TRANSACTION============
+@login_required
+def admin_reject_transaction(request, transaction_id):
+    if request.user.role != 'admin':
+        messages.error(request, "Only admins can reject transactions.")
+        return redirect('home')
+    
+    try:
+        transaction = Transaction.objects.get(id=transaction_id, payment_status='pending')
+    except Transaction.DoesNotExist:
+        messages.error(request, "Transaction not found or already processed.")
+        return redirect('admin_pending_transactions')
+    
+    
+    
+    transaction.payment_status = 'rejected'
+    transaction.save()
+    
+    transaction.property.status = 'approved'
+    transaction.property.save()
+    
+
+    
+    messages.success(request, "Transaction rejected successfully. The agent can submit a new request.")
+    return redirect('admin_pending_transactions')

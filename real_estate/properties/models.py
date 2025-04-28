@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
@@ -15,7 +16,7 @@ class CustomUser(AbstractUser):
     license_number = models.CharField(max_length=50, blank=True, null=True)
     experience_years = models.IntegerField(blank=True, null=True)
     total_listings = models.PositiveIntegerField(default=0)
-    average_rating = models.FloatField(default=0.0)
+    average_rating = models.FloatField(default=0.0, null=True, blank=True)
     agent_application_status = models.CharField(
         max_length=20,
         choices=[('none', 'None'), ('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')],
@@ -119,7 +120,6 @@ class Interest(models.Model):
 
     class Meta:
         unique_together = ('property', 'interested_user')
-
 class Transaction(models.Model):
     buyer = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='purchases')
     property = models.ForeignKey('Property', on_delete=models.CASCADE)
@@ -127,7 +127,11 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     invoice = models.FileField(upload_to='invoices/', null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
-    payment_status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('approved', 'Approved')], default='pending')
+    payment_status = models.CharField(
+        max_length=20,
+        choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')],
+        default='pending'
+    )
 
 class Feedback(models.Model):
     STATUS_CHOICES = (
@@ -145,12 +149,26 @@ class Feedback(models.Model):
 class AgentRating(models.Model):
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='ratings_given')
     agent = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='ratings_received')
-    rating = models.PositiveIntegerField()
+    rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]  # Ensure rating is between 1 and 5
+    )
     review = models.TextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
+    transaction = models.ForeignKey('Transaction', on_delete=models.CASCADE, related_name='ratings', null=True)  # Add this field to link ratings to transactions
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        # SELECT * FROM properties_agentrating WHERE agent_id = <self.agent.id>;
         ratings = AgentRating.objects.filter(agent=self.agent)
-        self.agent.average_rating = sum(r.rating for r in ratings) / ratings.count()
+        if ratings.exists():
+            # UPDATE properties_customuser SET average_rating = <avg> WHERE id = <self.agent.id>;
+            self.agent.average_rating = sum(r.rating for r in ratings) / ratings.count()
+        else:
+            self.agent.average_rating = 0.0
         self.agent.save()
+
+    def __str__(self):
+        return f"Rating {self.rating} for {self.agent.username} by {self.user.username}"
+
+    class Meta:
+        unique_together = ('transaction', 'user')  # Prevent multiple ratings per user per transaction

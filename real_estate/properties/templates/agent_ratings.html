@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+{% load humanize %}
+
+<div class="container mt-5 py-5">
+    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; font-size: 2.5rem;">
+        Your Ratings
+    </h2>
+    
+    <!-- Average Rating -->
+    <div class="text-center mb-4">
+        <h4>
+            {% with stars=average_rating|floatformat:0|intcomma %}
+                {% for i in "12345"|make_list %}
+                    <i class="fas fa-star {% if i|add:0 <= stars %}filled{% endif %}"></i>
+                {% endfor %}
+                {{ average_rating }} Average Rating
+            {% endwith %}
+        </h4>
+    </div>
+
+    <div class="card shadow-lg p-4" style="border: none; border-radius: 20px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);">
+        <!-- Sorting Options -->
+        <div class="mb-3">
+            <label for="sort" class="me-2">Sort by:</label>
+            <select id="sort" onchange="window.location.href=this.value">
+                <option value="?sort=date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>Date (Newest First)</option>
+                <option value="?sort=rating_desc" {% if sort_by == 'rating_desc' %}selected{% endif %}>Highest Rating</option>
+                <option value="?sort=rating_asc" {% if sort_by == 'rating_asc' %}selected{% endif %}>Lowest Rating</option>
+            </select>
+        </div>
+
+        <!-- Ratings Table -->
+        <table class="table table-hover table-borderless">
+            <thead style="background: #1a2b4c; color: #fff;">
+                <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Property Title</th>
+                    <th scope="col">Stars Given</th>
+                    <th scope="col">Review</th>
+                    <th scope="col">Rated On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in ratings_with_rater_type %}
+                <tr>
+                    <td>{{ item.rater_type }}</td>
+                    <td>{{ item.rating.transaction.property.title }}</td>
+                    <td>
+                        {% for i in "12345"|make_list %}
+                            <i class="fas fa-star {% if i|add:0 <= item.rating.rating %}filled{% endif %}"></i>
+                        {% endfor %}
+                    </td>
+                    <td>{{ item.rating.review|truncatechars:100 }}</td>
+                    <td>{{ item.rating.date|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No ratings available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}">« Previous</a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next »</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .fas.fa-star {
+        font-size: 1.5rem;
+        color: #ddd;
+    }
+    .fas.fa-star.filled {
+        color: #d4af37;
+    }
+</style>
+
+{% endblock %}

@@ -8,20 +8,33 @@
     <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Assigned Properties</h2>
     
     {% if assigned_properties %}
-    <div class="row g-5">
-        {% for property in assigned_properties %}
-        <div class="col-md-4">
-            <div class="card h-100" style="border: 1px solidrgb(247, 246, 246); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
-                <div class="card-body p-4">
-                    <h5 class="card-title" style="color: #1a2b4c; font-weight: 600; font-size: 1.5rem;">{{ property.title }}</h5>
-                    <p><strong>Price:</strong> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ property.price }}</span></p>
-                    <p><strong>City:</strong> {{ property.city }}</p>
-                    <p><strong>Seller:</strong> {{ property.seller.username }}</p>
-                    <a href="{% url 'property_details_agent' property.id %}" class="btn btn-primary btn-sm mt-2" style="border-radius: 25px; padding: 8px 20px; background: #d4af37; border-color: #d4af37;">View Details</a>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle" style="background: #fff; border-radius: 10px; overflow: hidden;">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Property Title</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Seller</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for property in assigned_properties %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td style="font-weight: 600; color: #1a2b4c;">{{ property.title }}</td>
+                    <td style="color: #d4af37; font-weight: bold;">${{ property.price }}</td>
+                    <td>{{ property.city }}</td>
+                    <td>{{ property.seller.username }}</td>
+                    <td>
+                        <a href="{% url 'property_details_agent' property.id %}" class="btn btn-primary btn-sm" style="border-radius: 25px; padding: 6px 15px;">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     {% else %}
     <div class="card p-5 text-center" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
@@ -33,8 +46,6 @@
 <style>
     .btn-primary {
         transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .btn-primary {
         background: #d4af37;
         border-color: #d4af37;
     }
@@ -42,6 +53,18 @@
         background: #b8962e;
         transform: translateY(-3px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    thead th {
+        background: #1a2b4c;
+        color: #fff;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
     }
 </style>
 
