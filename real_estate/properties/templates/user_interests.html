@@ -8,6 +8,7 @@
             <thead style="background: #1a2b4c; color: #f8f9fa;">
                 <tr>
                     <th>Property</th>
+                    <th>Property Status</th>
                     <th>Agent Status</th>
                     <th>Date</th>
                     <th>Action</th>
@@ -15,28 +16,43 @@
             </thead>
             <tbody>
                 {% for interest in interests %}
-                <tr>
-                    <td style="font-weight: 500;">{{ interest.property.title }}</td>
+                <tr {% if interest.property.id in bought_properties %}class="bought-property"{% elif interest.property.status == 'sold' %}class="unavailable-property"{% endif %}>
+                    <td style="font-weight: 500;">
+                        {{ interest.property.title }}
+                        {% if interest.property.id in bought_properties %}
+                            <br><small class="text-success">Bought</small>
+                        {% elif interest.property.status == 'sold' %}
+                            <br><small class="text-muted">Sorry, the property is unavailable</small>
+                        {% else %}
+                            <br><small class="text-primary">Available</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if interest.property.id in bought_properties %}
+                            <span class="badge bg-success" style="padding: 6px 12px; font-size: 0.9rem;">Bought</span>
+                        {% elif interest.property.status == 'sold' %}
+                            <span class="badge bg-danger" style="padding: 6px 12px; font-size: 0.9rem;">Sold</span>
+                        {% else %}
+                            <span class="badge bg-primary" style="padding: 6px 12px; font-size: 0.9rem;">Approved</span>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if interest.status == 'pending' %}
                             <span class="badge bg-secondary" style="padding: 6px 12px; font-size: 0.9rem;">Pending</span>
                         {% elif interest.status == 'assigning' %}
                             <span class="badge bg-warning text-dark" style="padding: 6px 12px; font-size: 0.9rem;">Assigning…</span>
                         {% elif interest.status == 'assigned' %}
-                            <span class="badge text-success" style="padding: 6px 12px; font-size: 0.9rem;">{{ interest.assigned_agent.username }}</span>
+                            <span class="badge bg-success" style="padding: 6px 12px; font-size: 0.9rem;">{{ interest.assigned_agent.username }}</span>
                         {% endif %}
                     </td>
                     <td>{{ interest.created_at|date:"Y-m-d" }}</td>
                     <td>
                         <a href="{% url 'property_detail' interest.property.id %}" class="btn btn-info btn-sm" style="border-radius: 20px; padding: 6px 14px; margin-right: 5px;">View Details</a>
-
                         <a href="{% url 'remove_interest' interest.property.id %}" class="btn btn-danger btn-sm" style="border-radius: 20px; padding: 6px 14px;">Remove</a>
-                     
-                       
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" class="text-center text-muted" style="padding: 2rem;">No interests expressed yet.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted" style="padding: 2rem;">No interests expressed yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -47,9 +63,23 @@
         background: #e9ecef;
         transition: background 0.3s;
     }
-    .btn-outline-teal:hover {
-        background: #00c4b4;
-        color: #fff;
+    .bought-property {
+        background: #e6f4ea;
+        color: #155724;
+    }
+    .bought-property:hover {
+        background: #d4edda !important;
+    }
+    .unavailable-property {
+        background: #f1f1f1;
+        color: #6c757d;
+        opacity: 0.7;
+    }
+    .unavailable-property:hover {
+        background: #e0e0e0 !important;
+    }
+    .unavailable-property .btn, .bought-property .btn {
+        opacity: 1; /* Ensure buttons remain fully visible */
     }
 </style>
 {% endblock %}

@@ -337,7 +337,13 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form method="get" action="{% url 'home' %}">
+                    <div id="minPriceError" class="alert alert-danger d-none" role="alert">
+                        Minimum price cannot be negative.
+                    </div>
+                    <div id="cityError" class="alert alert-danger d-none" role="alert">
+                        City can only contain letters and spaces.
+                    </div>
+                    <form method="get" action="{% url 'home' %}" id="searchForm">
                         <div class="mb-3">
                             <label for="query" class="form-label">Keyword</label>
                             <input type="text" class="form-control" id="query" name="q" placeholder="e.g., Modern House" style="border-radius: 10px;">
@@ -348,28 +354,89 @@
                                 <option value="">Any</option>
                                 <option value="house">House</option>
                                 <option value="apartment">Apartment</option>
+                                <option value="commercial">Commercial</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="city" class="form-label">City</label>
-                            <input type="text" class="form-control" id="city" name="city" placeholder="e.g., Dhaka" style="border-radius: 10px;">
+                            <input type="text" class="form-control" id="city" name="city" placeholder="e.g., Dhaka" pattern="[A-Za-z\s]+" title="City can only contain letters and spaces" style="border-radius: 10px;" aria-describedby="cityError">
                         </div>
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="min_price" class="form-label">Min Price</label>
-                                <input type="number" class="form-control" id="min_price" name="min_price" placeholder="0" style="border-radius: 10px;">
+                                <input type="number" class="form-control" id="min_price" name="min_price" placeholder="0" min="0" style="border-radius: 10px;" aria-describedby="minPriceError">
                             </div>
                             <div class="col">
                                 <label for="max_price" class="form-label">Max Price</label>
-                                <input type="number" class="form-control" id="max_price" name="max_price" placeholder="1000000" style="border-radius: 10px;">
+                                <input type="number" class="form-control" id="max_price" name="max_price" placeholder="No limit" min="0" style="border-radius: 10px;">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 25px;">Apply Filters</button>
+                        <button type="submit" class="btn btn-primary w-100" id="applyFiltersBtn" style="border-radius: 25px;" disabled>Apply Filters</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const minPriceInput = document.getElementById('min_price');
+        const maxPriceInput = document.getElementById('max_price');
+        const cityInput = document.getElementById('city');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const minPriceError = document.getElementById('minPriceError');
+        const cityError = document.getElementById('cityError');
+    
+        function validateForm() {
+            const minPrice = parseFloat(minPriceInput.value);
+            const maxPrice = maxPriceInput.value ? parseFloat(maxPriceInput.value) : null;
+            const cityValue = cityInput.value;
+    
+            // Reset error states
+            minPriceError.classList.add('d-none');
+            cityError.classList.add('d-none');
+            applyFiltersBtn.disabled = false;
+    
+            // Validate min_price
+            if (minPriceInput.value && minPrice < 0) {
+                minPriceError.classList.remove('d-none');
+                applyFiltersBtn.disabled = true;
+                return;
+            }
+    
+            // Validate max_price vs min_price
+            if (minPriceInput.value && maxPriceInput.value && maxPrice < minPrice) {
+                minPriceError.textContent = "Maximum price cannot be less than minimum price.";
+                minPriceError.classList.remove('d-none');
+                applyFiltersBtn.disabled = true;
+                return;
+            }
+    
+            // Validate city (only letters and spaces)
+            const cityRegex = /^[A-Za-z\s]*$/;
+            if (cityValue && !cityRegex.test(cityValue)) {
+                cityError.classList.remove('d-none');
+                applyFiltersBtn.disabled = true;
+                return;
+            }
+        }
+    
+        // Add event listeners for real-time validation
+        minPriceInput.addEventListener('input', validateForm);
+        maxPriceInput.addEventListener('input', validateForm);
+        cityInput.addEventListener('input', function (e) {
+            // Prevent non-alphabetic characters in real-time
+            const cityRegex = /^[A-Za-z\s]*$/;
+            if (!cityRegex.test(cityInput.value)) {
+                cityInput.value = cityInput.value.replace(/[^A-Za-z\s]/g, '');
+            }
+            validateForm();
+        });
+    
+        // Initial validation
+        validateForm();
+    });
+    </script>
     {% bootstrap_javascript %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {

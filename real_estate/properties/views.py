@@ -826,13 +826,22 @@ def user_transactions(request):
 #=========USER INTERESTS============
 @login_required
 def user_interests(request):
-    # SELECT role FROM properties_customuser WHERE id = <request.user.id>;
     if request.user.role != 'normal':
         return redirect('home')
-    # SELECT * FROM properties_interest WHERE user_id = <request.user.id>;
-    interests = Interest.objects.filter(interested_user=request.user)
-    return render(request, 'user_interests.html', {'interests': interests})
-
+    # SELECT * FROM properties_interest WHERE interested_user_id = <request.user.id>;
+    interests = Interest.objects.filter(interested_user=request.user).select_related('property')
+    # SELECT property_id FROM properties_transaction WHERE buyer_id = <request.user.id> AND payment_status = 'approved';
+    bought_properties = Transaction.objects.filter(
+        buyer=request.user, payment_status='approved'
+    ).values_list('property_id', flat=True)
+    return render(
+        request,
+        'user_interests.html',
+        {
+            'interests': interests,
+            'bought_properties': bought_properties
+        }
+    )
 #=========AGENT PROPERTIES============
 @login_required
 def agent_properties(request):
@@ -1105,15 +1114,25 @@ def admin_agent_assignments(request):
 #=========REMOVE INTEREST============
 @login_required
 def remove_interest(request, property_id):
-    # SELECT * FROM properties_property WHERE id = <property_id> AND status = 'approved';
-    property = get_object_or_404(Property, id=property_id, status='approved')
-    # SELECT role FROM properties_customuser WHERE id = <request.user.id>;
-    if request.user != property.seller and request.user.role == 'normal':
-        # DELETE FROM properties_interest WHERE property_id = <property.id> AND user_id = <request.user.id>;
-        Interest.objects.filter(property=property, interested_user=request.user).delete()
-        messages.success(request, "Interest removed successfully.")
-    return redirect('home')
+    # Only normal users can remove their own interests
+    if request.user.role != 'normal':
+        messages.error(request, "Only normal users can remove interests.")
+        return redirect('user_interests')
 
+    # Try to find the interest for this user and property
+    try:
+        interest = Interest.objects.get(property__id=property_id, interested_user=request.user)
+        # DELETE FROM properties_interest WHERE property_id = <property_id> AND interested_user_id = <request.user.id>;
+        interest.delete()
+        messages.success(request, "Interest removed successfully.")
+    except Interest.DoesNotExist:
+        # If no interest exists (possibly because the property was deleted), inform the user
+        messages.warning(request, "The property no longer exists or you haven't expressed interest in it.")
+    except Property.DoesNotExist:
+        # This case is unlikely since we're querying Interest, but handle it just in case
+        messages.warning(request, "The property no longer exists.")
+
+    return redirect('user_interests')
 #=========REQUEST TRANSACTION============
 @login_required
 def request_transaction(request, property_id):
@@ -1184,7 +1203,7 @@ def admin_confirm_transaction(request, transaction_id):
     if request.user.role != 'admin':
         messages.error(request, "Only admins can confirm transactions.")
         return redirect('home')
-    
+
     # SELECT * FROM properties_transaction WHERE id = <transaction_id> AND payment_status = 'pending';
     transaction = get_object_or_404(Transaction, id=transaction_id, payment_status='pending')
     if request.method == 'POST':
@@ -1192,13 +1211,11 @@ def admin_confirm_transaction(request, transaction_id):
         transaction.property.status = 'sold'
         # UPDATE properties_property SET status = 'sold' WHERE id = <transaction.property.id>;
         transaction.property.save()
-        # DELETE FROM properties_interest WHERE property_id = <transaction.property.id>;
-        Interest.objects.filter(property=transaction.property).delete()
         # UPDATE properties_transaction SET payment_status = 'approved' WHERE id = <transaction_id>;
         transaction.save()
         messages.success(request, f"Transaction for '{transaction.property.title}' confirmed.")
         return redirect('admin_pending_transactions')
-    
+
     return render(request, 'admin_confirm_transaction.html', {'transaction': transaction})
 
 #=========PROPERTY DETAILS AGENT============
@@ -1212,7 +1229,7 @@ def property_details_agent(request, property_id):
     # SELECT p.* FROM properties_property p 
     # JOIN properties_interest i ON p.id = i.property_id 
     # WHERE p.id = <property_id> AND i.assigned_agent_id = <request.user.id>;
-    property = get_object_or_404(Property, id=property_id, interest__assigned_agent=request.user)
+    property = get_object_or_404(Property.objects.filter(id=property_id, interest__assigned_agent=request.user).distinct())
     # SELECT * FROM properties_interest WHERE property_id = <property.id> AND assigned_agent_id = <request.user.id> AND status = 'assigned';
     interests = Interest.objects.filter(property=property, assigned_agent=request.user, status='assigned')
     # SELECT * FROM properties_transaction WHERE property_id = <property.id> AND agent_id = <request.user.id> LIMIT 1;
