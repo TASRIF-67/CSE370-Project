@@ -23,7 +23,7 @@ def home(request):
     
     if request.user.is_authenticated:
         # SELECT * FROM properties_property WHERE status = 'approved' AND seller_id != <request.user.id>;
-        properties = properties.exclude(seller=request.user)
+        # properties = properties.exclude(seller=request.user)
         # SELECT property_id FROM properties_interest WHERE user_id = <request.user.id>;
         interested_property_ids = set(request.user.interests.values_list('property_id', flat=True))
 
