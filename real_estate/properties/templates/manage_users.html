@@ -3,93 +3,157 @@
 {% load static %}
 {% block content %}
 
-<div class="container py-5" style="background: #fff; min-height: 100vh;">
-    <h1 class="fw-bold text-center mb-5" style="color: #1a2b4c; font-size: 2.25rem; letter-spacing: 1px;">Manage Users</h1>
+<div class="container py-5">
+    <div class="header-section mb-5">
+        <h1 class="ultra-title">Manage Users</h1>
+    </div>
 
     <div class="row g-4">
         <!-- Agents Table -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
-                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Agents</h2>
+        <div class="col-lg-6">
+            <div class="ultra-panel">
+                <div class="ultra-panel-header">
+                    <h2 class="panel-title">Agents</h2>
                 </div>
-                <div class="card-body p-4">
+                <div class="ultra-panel-body">
                     {% if agents %}
-                    <div class="table-responsive">
-                        <table class="table custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Username</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for agent in agents %}
-                                <tr>
-                                    <td>{{ agent.username }}</td>
-                                    <td class="text-end">
-                                        <a href="{% url 'user_detail' agent.id %}" class="btn btn-sm btn-gold">Details</a>
-                                        {% if agent != current_user %}
-                                        <form method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ agent.username }}?');">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="user_id" value="{{ agent.id }}">
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Delete</button>
-                                        </form>
-                                        {% else %}
-                                        <span class="text-muted" style="font-size: 0.9rem;">Self</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="ultra-table-container">
+                        <div class="ultra-table-header">
+                            <div class="row g-0">
+                                <div class="col-7">
+                                    <div class="ultra-th">Username</div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="ultra-th text-end">Actions</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ultra-table-body">
+                            {% for agent in agents %}
+                            <div class="ultra-table-row">
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-7">
+                                        <div class="ultra-td username">
+                                            <div class="user-avatar">{{ agent.username|first|upper }}</div>
+                                            <span>{{ agent.username }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="ultra-td text-end">
+                                            <div class="action-buttons">
+                                                <a href="{% url 'user_detail' agent.id %}" class="ultra-btn-outline">
+                                                    <span>Details</span>
+                                                </a>
+                                                {% if agent != current_user %}
+                                                <form method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete {{ agent.username }}?');">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="user_id" value="{{ agent.id }}">
+                                                    <button type="submit" class="ultra-btn-danger">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                            <path d="M3 5.5H21M16.0557 5.5L15.3731 4.09173C14.9196 3.15626 14.6928 2.68852 14.3017 2.39681C14.215 2.3321 14.1231 2.27454 14.027 2.2247C13.5939 2 13.0741 2 12.0345 2C10.9688 2 10.4359 2 9.99568 2.23412C9.89791 2.28693 9.80438 2.3477 9.71729 2.41603C9.32163 2.7167 9.10063 3.20155 8.6586 4.17126L8 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                            <path d="M9.5 16.5L9.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                            <path d="M14.5 16.5L14.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                                {% else %}
+                                                <span class="self-indicator">Self</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                     {% else %}
-                    <p class="text-muted">No agents available.</p>
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <p>No agents available</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Normal Users Table -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-                <div class="card-header" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
-                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Normal Users</h2>
+        <div class="col-lg-6">
+            <div class="ultra-panel">
+                <div class="ultra-panel-header">
+                    <h2 class="panel-title">Normal Users</h2>
                 </div>
-                <div class="card-body p-4">
+                <div class="ultra-panel-body">
                     {% if normal_users %}
-                    <div class="table-responsive">
-                        <table class="table custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Username</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in normal_users %}
-                                <tr>
-                                    <td>{{ user.username }}</td>
-                                    <td class="text-end">
-                                        <a href="{% url 'user_detail' user.id %}" class="btn btn-sm btn-gold">Details</a>
-                                        {% if user != current_user %}
-                                        <form method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ user.username }}?');">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="user_id" value="{{ user.id }}">
-                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Delete</button>
-                                        </form>
-                                        {% else %}
-                                        <span class="text-muted" style="font-size: 0.9rem;">Self</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="ultra-table-container">
+                        <div class="ultra-table-header">
+                            <div class="row g-0">
+                                <div class="col-7">
+                                    <div class="ultra-th">Username</div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="ultra-th text-end">Actions</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ultra-table-body">
+                            {% for user in normal_users %}
+                            <div class="ultra-table-row">
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-7">
+                                        <div class="ultra-td username">
+                                            <div class="user-avatar user-standard">{{ user.username|first|upper }}</div>
+                                            <span>{{ user.username }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="ultra-td text-end">
+                                            <div class="action-buttons">
+                                                <a href="{% url 'user_detail' user.id %}" class="ultra-btn-outline">
+                                                    <span>Details</span>
+                                                </a>
+                                                {% if user != current_user %}
+                                                <form method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete {{ user.username }}?');">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                    <button type="submit" class="ultra-btn-danger">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M19.5 5.5L18.8803 15.5251C18.7219 18.0864 18.6428 19.3671 18.0008 20.2879C17.6833 20.7431 17.2747 21.1273 16.8007 21.416C15.8421 22 14.559 22 11.9927 22C9.42312 22 8.1383 22 7.17905 21.4149C6.7048 21.1257 6.296 20.7408 5.97868 20.2848C5.33688 19.3626 5.25945 18.0801 5.10461 15.5152L4.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                            <path d="M3 5.5H21M16.0557 5.5L15.3731 4.09173C14.9196 3.15626 14.6928 2.68852 14.3017 2.39681C14.215 2.3321 14.1231 2.27454 14.027 2.2247C13.5939 2 13.0741 2 12.0345 2C10.9688 2 10.4359 2 9.99568 2.23412C9.89791 2.28693 9.80438 2.3477 9.71729 2.41603C9.32163 2.7167 9.10063 3.20155 8.6586 4.17126L8 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                            <path d="M9.5 16.5L9.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                            <path d="M14.5 16.5L14.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                                {% else %}
+                                                <span class="self-indicator">Self</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                     {% else %}
-                    <p class="text-muted">No normal users available.</p>
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <p>No normal users available</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -98,54 +162,297 @@
 </div>
 
 <style>
-    .custom-table {
-        border: 1px solid #d4af37;
-        border-radius: 10px;
+    /* Ultra Modern Design System */
+    :root {
+        --ultra-bg: #f7f9fc;
+        --ultra-surface: #ffffff;
+        --ultra-primary: #192c53;
+        --ultra-secondary: #e4a951;
+        --ultra-accent: #0ea5e9;
+        --ultra-text: #1a202c;
+        --ultra-text-light: #64748b;
+        --ultra-danger: #ef4444;
+        --ultra-danger-light: #fee2e2;
+        --ultra-agent: #3b82f6;
+        --ultra-user: #6366f1;
+        --ultra-border: #e2e8f0;
+        --ultra-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --ultra-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --ultra-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+        --ultra-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+        background-color: var(--ultra-bg);
+    }
+
+    /* Header Section */
+    .header-section {
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .ultra-title {
+        color: var(--ultra-primary);
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 0;
+        position: relative;
+        display: inline-block;
+    }
+
+    .ultra-title::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: var(--ultra-secondary);
+        border-radius: 2px;
+    }
+
+    /* Panel Design */
+    .ultra-panel {
+        background: var(--ultra-surface);
+        border-radius: 16px;
         overflow: hidden;
-        background: #fff;
+        box-shadow: var(--ultra-shadow);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
-
-    .custom-table td {
-        border-top: 1px solid #f0e6c5;
-        color: #1a2b4c;
-        vertical-align: middle;
-    }
-
-    .custom-table tbody tr:hover {
-        background-color: #f9f6ee;
-    }
-
-    .btn-gold {
-        background-color: #d4af37;
+    .ultra-panel-header {
+        background: var(--ultra-primary);
         color: white;
-        border-radius: 20px;
-        padding: 6px 16px;
-        transition: all 0.3s ease;
+        padding: 1.5rem;
+        position: relative;
     }
 
-    .btn-gold:hover {
-        background-color: #c9a025;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    .panel-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.01em;
     }
 
-    .btn-danger {
-        transition: all 0.3s ease;
+    .ultra-panel-body {
+        padding: 0;
+        flex: 1;
     }
 
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    /* Ultra Table Design */
+    .ultra-table-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
-    .card {
-        background: #fff;
+    .ultra-table-header {
+        background: #f1f5f9;
+        color: var(--ultra-primary);
+        padding: 1rem 1.5rem;
+        font-weight: 600;
     }
 
-    .table-responsive {
-        border-radius: 10px;
-        overflow-x: auto;
+    .ultra-th {
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+    }
+
+    .ultra-table-body {
+        flex: 1;
+    }
+
+    .ultra-table-row {
+        padding: 1rem 1.5rem;
+        position: relative;
+        border-bottom: 1px solid var(--ultra-border);
+        transition: var(--ultra-transition);
+    }
+
+    .ultra-table-row:last-child {
+        border-bottom: none;
+    }
+
+    .ultra-table-row:hover {
+        background-color: rgba(25, 44, 83, 0.02);
+    }
+
+    .ultra-table-row::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        background: var(--ultra-secondary);
+        transition: var(--ultra-transition);
+    }
+
+    .ultra-table-row:hover::before {
+        width: 4px;
+    }
+
+    /* Username Cell */
+    .ultra-td.username {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--ultra-text);
+        font-weight: 500;
+    }
+
+    .user-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: var(--ultra-agent);
+        color: white;
+        border-radius: 50%;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .user-avatar.user-standard {
+        background: var(--ultra-user);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .ultra-btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        color: var(--ultra-primary);
+        border: 1.5px solid var(--ultra-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: var(--ultra-transition);
+    }
+
+    .ultra-btn-outline:hover {
+        background: var(--ultra-primary);
+        color: white;
+    }
+
+    .ultra-btn-danger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        color: var(--ultra-danger);
+        border: 1.5px solid var(--ultra-danger-light);
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        transition: var(--ultra-transition);
+        cursor: pointer;
+    }
+
+    .ultra-btn-danger:hover {
+        background: var(--ultra-danger);
+        color: white;
+    }
+
+    .self-indicator {
+        display: inline-block;
+        padding: 0.4rem 0.75rem;
+        background: #f1f5f9;
+        color: var(--ultra-text-light);
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        background: #f1f5f9;
+        border-radius: 50%;
+        color: var(--ultra-text-light);
+    }
+
+    .empty-state p {
+        color: var(--ultra-text-light);
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 991px) {
+        .col-lg-6:first-child {
+            margin-bottom: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ultra-table-header {
+            display: none;
+        }
+
+        .ultra-table-row {
+            padding: 1.25rem;
+        }
+
+        .row.g-0 > .col-7,
+        .row.g-0 > .col-5 {
+            width: 100%;
+        }
+
+        .ultra-td.text-end {
+            text-align: left !important;
+            margin-top: 1rem;
+        }
+
+        .action-buttons {
+            justify-content: flex-start;
+        }
+
+        .ultra-btn-outline,
+        .ultra-btn-danger {
+            padding: 0.5rem 1rem;
+            width: auto;
+            height: auto;
+        }
+
+        .ultra-btn-outline {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .ultra-btn-danger svg {
+            margin-right: 0.5rem;
+        }
+
+        .ultra-btn-danger:after {
+            content: 'Delete';
+        }
     }
 </style>
 

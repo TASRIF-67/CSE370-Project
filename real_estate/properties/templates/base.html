@@ -7,376 +7,859 @@
     {% load django_bootstrap5 %}
     {% load static %}
     {% bootstrap_css %}
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {% block extra_css %}{% endblock %}
+    
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            color: #1a2b4c;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        /* Base & Typography Styles */
+:root {
+    --primary-color: #0092ca;
+    --primary-hover: #0077a2;
+    --secondary-color: #1a2b4c;
+    --accent-color: #00c4b4;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --medium-color: #495057;
+    --border-color: #e9ecef;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+}
 
-        /* Elegant and Professional Navbar Styling */
-        .navbar {
-            background: #1a2b4c;
-            padding: 1.5rem 0;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            border-bottom: 3px solid #d4af37;
-            transition: background 0.3s ease;
-        }
-        .navbar:hover {
-            background: #223558;
-        }
-        .navbar-brand {
-            color: #f8f9fa !important;
-            font-weight: 600;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-        .navbar-brand:hover {
-            color: #d4af37 !important;
-            transform: scale(1.05);
-        }
-        .navbar-brand img {
-            width: 35px;
-            height: 35px;
-            margin-right: 15px;
-            border-radius: 50%;
-            border: 2px solid #d4af37;
-            object-fit: cover;
-            transition: border-color 0.3s ease, transform 0.3s ease;
-        }
-        .navbar-brand:hover img {
-            border-color: #f8f9fa;
-            transform: rotate(10deg);
-        }
-        .navbar-nav {
-            align-items: center;
-        }
-        .nav-item {
-            position: relative;
-        }
-        .nav-link {
-            color: #f8f9fa !important;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 0.5rem 1rem;
-            transition: color 0.3s ease, transform 0.3s ease, background 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-        .nav-link:hover {
-            color: #d4af37 !important;
-            transform: translateY(-3px);
-            background: rgba(212, 175, 55, 0.1);
-            border-radius: 5px;
-        }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: #d4af37;
-            transition: width 0.3s ease, left 0.3s ease;
-        }
-        .nav-link:hover::after {
-            width: 50%;
-            left: 25%;
-        }
-        .navbar-toggler {
-            border: none;
-            color: #f8f9fa;
-            transition: transform 0.3s ease;
-        }
-        .navbar-toggler:hover {
-            transform: rotate(90deg);
-        }
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(212, 175, 55, 0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-        }
-        .dropdown-menu {
-            background: #1a2b4c;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            margin-top: 0;
-            padding: 0.5rem 0;
-            min-width: 200px;
-            display: none; /* Default hidden state */
-        }
-        .nav-item.dropdown:hover .dropdown-menu {
-            display: block; /* Show on hover */
-            animation: fadeIn 0.2s ease-in-out; /* Smooth fade-in */
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .dropdown-item {
-            color: #f8f9fa;
-            font-weight: 400;
-            font-size: 0.9rem;
-            padding: 0.25rem 1.5rem;
-            transition: background 0.3s ease, color 0.3s ease, padding-left 0.3s ease;
-        }
-        .dropdown-item:hover {
-            background: #d4af37;
-            color: #1a2b4c;
-            padding-left: 2rem;
-        }
-        .profile-pic {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid #d4af37;
-            margin-right: 10px;
-            object-fit: cover;
-            transition: border-color 0.3s ease, transform 0.3s ease;
-        }
-        .nav-item:hover .profile-pic {
-            border-color: #f8f9fa;
-            transform: scale(1.1);
-        }
-        .nav-link i.fas {
-            margin-right: 5px;
-            font-size: 1rem;
-        }
-        .nav-link.no-profile-pic i.fas {
-            width: 35px;
-            text-align: center;
-        }
+body, html {
+    font-family: 'Poppins', sans-serif;
+    color: var(--dark-color);
+    line-height: 1.6;
+    background-color: #f8f9fa;
+    scroll-behavior: smooth;
+}
 
-        /* Other Styles */
-        .content {
-            flex: 1 0 auto;
-            padding-top: 2rem;
-            padding-bottom: 4rem;
-        }
-        footer {
-            background: #1a2b4c;
-            color: #f8f9fa;
-            padding: 2rem 0;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        footer a {
-            color: #00c4b4;
-            text-decoration: none;
-            margin: 0 10px;
-            transition: color 0.3s;
-        }
-        footer a:hover {
-            color: #fff;
-        }
-        .btn-primary {
-            background: #00c4b4;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
-        .btn-primary:hover {
-            background: #009a8e;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-            background: #fff;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-        .alert {
-            border-radius: 10px !important;
-            margin-bottom: 1rem;
-            opacity: 1;
-            transition: opacity 2s ease-in-out;
-        }
-        .alert-success {
-            background: #e6f4ea !important;
-            border: 1px solid #c3e6cb !important;
-            color: #155724 !important;
-        }
-        .alert-danger {
-            background: #f8d7da !important;
-            border: 1px solid #f5c6cb !important;
-            color: #721c24 !important;
-        }
-        .alert-warning {
-            background: #fff3cd !important;
-            border: 1px solid #ffeeba !important;
-            color: #856404 !important;
-        }
-        .alert-info {
-            background: #d1ecf1 !important;
-            border: 1px solid #bee5eb !important;
-            color: #0c5460 !important;
-        }
-        .alert .btn-close {
-            filter: invert(20%) sepia(50%) saturate(500%) hue-rotate(80deg) brightness(90%) contrast(90%);
-        }
-        .alert.fade-out {
-            opacity: 0;
-        }
+.site-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Shared Component Styles */
+.container {
+    max-width: 1280px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px; 
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover, 
+.btn-primary:focus {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sign-up-btn {
+    margin-left: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* Navbar Styles */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.navbar {
+    padding: 1rem 0;
+    transition: var(--transition);
+    background-color: white;
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--secondary-color) !important;
+    transition: var(--transition);
+}
+
+.navbar-brand:hover {
+    color: var(--primary-color) !important;
+}
+
+.navbar-logo {
+    height: 40px;
+    width: auto;
+    margin-right: 0.75rem;
+    border-radius: 8px;
+}
+
+.navbar-brand-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.navbar-toggler {
+    border: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: 2px solid var(--primary-color);
+}
+
+.navbar-nav {
+    align-items: center;
+}
+
+.nav-item {
+    margin: 0 0.25rem;
+}
+
+.nav-link {
+    color: var(--medium-color) !important;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: var(--primary-color) !important;
+    background-color: rgba(0, 146, 202, 0.05);
+}
+
+.user-profile-link {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+}
+
+.user-profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.5rem;
+    border: 2px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.user-profile-link:hover .user-profile-img {
+    border-color: var(--primary-color);
+}
+
+.profile-icon {
+    font-size: 1.25rem;
+    margin-right: 0.5rem;
+    color: var(--medium-color);
+}
+
+.username {
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.dropdown-menu {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    padding: 0.75rem 0;
+    min-width: 12rem;
+    animation: fadeInUp 0.2s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    color: var(--medium-color);
+    transition: var(--transition);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(0, 146, 202, 0.05);
+    color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+/* Hero Section Styles */
+.hero-section {
+    background-color: white;
+    padding: 4rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    color: var(--medium-color);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-cta {
+    padding: 0.75rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Main Content Styles */
+.site-main {
+    flex: 1;
+    padding: 3rem 0;
+}
+
+.main-container {
+    min-height: 50vh;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.alert-danger {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.alert-warning {
+    background-color: #fff8e1;
+    color: #f57f17;
+}
+
+.alert-info {
+    background-color: #e1f5fe;
+    color: #0277bd;
+}
+
+.fade-out {
+    transition: opacity 1s;
+    opacity: 0;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-footer {
+    background-color: white;
+    border-top: 1px solid var(--border-color);
+    padding: 1.25rem 1.5rem;
+}
+
+/* Footer Styles */
+.site-footer {
+    background-color: var(--secondary-color);
+    color: #fff;
+    padding: 4rem 0 0 0;
+}
+
+.footer-container {
+    padding-bottom: 1.5rem;
+}
+
+.footer-top {
+    margin-bottom: 3rem;
+}
+
+.footer-branding {
+    margin-bottom: 2rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+}
+
+.footer-logo:hover {
+    color: var(--accent-color);
+}
+
+.footer-logo-img {
+    width: 40px;
+    height: 40px;
+    margin-right: 1rem;
+    border-radius: 8px;
+}
+
+.footer-brand-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.footer-tagline {
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 1rem;
+}
+
+.footer-heading {
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.footer-heading:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 2px;
+    background-color: var(--accent-color);
+}
+
+.footer-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-link {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.5rem 0;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-link:hover {
+    color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.footer-newsletter-text {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.25rem;
+}
+
+.footer-input {
+    border-radius: 8px 0 0 8px !important;
+    border: none;
+    padding: 0.75rem 1rem;
+    height: auto;
+}
+
+.footer-btn {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    border-radius: 0 8px 8px 0 !important;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+}
+
+.footer-btn:hover {
+    background-color: #00b0a1;
+    border-color: #00b0a1;
+}
+
+.footer-social {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.social-link:hover {
+    background-color: var(--accent-color);
+    color: white;
+    transform: translateY(-3px);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1.5rem;
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.copyright {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.5rem;
+}
+
+.footer-bottom-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.footer-bottom-link {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-bottom-link:hover {
+    color: var(--accent-color);
+}
+
+/* Search Modal Styles */
+.search-modal-content {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.search-modal-header {
+    background-color: var(--secondary-color);
+    color: white;
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
+}
+
+.search-modal-header .btn-close {
+    filter: invert(1) brightness(200%);
+}
+
+.search-modal-body {
+    padding: 1.75rem;
+}
+
+.search-input, 
+.search-select {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.search-input:focus,
+.search-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(0, 146, 202, 0.25);
+}
+
+.search-submit-btn {
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-md);
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .nav-item {
+        margin: 0.25rem 0;
+    }
+    
+    .user-profile-link {
+        justify-content: flex-start;
+    }
+    
+    .dropdown-menu {
+        border: none;
+        box-shadow: none;
+        padding-left: 1rem;
+    }
+    
+    .site-main {
+        padding: 2rem 0;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .footer-top {
+        text-align: center;
+    }
+    
+    .footer-heading:after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-bottom-links {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .footer-social {
+        justify-content: center;
+    }
+    
+    .site-main {
+        padding: 1.5rem 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .navbar-brand-text {
+        font-size: 1.125rem;
+    }
+    
+    .navbar-logo {
+        height: 32px;
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .footer-container {
+        padding-bottom: 1rem;
+    }
+    
+    .hero-section {
+        padding: 3rem 0;
+    }
+    
+    .site-main {
+        padding: 1rem 0;
+    }
+}
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-                <img src="{% static 'logo.png' %}" alt="Logo" style="width: 35px; height: 35px; margin-right: 15px; border-radius: 50%;">
-                Real Estate Pro
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Close">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i> Search</a></li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link" href="#" id="dashboardDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-tachometer-alt"></i> Dashboards
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dashboardDropdown">
-                            {% if request.user.role == 'normal' %}
-                            <li><a class="dropdown-item" href="{% url 'user_properties' %}">My Properties</a></li>
-                            <li><a class="dropdown-item" href="{% url 'user_transactions' %}">My Transactions</a></li>
-                            <li><a class="dropdown-item" href="{% url 'user_interests' %}">My Interests</a></li>
-                            {% elif request.user.role == 'agent' %}
-                            <li><a class="dropdown-item" href="{% url 'agent_properties' %}">Assigned Properties</a></li>
-                            <li><a class="dropdown-item" href="{% url 'agent_transactions' %}">My Transactions</a></li>
-                            <li><a class="dropdown-item" href="{% url 'agent_interests' %}">Completed Assignments</a></li>
-                            <li><a class="dropdown-item" href="{% url 'agent_ratings' %}">See Your Ratings</a></li>
-
-
-                            {% elif request.user.role == 'admin' %}
-                            <li><a class="dropdown-item" href="{% url 'admin_properties' %}">All Properties</a></li>
-                            <li><a class="dropdown-item" href="{% url 'admin_pending_properties' %}">Pending Properties</a></li>
-                            <li><a class="dropdown-item" href="{% url 'admin_agent_requests' %}">Agent Applications</a></li>
-                            <li><a class="dropdown-item" href="{% url 'admin_interests' %}">New Interests</a></li>
-                            <li><a class="dropdown-item" href="{% url 'admin_feedbacks' %}">View Feedbacks</a></li>
-                            <li><a class="dropdown-item" href="{% url 'admin_transactions' %}">Transactions History</a></li>
-                            <li><a class="dropdown-item" href="{% url 'admin_pending_transactions' %}">Pending Transactions</a></li>
-                            {% comment %} <li><a class="dropdown-item" href="{% url 'admin_agent_assignments' %}">Agent Assignments</a></li> {% endcomment %}
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'create_property' %}">List Property</a></li>
-                    {% if request.user.role == 'normal' %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'submit_feedback' %}">Feedback</a></li>
-                    {% endif %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link {% if not request.user.profile_picture %}no-profile-pic{% endif %}" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% if request.user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="Profile" class="profile-pic">
-                            {% else %}
-                            <i class="fas fa-user"></i>
-                            {% endif %}
-                            {{ request.user.username }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            {% if request.user.role == 'normal' or request.user.role == 'agent' %}
-                            <li><a class="dropdown-item" href="{% url 'update_profile' %}">My Profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                            {% elif request.user.role == 'admin' %}
-                            <li><a class="dropdown-item" href="{% url 'update_profile' %}">My Profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'manage_users' %}">Manage Users</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'normal_signup' %}">Sign Up</a></li>
-                    {% endif %}
-                </ul>
+<body class="site-body">
+    <!-- Header Section -->
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container navbar-container">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <img src="{% static 'logo.png' %}" alt="Logo" class="navbar-logo">
+                    <span class="navbar-brand-text">Real Estate Pro</span>
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav main-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}">About Us</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i> Search</a></li>
+                    </ul>
+                    
+                    <ul class="navbar-nav user-nav ms-auto">
+                        {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="dashboardDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-tachometer-alt"></i> Dashboards
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
+                                {% if request.user.role == 'normal' %}
+                                <li><a class="dropdown-item" href="{% url 'user_properties' %}">My Properties</a></li>
+                                <li><a class="dropdown-item" href="{% url 'user_transactions' %}">My Transactions</a></li>
+                                <li><a class="dropdown-item" href="{% url 'user_interests' %}">My Interests</a></li>
+                                {% elif request.user.role == 'agent' %}
+                                <li><a class="dropdown-item" href="{% url 'agent_properties' %}">Assigned Properties</a></li>
+                                <li><a class="dropdown-item" href="{% url 'agent_transactions' %}">My Transactions</a></li>
+                                <li><a class="dropdown-item" href="{% url 'agent_interests' %}">Completed Assignments</a></li>
+                                <li><a class="dropdown-item" href="{% url 'agent_ratings' %}">See Your Ratings</a></li>
+                                {% elif request.user.role == 'admin' %}
+                                <li><a class="dropdown-item" href="{% url 'admin_properties' %}">All Properties</a></li>
+                                <li><a class="dropdown-item" href="{% url 'manage_users' %}">Manage Users</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_pending_properties' %}">Pending Properties</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_agent_requests' %}">Agent Applications</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_interests' %}">New Interests</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_feedbacks' %}">View Feedbacks</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_transactions' %}">Transactions History</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_pending_transactions' %}">Pending Transactions</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'create_property' %}">List Property</a></li>
+                        {% if request.user.role == 'normal' %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'submit_feedback' %}">Feedback</a></li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle user-profile-link" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                {% if request.user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" alt="Profile" class="user-profile-img">
+                                {% else %}
+                                <i class="fas fa-user profile-icon"></i>
+                                {% endif %}
+                                <span class="username">{{ request.user.username }}</span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                {% if request.user.role == 'normal' or request.user.role == 'agent' %}
+                                <li><a class="dropdown-item" href="{% url 'update_profile' %}">Update Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                {% elif request.user.role == 'admin' %}
+                                <li><a class="dropdown-item" href="{% url 'update_profile' %}">Update Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-outline-primary sign-up-btn" href="{% url 'normal_signup' %}">Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
-    <div class="content">
-        <div class="container">
+        </nav>
+    </header>
+
+    <!-- Hero Section (Optional) -->
+    {% block hero %}{% endblock %}
+    
+    <!-- Main Content Area -->
+    <main class="site-main">
+        <div class="container main-container">
             {% bootstrap_messages %}
+            
             {% block content %}{% endblock %}
         </div>
-    </div>
-    <footer>
-        <div class="container">
-            <p>© 2025 Real Estate Pro. All Rights Reserved.</p>
-            <p>
-                <a href="{% url 'about_us' %}">About Us</a> |
-                <a href="#">Terms</a> |
-                <a href="#">Privacy</a> |
-                <a href="#">Contact</a>
-            </p>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <div class="container footer-container">
+            <div class="footer-top">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-branding">
+                            <a href="{% url 'home' %}" class="footer-logo">
+                                <img src="{% static 'logo.png' %}" alt="Logo" class="footer-logo-img">
+                                <span class="footer-brand-name">Real Estate Pro</span>
+                            </a>
+                            <p class="footer-tagline">Finding your perfect place to call home.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-links">
+                            <h5 class="footer-heading">Company</h5>
+                            <ul class="footer-nav">
+                                <li><a href="{% url 'about_us' %}" class="footer-link">About Us</a></li>
+                                <li><a href="#" class="footer-link">Our Team</a></li>
+                                <li><a href="#" class="footer-link">Careers</a></li>
+                                <li><a href="#" class="footer-link">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-links">
+                            <h5 class="footer-heading">Support</h5>
+                            <ul class="footer-nav">
+                                <li><a href="#" class="footer-link">Help Center</a></li>
+                                <li><a href="#" class="footer-link">FAQs</a></li>
+                                <li><a href="#" class="footer-link">Privacy Policy</a></li>
+                                <li><a href="#" class="footer-link">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-newsletter">
+                            <h5 class="footer-heading">Stay Updated</h5>
+                            <p class="footer-newsletter-text">Subscribe to our newsletter for the latest property news.</p>
+                            <form class="footer-form">
+                                <div class="input-group">
+                                    <input type="email" class="form-control footer-input" placeholder="Your email">
+                                    <button class="btn btn-primary footer-btn" type="submit">Subscribe</button>
+                                </div>
+                            </form>
+                            <div class="footer-social">
+                                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">© 2025 Real Estate Pro. All Rights Reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="{% url 'about_us' %}" class="footer-bottom-link">About Us</a>
+                    <a href="#" class="footer-bottom-link">Terms</a>
+                    <a href="#" class="footer-bottom-link">Privacy</a>
+                    <a href="#" class="footer-bottom-link">Contact</a>
+                </div>
+            </div>
         </div>
     </footer>
+
     <!-- Search Modal -->
     <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 15px; background: #fff;">
-                <div class="modal-header" style="background: #1a2b4c; color: #f8f9fa;">
+            <div class="modal-content search-modal-content">
+                <div class="modal-header search-modal-header">
                     <h5 class="modal-title" id="searchModalLabel">Search Properties</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
+                <div class="modal-body search-modal-body">
                     <div id="minPriceError" class="alert alert-danger d-none" role="alert">
                         Minimum price cannot be negative.
                     </div>
                     <div id="cityError" class="alert alert-danger d-none" role="alert">
                         City can only contain letters and spaces.
                     </div>
-                    <form method="get" action="{% url 'home' %}" id="searchForm">
-                        <div class="mb-3">
+                    <form method="get" action="{% url 'home' %}" id="searchForm" class="search-form">
+                        <div class="mb-3 form-group">
                             <label for="query" class="form-label">Keyword</label>
-                            <input type="text" class="form-control" id="query" name="q" placeholder="e.g., Modern House" style="border-radius: 10px;">
+                            <input type="text" class="form-control search-input" id="query" name="q" placeholder="e.g., Modern House">
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 form-group">
                             <label for="property_type" class="form-label">Property Type</label>
-                            <select class="form-select" id="property_type" name="property_type" style="border-radius: 10px;">
+                            <select class="form-select search-select" id="property_type" name="property_type">
                                 <option value="">Any</option>
                                 <option value="house">House</option>
                                 <option value="apartment">Apartment</option>
                                 <option value="commercial">Commercial</option>
                             </select>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3 form-group">
                             <label for="city" class="form-label">City</label>
-                            <input type="text" class="form-control" id="city" name="city" placeholder="e.g., Dhaka" pattern="[A-Za-z\s]+" title="City can only contain letters and spaces" style="border-radius: 10px;" aria-describedby="cityError">
+                            <input type="text" class="form-control search-input" id="city" name="city" placeholder="e.g., Dhaka" pattern="[A-Za-z\s]+" title="City can only contain letters and spaces" aria-describedby="cityError">
                         </div>
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="min_price" class="form-label">Min Price</label>
-                                <input type="number" class="form-control" id="min_price" name="min_price" placeholder="0" min="0" style="border-radius: 10px;" aria-describedby="minPriceError">
+                                <input type="number" class="form-control search-input" id="min_price" name="min_price" placeholder="0" min="0" aria-describedby="minPriceError">
                             </div>
                             <div class="col">
                                 <label for="max_price" class="form-label">Max Price</label>
-                                <input type="number" class="form-control" id="max_price" name="max_price" placeholder="No limit" min="0" style="border-radius: 10px;">
+                                <input type="number" class="form-control search-input" id="max_price" name="max_price" placeholder="No limit" min="0">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100" id="applyFiltersBtn" style="border-radius: 25px;" disabled>Apply Filters</button>
+                        <button type="submit" class="btn btn-primary search-submit-btn w-100" id="applyFiltersBtn" disabled>Apply Filters</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    
+    {% bootstrap_javascript %}
     
     <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -435,40 +918,39 @@
     
         // Initial validation
         validateForm();
-    });
-    </script>
-    {% bootstrap_javascript %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
+        
+        // Auto-hide alerts after a delay
+        const alerts = document.querySelectorAll('.alert:not(#minPriceError):not(#cityError)');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.add('fade-out');
                 setTimeout(() => {
-                    alert.classList.add('fade-out');
-                    setTimeout(() => {
-                        alert.remove();
-                    }, 1000);
+                    alert.remove();
                 }, 1000);
-            });
+            }, 5000);
+        });
 
-            // Enhance hover dropdown with Bootstrap compatibility
-            const dropdowns = document.querySelectorAll('.nav-item.dropdown');
+        // Enhanced dropdown behavior for desktop
+        const mediaQuery = window.matchMedia('(min-width: 992px)');
+        if (mediaQuery.matches) {
+            const dropdowns = document.querySelectorAll('.navbar .nav-item.dropdown');
             dropdowns.forEach(dropdown => {
                 const dropdownMenu = dropdown.querySelector('.dropdown-menu');
-                const dropdownToggle = dropdown.querySelector('.nav-link');
-
-                // Show on hover
+                
                 dropdown.addEventListener('mouseenter', function() {
                     dropdownMenu.classList.add('show');
-                    dropdownToggle.setAttribute('aria-expanded', 'true');
+                    this.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'true');
                 });
-
-                // Hide on mouse leave
+                
                 dropdown.addEventListener('mouseleave', function() {
                     dropdownMenu.classList.remove('show');
-                    dropdownToggle.setAttribute('aria-expanded', 'false');
+                    this.querySelector('.dropdown-toggle').setAttribute('aria-expanded', 'false');
                 });
             });
-        });
+        }
+    });
     </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

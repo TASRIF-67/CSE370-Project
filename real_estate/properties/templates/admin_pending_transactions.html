@@ -3,68 +3,289 @@
 {% load static %}
 {% block content %}
 
-<!-- Pending Transaction Requests Section -->
+<!-- Modern Pending Transaction Requests Section -->
 <div class="container py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Pending Transaction Requests</h2>
+    <h2 class="transaction-title text-center mb-4">Pending Transaction Requests</h2>
     
-    
-
-
     {% if pending_transactions %}
-    <div class="row g-5">
+    <div class="transaction-grid">
         {% for transaction in pending_transactions %}
-        <div class="col-md-4">
-            <div class="card h-100" style="border: 1px solid rgb(238, 237, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
-                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                    <h5 class="mb-0" style="font-weight: 600; font-size: 1.5rem;">{{ transaction.property.title }}</h5>
+        <div class="transaction-card">
+            <div class="transaction-header">
+                <h3 class="property-title">{{ transaction.property.title }}</h3>
+                <div class="status-chip">Pending</div>
+            </div>
+            
+            <div class="transaction-body">
+                <div class="transaction-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Agent</span>
+                        <span class="detail-value">{{ transaction.agent.username }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Buyer</span>
+                        <span class="detail-value">{{ transaction.buyer.username }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Amount</span>
+                        <span class="price-value">${{ transaction.amount }}</span>
+                    </div>
                 </div>
-                <div class="card-body p-4 d-flex flex-column justify-content-between">
-                    <div>
-                        <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Agent:</span> <span style="color: #6c757d;">{{ transaction.agent.username }}</span></p>
-                        <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Buyer:</span> <span style="color: #6c757d;">{{ transaction.buyer.username }}</span></p>
-                        <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Amount:</span> <span style="color: #d4af37; font-weight: bold;">${{ transaction.amount }}</span></p>
-                        <p><span class="fw-bold" style="color: #1a2b4c;">Status:</span> <span style="color: #d4af37; font-weight: 600;">Pending</span></p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'admin_transaction_detail' transaction.id %}" class="btn btn-primary btn-sm" style="border-radius: 25px; padding: 8px 20px; background: #d4af37; border-color: #d4af37;">View Details</a>
-                        <a href="{% url 'admin_confirm_transaction' transaction.id %}" class="btn btn-success btn-sm" style="border-radius: 25px; padding: 8px 20px;">Confirm</a>
-                        <a href="{% url 'admin_reject_transaction' transaction.id %}" class="btn btn-danger btn-sm" style="border-radius: 25px; padding: 8px 20px;">Reject</a>
-                    </div>
+                
+                <div class="action-buttons">
+                    <a href="{% url 'admin_transaction_detail' transaction.id %}" class="btn btn-view">
+                        <i class="bi bi-eye me-1"></i> View
+                    </a>
+                    <a href="{% url 'admin_confirm_transaction' transaction.id %}" class="btn btn-confirm">
+                        <i class="bi bi-check-circle me-1"></i> Confirm
+                    </a>
+                    <a href="{% url 'admin_reject_transaction' transaction.id %}" class="btn btn-reject">
+                        <i class="bi bi-x-circle me-1"></i> Reject
+                    </a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
-{% else %}
-    <div class="card p-5 text-center" style="border: 1px solid rgb(233, 233, 233); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
-        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300;">No pending transaction requests available.</p>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="bi bi-clipboard-check"></i>
+        </div>
+        <h3>No Pending Requests</h3>
+        <p>There are currently no pending transaction requests that require your attention.</p>
     </div>
-{% endif %}
+    {% endif %}
 </div>
 
 <style>
-    .card-header { padding: 15px; }
-    .card-body p { font-size: 1.1rem; line-height: 1.6; }
-    .btn-primary, .btn-success {
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    /* Modern styling for pending transactions */
+    .transaction-title {
+        color: #1a2b4c;
+        font-weight: 600;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 0.5rem;
     }
-    .btn-primary {
-        background: #d4af37; border-color: #d4af37;
+    
+    .transaction-title:after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        height: 3px;
+        width: 80px;
+        background-color: #d4af37;
+        transform: translateX(-50%);
     }
-    .btn-primary:hover {
-        background: #b8962e; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    
+    .transaction-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
     }
-    .btn-success {
-        background: #28a745; border-color: #28a745;
-    }
-    .btn-success:hover {
-        background: #218838; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    }
-    .card {
+    
+    .transaction-card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
-    .card:hover {
-        transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    
+    .transaction-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+    
+    .transaction-header {
+        background: linear-gradient(120deg, #1a2b4c, #2a3b5c);
+        color: #ffffff;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .property-title {
+        font-weight: 600;
+        font-size: 1.4rem;
+        margin-bottom: 0;
+        flex: 1;
+    }
+    
+    .status-chip {
+        background-color: rgba(212, 175, 55, 0.2);
+        color: #d4af37;
+        font-weight: 600;
+        padding: 0.3rem 0.8rem;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        margin-left: 1rem;
+        display: inline-block;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    
+    .transaction-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+    }
+    
+    .transaction-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-bottom: 0.2rem;
+        font-weight: 500;
+    }
+    
+    .detail-value {
+        color: #1a2b4c;
+        font-size: 1.05rem;
+    }
+    
+    .price-value {
+        color: #d4af37;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        border-radius: 30px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        flex: 1;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+    
+    .btn-view {
+        background-color: #d4af37;
+        border-color: #d4af37;
+        color: white;
+    }
+    
+    .btn-view:hover {
+        background-color: #b8962e;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-confirm {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    
+    .btn-confirm:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-reject {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+    
+    .btn-reject:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        color: #d4af37;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        font-weight: 600;
+        color: #1a2b4c;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    @media (max-width: 768px) {
+        .transaction-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .transaction-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .property-title {
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .status-chip {
+            margin-left: 0;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .btn {
+            width: 100%;
+        }
     }
 </style>
 

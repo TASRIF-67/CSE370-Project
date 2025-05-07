@@ -3,89 +3,297 @@
 {% load static %}
 {% block content %}
 
-<!-- Transaction Detail Section -->
+<!-- Modern Transaction Detail Section -->
 <div class="container py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Transaction Details</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="transaction-title">Transaction Details</h2>
+        <a href="{% url 'agent_interests' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Completed Tasks
+        </a>
+    </div>
     
-
-    <!-- Main Transaction Card -->
-    <div class="card mb-4" style="border: 1px solidrgb(235, 233, 228); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
-        <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-            <h3 class="mb-0" style="font-weight: 600; font-size: 1.8rem;">{{ transaction.property.title }}</h3>
-        </div>
-        <div class="card-body p-4">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Location:</span> <span style="color: #6c757d;">{{ transaction.property.city }}</span></p>
-                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Selling Price:</span> <span style="color: #d4af37; font-weight: bold; font-size: 1.2rem;">${{ transaction.amount }}</span></p>
-                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Date:</span> <span style="color: #6c757d;">{{ transaction.date }}</span></p>
-                    <p><span class="fw-bold" style="color: #1a2b4c;">Status:</span> <span style="color: #28a745; font-weight: 600;">Sold</span></p>
+    <div class="transaction-container">
+        <!-- Property Summary -->
+        <div class="main-card">
+            <div class="property-header">
+                <div>
+                    <h3 class="property-title">{{ transaction.property.title }}</h3>
+                    <p class="property-location">{{ transaction.property.city }}</p>
+                </div>
+                <div class="status-chip">Sold</div>
+            </div>
+            
+            <div class="property-details">
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <span class="detail-label">Selling Price</span>
+                        <span class="price-value">${{ transaction.amount }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Transaction Date</span>
+                        <span class="detail-value">{{ transaction.date }}</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Buyer and Seller Sections -->
-    <div class="row g-4">
-        <!-- Seller Card -->
-        <div class="col-md-6">
-            <div class="card" style="border: 1px solidrgb(240, 239, 235); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
-                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                    <h4 class="mb-0" style="font-weight: 600; font-size: 1.5rem;">Seller Information</h4>
+        
+        <!-- Parties Information -->
+        <div class="parties-container">
+            <!-- Seller Info -->
+            <div class="party-card seller-card">
+                <div class="party-header">
+                    <h4>
+                        <i class="bi bi-person-check me-2"></i>
+                        Seller Information
+                    </h4>
                 </div>
-                <div class="card-body p-4">
-                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Name:</span> <span style="color: #6c757d;">{{ transaction.property.seller.username }}</span></p>
-                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Phone:</span> <span style="color: #6c757d;">{{ transaction.property.seller.phone_number|default:"Not provided" }}</span></p>
-                    <p><span class="fw-bold" style="color: #1a2b4c;">Location:</span> <span style="color: #6c757d;">{{ transaction.property.seller.address|default:"Not provided" }}</span></p>
+                <div class="party-details">
+                    <div class="contact-info">
+                        <div class="info-item">
+                            <span class="info-label">Name</span>
+                            <span class="info-value">{{ transaction.property.seller.username }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Phone</span>
+                            <span class="info-value">{{ transaction.property.seller.phone_number|default:"Not provided" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">{{ transaction.property.seller.address|default:"Not provided" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Buyer Info -->
+            <div class="party-card buyer-card">
+                <div class="party-header">
+                    <h4>
+                        <i class="bi bi-person-plus me-2"></i>
+                        Buyer Information
+                    </h4>
+                </div>
+                <div class="party-details">
+                    <div class="contact-info">
+                        <div class="info-item">
+                            <span class="info-label">Name</span>
+                            <span class="info-value">{{ transaction.buyer.username }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Phone</span>
+                            <span class="info-value">{{ transaction.buyer.phone_number|default:"Not provided" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">{{ transaction.buyer.address|default:"Not provided" }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Buyer Card -->
-        <div class="col-md-6">
-            <div class="card" style="border: 1px solidrgb(233, 230, 222); border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05); background: #fff;">
-                <div class="card-header" style="background: #1a2b4c; color: #fff; border-top-left-radius: 15px; border-top-right-radius: 15px;">
-                    <h4 class="mb-0" style="font-weight: 600; font-size: 1.5rem;">Buyer Information</h4>
-                </div>
-                <div class="card-body p-4">
-                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Name:</span> <span style="color: #6c757d;">{{ transaction.buyer.username }}</span></p>
-                    <p class="mb-2"><span class="fw-bold" style="color: #1a2b4c;">Phone:</span> <span style="color: #6c757d;">{{ transaction.buyer.phone_number|default:"Not provided" }}</span></p>
-                    <p><span class="fw-bold" style="color: #1a2b4c;">Location:</span> <span style="color: #6c757d;">{{ transaction.buyer.address|default:"Not provided" }}</span></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="text-center mt-4">
-        <a href="{% url 'agent_interests' %}" class="btn btn-primary" style="border-radius: 25px; padding: 10px 25px; background: #d4af37; border-color: #d4af37;">Back to Completed Tasks</a>
     </div>
 </div>
 
 <style>
-    .card-header {
-        padding: 15px;
+    /* Modern styling for transaction details */
+    .transaction-title {
+        color: #1a2b4c;
+        font-weight: 600;
+        font-size: 1.8rem;
+        position: relative;
+        padding-bottom: 0.5rem;
     }
-    .card-body p {
+    
+    .transaction-title:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 3px;
+        width: 60px;
+        background-color: #d4af37;
+    }
+    
+    .transaction-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .main-card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .property-header {
+        background: linear-gradient(120deg, #1a2b4c, #2a3b5c);
+        color: #ffffff;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .property-title {
+        font-weight: 600;
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .property-location {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .status-chip {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        font-weight: 600;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    
+    .property-details {
+        padding: 1.5rem;
+    }
+    
+    .detail-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .price-value {
+        color: #d4af37;
+        font-weight: 700;
+        font-size: 1.6rem;
+    }
+    
+    .detail-value {
+        color: #1a2b4c;
+        font-weight: 500;
         font-size: 1.1rem;
-        line-height: 1.6;
     }
-    .btn-primary {
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-        background: #d4af37;
-        border-color: #d4af37;
+    
+    .parties-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
     }
-    .btn-primary:hover {
-        background: #b8962e;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    }
-    .card {
+    
+    .party-card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        height: 100%;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .card:hover {
+    
+    .party-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .party-header {
+        background: #1a2b4c;
+        color: #ffffff;
+        padding: 1.2rem 1.5rem;
+    }
+    
+    .party-header h4 {
+        margin-bottom: 0;
+        font-weight: 600;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .party-details {
+        padding: 1.5rem;
+    }
+    
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.2rem;
+    }
+    
+    .info-value {
+        color: #1a2b4c;
+        font-size: 1.05rem;
+    }
+    
+    .btn-outline-primary {
+        color: #1a2b4c;
+        border-color: #d4af37;
+        border-radius: 30px;
+        padding: 0.5rem 1.2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #d4af37;
+        color: #ffffff;
+        border-color: #d4af37;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+        .property-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .status-chip {
+            align-self: flex-start;
+        }
+        
+        .detail-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .transaction-title {
+            font-size: 1.5rem;
+        }
+        
+        .property-title {
+            font-size: 1.4rem;
+        }
     }
 </style>
 

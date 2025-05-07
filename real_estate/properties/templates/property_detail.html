@@ -2,212 +2,565 @@
 {% load django_bootstrap5 %}
 {% block content %}
 
-<div class="container mt-5 py-5" style="max-width: 1000px;">
-    <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);">
-        <!-- Property Carousel -->
-        {% if property.images.first %}
+<div class="property-container">
+    <!-- Property Carousel -->
+    {% if property.images.first %}
+    <div class="image-gallery">
         <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 {% for image in property.images.all %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                    <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ property.title }}" style="height: 450px; object-fit: cover; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                    <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ property.title }}">
                 </div>
                 {% endfor %}
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" style="filter: invert(20%) sepia(50%) saturate(500%) hue-rotate(180deg) brightness(90%) contrast(90%);"></span>
+                <span class="carousel-control-prev-icon"></span>
                 <span class="visually-hidden">Previous</span>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" style="filter: invert(20%) sepia(50%) saturate(500%) hue-rotate(180deg) brightness(90%) contrast(90%);"></span>
+                <span class="carousel-control-next-icon"></span>
                 <span class="visually-hidden">Next</span>
             </button>
+            
+            <!-- Image Counter -->
+            <div class="image-counter">
+                <span class="current-image">1</span>/<span class="total-images">{{ property.images.all|length }}</span>
+            </div>
         </div>
-        {% endif %}
+    </div>
+    {% endif %}
 
-        <!-- Property Details -->
-        <div class="card-body p-5">
-            <h2 class="card-title text-center mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 2.5rem; letter-spacing: 1px;">{{ property.title }}</h2>
-            <p class="text-center text-muted mb-5" style="font-size: 1.1rem; font-style: italic;">
-                <span class="badge" style="background: #d4af37; color: #fff; font-size: 0.9rem; padding: 6px 12px; border-radius: 12px; margin-right: 10px;">{{ property.property_type|title }}</span>
-                <span class="badge" style="background: {% if property.status == 'approved' %}#28a745{% else %}#d4af37{% endif %}; color: #fff; font-size: 0.9rem; padding: 6px 12px; border-radius: 12px;">{{ property.status|title }}</span>
-            </p>
+    <!-- Property Details Content -->
+    <div class="property-content">
+        <!-- Header Section -->
+        <div class="property-header">
+            <h1 class="property-title">{{ property.title }}</h1>
+            <div class="property-tags">
+                <span class="property-tag property-type">{{ property.property_type|title }}</span>
+                <span class="property-tag property-status status-{{ property.status|lower }}">{{ property.status|title }}</span>
+            </div>
+            <div class="property-price">
+                <span class="price-value">${{ property.price }}</span>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-bed"></i>
+                </div>
+                <div class="stat-value">{{ property.bedrooms }}</div>
+                <div class="stat-label">Beds</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-bath"></i>
+                </div>
+                <div class="stat-value">{{ property.bathrooms }}</div>
+                <div class="stat-label">Baths</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-ruler-combined"></i>
+                </div>
+                <div class="stat-value">{{ property.square_footage }}</div>
+                <div class="stat-label">Sq Ft</div>
+            </div>
+            {% if property.year_built %}
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-value">{{ property.year_built }}</div>
+                <div class="stat-label">Built</div>
+            </div>
+            {% endif %}
+        </div>
 
-            <!-- Details Section -->
-            <div class="row g-4 mb-5">
-                <div class="col-md-6">
-                    <div class="detail-item d-flex align-items-center mb-4">
-                        <i class="fas fa-dollar-sign me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Price:</strong></p>
-                            <p class="mb-0 text-success fw-bold" style="font-size: 1.2rem;">${{ property.price }}</p>
-                        </div>
+        <!-- Detailed Information -->
+        <div class="property-details">
+            <div class="details-section">
+                <h2 class="section-title">Location</h2>
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <i class="fas fa-map-marker-alt"></i>
                     </div>
-                    <div class="detail-item d-flex align-items-center mb-4">
-                        <i class="fas fa-map-marker-alt me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Location:</strong></p>
-                            <p class="mb-0" style="color: #555; font-size: 1rem;">{{ property.city }}{% if property.street %}, {{ property.street }}{% endif %}{% if property.zip_code %}, {{ property.zip_code }}{% endif %}</p>
-                        </div>
-                    </div>
-                    <div class="detail-item d-flex align-items-center mb-4">
-                        <i class="fas fa-bed me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Bedrooms:</strong></p>
-                            <p class="mb-0" style="color: #555; font-size: 1rem;">{{ property.bedrooms }}</p>
-                        </div>
-                    </div>
-                    <div class="detail-item d-flex align-items-center">
-                        <i class="fas fa-bath me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Bathrooms:</strong></p>
-                            <p class="mb-0" style="color: #555; font-size: 1rem;">{{ property.bathrooms }}</p>
-                        </div>
+                    <div class="detail-content">
+                        {{ property.city }}{% if property.street %}, {{ property.street }}{% endif %}{% if property.zip_code %}, {{ property.zip_code }}{% endif %}
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="detail-item d-flex align-items-center mb-4">
-                        <i class="fas fa-ruler-combined me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Square Footage:</strong></p>
-                            <p class="mb-0" style="color: #555; font-size: 1rem;">{{ property.square_footage }} sq ft</p>
-                        </div>
+            </div>
+
+            <div class="details-section">
+                <h2 class="section-title">Contacts</h2>
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <i class="fas fa-user"></i>
                     </div>
-                    {% if property.year_built %}
-                    <div class="detail-item d-flex align-items-center mb-4">
-                        <i class="fas fa-calendar-alt me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Year Built:</strong></p>
-                            <p class="mb-0" style="color: #555; font-size: 1rem;">{{ property.year_built }}</p>
-                        </div>
+                    <div class="detail-content">
+                        <span class="detail-label">Seller:</span> {{ property.seller.username }}
                     </div>
-                    {% endif %}
-                    <div class="detail-item d-flex align-items-center mb-4">
-                        <i class="fas fa-user me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Seller:</strong></p>
-                            <p class="mb-0" style="color: #555; font-size: 1rem;">{{ property.seller.username }}</p>
-                        </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <i class="fas fa-user-tie"></i>
                     </div>
-                    <div class="detail-item d-flex align-items-center">
-                        <i class="fas fa-user-tie me-3" style="color: #d4af37; font-size: 1.5rem;"></i>
-                        <div>
-                            <p class="mb-0"><strong style="color: #1a2b4c; font-size: 1rem;">Agent:</strong></p>
-                            <p class="mb-0" style="color: #555; font-size: 1rem;">{{ property.assigned_agent.username|default:"Not Assigned" }}</p>
-                        </div>
+                    <div class="detail-content">
+                        <span class="detail-label">Agent:</span> {{ property.assigned_agent.username|default:"Not Assigned" }}
                     </div>
                 </div>
             </div>
 
             <!-- Description -->
-            <hr style="border-top: 1px solid #d4af37; opacity: 0.3;">
-            <div class="mt-4">
-                <h5 style="color: #1a2b4c; font-weight: 600; font-size: 1.3rem; margin-bottom: 15px;">Description</h5>
-                <p style="color: #555; font-size: 1rem; line-height: 1.8;">{{ property.description }}</p>
+            <div class="details-section">
+                <h2 class="section-title">Description</h2>
+                <div class="property-description">
+                    {{ property.description }}
+                </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="text-center mt-5">
+            <div class="action-buttons">
                 {% if user.is_authenticated %}
                 {% if user != property.seller and user.role == 'normal' and property.status == 'approved' %}
                     {% if has_expressed_interest %}
-                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-danger btn-lg px-5 me-3 custom-btn" style="background: #dc3545; border-color: #dc3545;">Remove Interest</a>
+                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-danger">
+                            <i class="fas fa-heart-broken me-2"></i>Remove Interest
+                        </a>
                     {% else %}
-                        <a href="{% url 'express_interest' property.id %}" class="btn btn-primary btn-lg px-5 me-3 custom-btn" style="background: #d4af37; border-color: #d4af37;">Express Interest</a>
+                        <a href="{% url 'express_interest' property.id %}" class="btn btn-primary">
+                            <i class="fas fa-heart me-2"></i>Express Interest
+                        </a>
                     {% endif %}
                 {% endif %}
             
                 {% if user.role == 'admin' %}
-                <div class="mt-3">
-                    <a href="{% url 'admin_delete_property' property.id %}" class="btn btn-danger btn-sm custom-btn">Delete</a>
-                </div>
+                <a href="{% url 'admin_delete_property' property.id %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt me-2"></i>Delete Property
+                </a>
                 {% endif %}
             
                 {% if request.user.role == 'normal' %}
-                    <a href="{% url 'user_properties' %}" class="btn btn-primary btn-lg px-5 custom-btn" style="background: #1a2b4c; border-color: #1a2b4c;">Back to Properties</a>
+                    <a href="{% url 'user_properties' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Properties
+                    </a>
                 {% elif request.user.role == 'admin' %}
-                    <a href="{% url 'admin_properties' %}" class="btn btn-primary btn-lg px-5 custom-btn" style="background: #1a2b4c; border-color: #1a2b4c;">Back to All Properties</a>
+                    <a href="{% url 'admin_properties' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to All Properties
+                    </a>
                 {% endif %}
             {% endif %}
-            
-            
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Card Styling */
-    .card {
+    /* Modern Digital Design Style */
+    :root {
+        --primary-color: #3a86ff;
+        --primary-dark: #2667cc;
+        --secondary-color: #1a2b4c;
+        --accent-color: #d4af37;
+        --danger-color: #ef476f;
+        --success-color: #06d6a0;
+        --light-bg: #f8f9fa;
+        --dark-text: #2b2d42;
+        --light-text: #8d99ae;
+        --border-radius: 14px;
+        --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        background-color: #f5f7fa;
+        color: var(--dark-text);
+    }
+    
+    /* Container */
+    .property-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 0 20px;
+    }
+    
+    @media (min-width: 992px) {
+        .property-container {
+            grid-template-columns: 1fr 1.2fr;
+            align-items: start;
+        }
+    }
+    
+    /* Image Gallery */
+    .image-gallery {
+        position: relative;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        background: #fff;
+        height: 500px;
+    }
+    
+    .carousel, .carousel-inner, .carousel-item {
+        height: 100%;
+    }
+    
+    .carousel-item img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    
+    .carousel-control-prev, .carousel-control-next {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.9;
+        margin: 0 20px;
+    }
+    
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231a2b4c' viewBox='0 0 16 16'%3E%3Cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
+    }
+    
+    .carousel-control-next-icon {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231a2b4c' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    }
+    
+    .image-counter {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    /* Property Content */
+    .property-content {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+    }
+    
+    /* Property Header */
+    .property-header {
+        padding: 30px;
+        position: relative;
+        background: linear-gradient(135deg, var(--secondary-color) 0%, #2a3f5f 100%);
+        color: white;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .property-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        line-height: 1.2;
+    }
+    
+    .property-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .property-tag {
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    
+    .property-type {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .status-approved {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .status-pending {
+        background: var(--accent-color);
+        color: white;
+    }
+    
+    .status-sold {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    .property-price {
+        margin-top: 5px;
+        align-self: flex-start;
+        background: var(--accent-color);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 1.5rem;
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    /* Quick Stats */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 15px;
+        padding: 25px;
+        background: linear-gradient(to right, #f8f9fa, #ffffff);
+        border-bottom: 1px solid #eaeaea;
+    }
+    
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 15px 10px;
+        border-radius: var(--border-radius);
+        background: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
-    .card:hover {
+    
+    .stat-item:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
     }
-
-    /* Carousel Styling */
-    .carousel-control-prev, .carousel-control-next {
-        width: 5%;
-        background: rgba(0, 0, 0, 0.3);
-        transition: background 0.3s ease;
+    
+    .stat-icon {
+        color: var(--accent-color);
+        font-size: 1.6rem;
+        margin-bottom: 8px;
     }
-
-    .carousel-control-prev:hover, .carousel-control-next:hover {
-        background: rgba(0, 0, 0, 0.5);
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark-text);
+        line-height: 1;
+        margin-bottom: 5px;
     }
-
-    /* Details Section */
-    .detail-item {
-        transition: transform 0.3s ease;
+    
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--light-text);
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-
-    .detail-item:hover {
-        transform: translateX(5px);
+    
+    /* Property Details */
+    .property-details {
+        padding: 30px;
     }
-
-    /* Button Styling */
-    .custom-btn {
-        border-radius: 25px;
-        padding: 10px 25px;
+    
+    .details-section {
+        margin-bottom: 30px;
+    }
+    
+    .section-title {
+        position: relative;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--secondary-color);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--accent-color);
+    }
+    
+    .detail-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .detail-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+        border-radius: 10px;
+        color: var(--accent-color);
+        margin-right: 15px;
+        font-size: 1.2rem;
+    }
+    
+    .detail-content {
+        font-size: 1.1rem;
+        color: var(--dark-text);
+    }
+    
+    .detail-label {
+        color: var(--light-text);
+        font-weight: 500;
+        margin-right: 5px;
+    }
+    
+    /* Description */
+    .property-description {
+        color: #555;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 30px;
+        justify-content: center;
+    }
+    
+    .btn {
+        padding: 12px 30px;
         font-weight: 600;
-        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 50px;
+        font-size: 1rem;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-
-    .custom-btn[style*="background: #d4af37"] {
-        background: #d4af37;
-        border-color: #d4af37;
-    }
-
-    .custom-btn[style*="background: #d4af37"]:hover {
-        background: #b8962e;
+    
+    .btn:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(212, 175, 55, 0.3);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     }
-
-    .custom-btn[style*="background: #1a2b4c"] {
-        background: #1a2b4c;
-        border-color: #1a2b4c;
+    
+    .btn-primary {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+        color: white;
     }
-
-    .custom-btn[style*="background: #1a2b4c"]:hover {
-        background: #13203a;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    
+    .btn-primary:hover {
+        background: #c09c31;
+        border-color: #c09c31;
     }
-
+    
+    .btn-secondary {
+        background: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #131f38;
+        border-color: #131f38;
+    }
+    
     .btn-danger {
-        border-radius: 25px;
-        padding: 8px 20px;
-        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        background: var(--danger-color);
+        border-color: var(--danger-color);
+        color: white;
     }
-
+    
     .btn-danger:hover {
-        background: #c82333;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(220, 53, 69, 0.3);
+        background: #d82d58;
+        border-color: #d82d58;
     }
+    
+    .btn-outline-danger {
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+        background: transparent;
+    }
+    
+    .btn-outline-danger:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 991px) {
+        .image-gallery {
+            height: 400px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .quick-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .property-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .property-header {
+            padding: 20px;
+        }
+        
+        .property-title {
+            font-size: 1.6rem;
+        }
+        
+        .property-price {
+            padding: 8px 18px;
+            font-size: 1.2rem;
+        }
+        
+        .property-tag {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+    }
+          
+
+
+    /* Script for Image Counter */
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.getElementById('propertyCarousel');
+        const currentImageElement = document.querySelector('.current-image');
+        
+        if (carousel && currentImageElement) {
+            carousel.addEventListener('slide.bs.carousel', function(event) {
+                const nextIndex = event.to + 1;
+                currentImageElement.textContent = nextIndex;
+            });
+        }
+    });
 </style>
 
 {% endblock %}

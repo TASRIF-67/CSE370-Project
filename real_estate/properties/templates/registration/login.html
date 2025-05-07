@@ -1,17 +1,61 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 {% block content %}
-<div class="container mt-5" style="max-width: 500px;">
-    <h2 class="text-center">Login</h2>
-    <div class="card p-4">
+<div class="container d-flex justify-content-center align-items-center min-vh-75 py-5">
+  <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+      <!-- Wave shape inside the card at the top -->
+      <div class="position-relative bg-primary" style="height: 80px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="position-absolute bottom-0" style="width: 100%;">
+          <path fill="#fff" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,128C960,117,1056,75,1152,64C1248,53,1344,75,1392,85.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+      </div>
+      
+      <div class="card-body p-5 position-relative">
+        <!-- Header -->
+        <div class="text-center mb-4">
+          <h1 class="fw-bold mb-0">Welcome back</h1>
+          <p class="text-muted">Sign in to continue to your account</p>
+        </div>
+        
+        <!-- Login form - Only the functional part -->
         <form method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+          {% csrf_token %}
+          <div class="mb-4">
+            {% bootstrap_form form layout="floating" %}
+          </div>
+          
+          <!-- Submit button -->
+          <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill mb-3">
+            <span class="fw-bold">Sign In</span>
+          </button>
         </form>
-        <p class="text-center mt-3">
-            Don't have an account? <a href="{% url 'normal_signup' %}">Sign Up</a>
-        </p>
+        
+        <!-- Sign up link -->
+        <div class="text-center mt-4">
+          <p class="mb-0">Don't have an account? <a href="{% url 'normal_signup' %}" class="fw-bold text-decoration-none">Sign up</a></p>
+        </div>
+        
+        <!-- Wave shape inside the card at the bottom -->
+        <div class="position-absolute bottom-0 start-0 w-100" style="z-index: -1;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style="width: 100%; height: 80px;">
+            <path fill="#4f46e5" fill-opacity="0.1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,213.3C672,224,768,224,864,208C960,192,1056,160,1152,149.3C1248,139,1344,149,1392,154.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Curved separator between card body and footer -->
+      <div class="position-relative overflow-hidden" style="height: 40px; background-color: white;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="position-absolute top-0" style="width: 100%;">
+          <path fill="#f8f9fa" d="M0,96L48,106.7C96,117,192,139,288,149.3C384,160,480,160,576,138.7C672,117,768,75,864,64C960,53,1056,75,1152,90.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+      </div>
+      
+      <!-- Card footer with a different background -->
+      <div class="card-footer bg-light p-3 text-center">
+        <p class="small text-muted mb-0">© 2025 Your Company. All rights reserved.</p>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,80 +1,335 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
+
 {% block content %}
-<div class="container mt-5" style="max-width: 800px;">
-    <h2 class="text-center mb-4">List a New Property</h2>
-    <div class="card shadow-sm p-4" style="border-radius: 10px; background-color: #fff;">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="row g-3">
-                <!-- Left Column -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="id_title" class="form-label fw-bold">Property Title</label>
-                        {{ form.title }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_description" class="form-label fw-bold">Description</label>
-                        {{ form.description }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_price" class="form-label fw-bold">Price ($)</label>
-                        {{ form.price }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_city" class="form-label fw-bold">City</label>
-                        {{ form.city }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_street" class="form-label fw-bold">Street (Optional)</label>
-                        {{ form.street }}
-                    </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0 rounded-4 mb-5">
+                <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                    <h2 class="text-center m-0 fw-bold">List Your Property</h2>
                 </div>
-                <!-- Right Column -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="id_property_type" class="form-label fw-bold">Property Type</label>
-                        {{ form.property_type }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_bedrooms" class="form-label fw-bold">Bedrooms</label>
-                        {{ form.bedrooms }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_bathrooms" class="form-label fw-bold">Bathrooms</label>
-                        {{ form.bathrooms }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_square_footage" class="form-label fw-bold">Square Footage (sq ft)</label>
-                        {{ form.square_footage }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_year_built" class="form-label fw-bold">Year Built (Optional)</label>
-                        {{ form.year_built }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_zip_code" class="form-label fw-bold">Zip Code (Optional)</label>
-                        {{ form.zip_code }}
-                    </div>
-                </div>
-                <!-- Full Width for Images -->
-                <div class="col-12">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Upload Images</label>
-                        {{ formset.management_form }}
-                        {% for image_form in formset %}
-                        <div class="mb-2">
-                            {{ image_form.image }}
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" enctype="multipart/form-data" id="propertyForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Property Details Section -->
+                        <div class="mb-4">
+                            <h4 class="mb-3 text-primary border-bottom pb-2">Basic Information</h4>
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="id_title" class="form-label">Property Title</label>
+                                    <input type="text" name="{{ form.title.name }}" 
+                                        class="form-control" 
+                                        id="id_title" 
+                                        placeholder="Enter a descriptive title" 
+                                        required
+                                        {% if form.title.value %}value="{{ form.title.value }}"{% endif %}>
+                                    <div class="invalid-feedback">Please provide a property title</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="id_price" class="form-label">Price ($)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" name="{{ form.price.name }}" 
+                                            class="form-control price-input" 
+                                            id="id_price" 
+                                            placeholder="e.g. 350000" 
+                                            inputmode="numeric" 
+                                            pattern="[0-9]*" 
+                                            required
+                                            {% if form.price.value %}value="{{ form.price.value }}"{% endif %}>
+                                    </div>
+                                    <div class="invalid-feedback">Please enter a valid price (numbers only)</div>
+                                </div>
+                            </div>
                         </div>
-                        {% endfor %}
-                        <small class="form-text text-muted">Upload up to 3 images (e.g., JPG, PNG).</small>
-                    </div>
-                </div>
+                        
+                        <!-- Property Description -->
+                        <div class="mb-4">
+                            <label for="id_description" class="form-label">Description</label>
+                            <textarea name="{{ form.description.name }}" 
+                                class="form-control" 
+                                id="id_description" 
+                                placeholder="Describe your property..." 
+                                rows="5" 
+                                required>{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
+                            <div class="invalid-feedback">Please provide a property description</div>
+                        </div>
+                        
+                <!-- Property Specifications -->
+<div class="mb-4">
+    <h4 class="mb-3 text-primary border-bottom pb-2">Property Specifications</h4>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="id_property_type" class="form-label">Property Type</label>
+            <select name="{{ form.property_type.name }}" 
+                class="form-select" 
+                id="id_property_type" 
+                required>
+                {% for value, text in form.property_type.field.choices %}
+                <option value="{{ value }}" {% if form.property_type.value == value %}selected{% endif %}>{{ text }}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a property type</div>
+        </div>
+        <div class="col-md-6">
+            <label for="id_square_footage" class="form-label">Square Footage</label>
+            <div class="input-group">
+                <input type="text" name="{{ form.square_footage.name }}" 
+                    class="form-control" 
+                    id="id_square_footage" 
+                    placeholder="e.g. 1500" 
+                    inputmode="numeric" 
+                    pattern="[0-9]*" 
+                    required
+                    {% if form.square_footage.value %}value="{{ form.square_footage.value }}"{% endif %}>
+                <span class="input-group-text">sq ft</span>
             </div>
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary px-5 py-2" style="font-size: 1.1rem;">Submit Listing</button>
-            </div>
-        </form>
+            <div class="invalid-feedback">Please enter valid square footage (numbers only)</div>
+        </div>
+    </div>
+    
+    <div class="row g-3 mt-1">
+        <div class="col-md-4">
+            <label for="id_bedrooms" class="form-label">Bedrooms</label>
+            <input type="number" name="{{ form.bedrooms.name }}" 
+                class="form-control" 
+                id="id_bedrooms" 
+                min="1" 
+                step="1" 
+                placeholder="e.g. 3" 
+                required
+                {% if form.bedrooms.value %}value="{{ form.bedrooms.value }}"{% endif %}>
+            <div class="invalid-feedback">Please enter a valid number of bedrooms (0 or more)</div>
+        </div>
+        <div class="col-md-4">
+            <label for="id_bathrooms" class="form-label">Bathrooms</label>
+            <input type="number" name="{{ form.bathrooms.name }}" 
+                class="form-control" 
+                id="id_bathrooms" 
+                min="1" 
+                step="1" 
+                placeholder="e.g. 1" 
+                required
+                {% if form.bathrooms.value %}value="{{ form.bathrooms.value }}"{% endif %}>
+            <div class="invalid-feedback">Please enter a valid number of bathrooms (0 or more, can include 0.5 increments)</div>
+        </div>
+        <div class="col-md-4">
+            <label for="id_year_built" class="form-label">Year Built</label>
+            <input type="text" name="{{ form.year_built.name }}" 
+                class="form-control" 
+                id="id_year_built" 
+                placeholder="e.g. 2010" 
+                inputmode="numeric" 
+                pattern="[0-9]*"
+                {% if form.year_built.value %}value="{{ form.year_built.value }}"{% endif %}>
+            <div class="invalid-feedback">Please enter a valid year (numbers only)</div>
+        </div>
     </div>
 </div>
+                        <!-- Location Information -->
+                        <div class="mb-4">
+                            <h4 class="mb-3 text-primary border-bottom pb-2">Location Information</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_city" class="form-label">City</label>
+                                    <input type="text" name="{{ form.city.name }}" 
+                                        class="form-control city-input" 
+                                        id="id_city" 
+                                        placeholder="Enter city name" 
+                                        pattern="[A-Za-z\s\-']+" 
+                                        required
+                                        {% if form.city.value %}value="{{ form.city.value }}"{% endif %}>
+                                    <div class="invalid-feedback">Please enter a valid city name (letters only)</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_zip_code" class="form-label">Zip Code</label>
+                                    <input type="text" name="{{ form.zip_code.name }}" 
+                                        class="form-control" 
+                                        id="id_zip_code" 
+                                        placeholder="e.g. 90210" 
+                                        inputmode="numeric" 
+                                        pattern="[0-9]*"
+                                        {% if form.zip_code.value %}value="{{ form.zip_code.value }}"{% endif %}>
+                                    <div class="invalid-feedback">Please enter a valid zip code (numbers only)</div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <label for="id_street" class="form-label">Street Address</label>
+                                    <input type="text" name="{{ form.street.name }}" 
+                                        class="form-control" 
+                                        id="id_street" 
+                                        placeholder="Enter street address"
+                                        {% if form.street.value %}value="{{ form.street.value }}"{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Property Images -->
+                        <div class="mb-4">
+                            <h4 class="mb-3 text-primary border-bottom pb-2">Property Images</h4>
+                            {{ formset.management_form }}
+                            
+                            <div class="row image-preview-container">
+                                {% for image_form in formset %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 image-upload-card">
+                                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                                            <div class="image-preview mb-2">
+                                                <img src="/api/placeholder/400/320" class="img-preview img-fluid d-none" alt="Preview">
+                                                <div class="upload-placeholder">
+                                                    <i class="bi bi-image fs-1"></i>
+                                                    <p class="mb-0">Image {{ forloop.counter }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="position-relative">
+                                                {{ image_form.image }}
+                                                <script>
+                                                    document.currentScript.previousElementSibling.classList.add('form-control', 'image-input');
+                                                    document.currentScript.previousElementSibling.setAttribute('accept', 'image/*');
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">Upload up to 3 property images (JPG, PNG recommended). First image will be the featured image.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 col-md-6 mx-auto mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 rounded-3 shadow-sm">
+                                <i class="bi bi-house-add me-2"></i>Submit Property Listing
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add Bootstrap form validation
+(function() {
+    'use strict';
+    
+    // Form validation
+    const form = document.getElementById('propertyForm');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+    
+    // Input validation for price (numbers only)
+    const priceInput = document.querySelector('.price-input');
+    if (priceInput) {
+        priceInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+    
+    // Input validation for city (letters only)
+    const cityInput = document.querySelector('.city-input');
+    if (cityInput) {
+        cityInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^A-Za-z\s\-']/g, '');
+        });
+    }
+    
+    // Input validation for square footage and year (numbers only)
+    const numericInputs = document.querySelectorAll('input[pattern="[0-9]*"]');
+    numericInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    });
+    
+    // Image preview functionality
+    const imageInputs = document.querySelectorAll('.image-input');
+    imageInputs.forEach(input => {
+        input.addEventListener('change', function(e) {
+            const preview = this.closest('.image-upload-card').querySelector('.img-preview');
+            const placeholder = this.closest('.image-upload-card').querySelector('.upload-placeholder');
+            
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                }
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                preview.classList.add('d-none');
+                placeholder.classList.remove('d-none');
+            }
+        });
+    });
+})();
+</script>
+
+<style>
+/* Custom styles for property listing form */
+.card-header {
+    border-bottom: none;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+
+.image-upload-card {
+    border: 2px dashed #dee2e6;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.image-upload-card:hover {
+    border-color: #6c757d;
+}
+
+.upload-placeholder {
+    color: #6c757d;
+    padding: 2rem 0;
+}
+
+.image-preview {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-input {
+    cursor: pointer;
+}
+
+/* Override some Bootstrap styles */
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control::placeholder {
+    opacity: 0.6;
+}
+
+/* Add some spacing between sections */
+h4.text-primary {
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+/* Custom styles for form inputs */
+.input-group-text {
+    background-color: #f8f9fa;
+}
+</style>
 {% endblock %}

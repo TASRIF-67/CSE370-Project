@@ -1,43 +1,174 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
 {% load static %}
-{% block content %}
 
+{% block content %}
 <!-- Request Transaction Section -->
 <div class="container py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 2.5rem;">Request Transaction for {{ property.title }}</h2>
-    <div class="card p-4" style="border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);">
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="buyer_id" style="color: #1a2b4c; font-weight: 600;">Select Buyer:</label>
-                <select name="buyer_id" id="buyer_id" class="form-select" style="border-radius: 10px;">
-                    {% for interest in interested_users %}
-                    <option value="{{ interest.interested_user.id }}">{{ interest.interested_user.username }} ({{ interest.interested_user.phone_number }})</option>
-                    {% endfor %}
-                </select>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Page Header with Property Image Background -->
+            <div class="position-relative mb-5 rounded-4 overflow-hidden">
+                <div class="bg-dark rounded-4" style="height: 180px; background-image: url('{% static 'img/property-placeholder.jpg' %}'); background-size: cover; background-position: center; filter: brightness(0.7);"></div>
+                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                    <h2 class="text-white text-center px-4" style="font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                        Request Transaction
+                        <div class="fs-5 mt-2 fw-light">{{ property.title }}</div>
+                    </h2>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="amount" style="color: #1a2b4c; font-weight: 600;">Amount ($):</label>
-                <input type="number" name="amount" id="amount" step="0.01" class="form-control" value="{{ property.price }}" style="border-radius: 10px;">
+            
+            <!-- Transaction Form Card -->
+            <div class="card border-0 rounded-4 p-0 shadow">
+                <!-- Card Header -->
+                <div class="card-header bg-gradient border-0 text-white p-4 rounded-top-4" style="background: linear-gradient(135deg, #1a2b4c 0%, #304878 100%);">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-currency-exchange me-3 fs-4"></i>
+                        <h5 class="mb-0 fw-bold">Transaction Details</h5>
+                    </div>
+                </div>
+                
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Buyer Selection -->
+                        <div class="mb-4">
+                            <label for="buyer_id" class="form-label fw-semibold mb-2">
+                                <i class="bi bi-person-check me-2 text-primary"></i>Select Buyer
+                            </label>
+                            <select name="buyer_id" id="buyer_id" class="form-select shadow-sm" required>
+                                <option value="" disabled selected>Choose a buyer from interested parties</option>
+                                {% for interest in interested_users %}
+                                <option value="{{ interest.interested_user.id }}">
+                                    {{ interest.interested_user.username }} ({{ interest.interested_user.phone_number }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Only users who expressed interest are shown
+                            </div>
+                        </div>
+                        
+                        <!-- Amount Field -->
+                        <div class="mb-4">
+                            <label for="amount" class="form-label fw-semibold mb-2">
+                                <i class="bi bi-cash-stack me-2 text-primary"></i>Amount
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-light">$</span>
+                                <input type="number" name="amount" id="amount" step="0.01" class="form-control" 
+                                    value="{{ property.price }}" required>
+                            </div>
+                            <div class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Default value is the listed property price
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button Section -->
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <a href="#" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-arrow-left me-2"></i>Back
+                            </a>
+                            <button type="submit" class="btn btn-primary px-5 py-2">
+                                Submit Request
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="border-radius: 30px; padding: 12px 35px; font-size: 1.1rem; background: #d4af37; border-color: #d4af37;">Submit Request</button>
-        </form>
+            
+            <!-- Property Summary Card -->
+            <div class="card mt-4 border-0 rounded-4 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-house-check text-primary me-2 fs-4"></i>
+                        <h5 class="card-title mb-0 fw-bold">Property Summary</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-tag me-2 text-muted"></i>
+                                <span class="text-muted">Listed Price:</span>
+                                <span class="ms-2 fw-bold">${{ property.price }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-geo-alt me-2 text-muted"></i>
+                                <span class="text-muted">Location:</span>
+                                <span class="ms-2">{{ property.location }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
-    /* Sync with home.html styling */
-    .btn-primary {
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-        background: #d4af37;
-        border-color: #d4af37;
+    /* Modern Custom Styling */
+    .form-control:focus, .form-select:focus {
+        border-color: #1a2b4c;
+        box-shadow: 0 0 0 0.25rem rgba(26, 43, 76, 0.25);
     }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+    
     .btn-primary:hover {
-        background: #b8962e;
-        transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(212, 175, 55, 0.4);
+        background: linear-gradient(135deg, #b8962e 0%, #a3841e 100%);
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #ced4da;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #1a2b4c;
+        transform: translateY(-2px);
+    }
+    
+    .form-select, .form-control, .input-group-text {
+        border-radius: 8px;
+        padding: 12px 15px;
+        height: auto;
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .text-primary {
+        color: #d4af37 !important;
+    }
+    
+    /* Add smooth scroll behavior */
+    html {
+        scroll-behavior: smooth;
     }
 </style>
-
 {% endblock %}

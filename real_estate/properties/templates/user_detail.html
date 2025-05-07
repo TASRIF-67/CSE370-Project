@@ -3,125 +3,332 @@
 {% load static %}
 {% block content %}
 
-<div class="container py-5" style="background: #fff; min-height: 100vh;">
-    <h1 class="fw-bold text-center mb-5" style="color: #1a2b4c; font-size: 2.25rem; letter-spacing: 1px;">{{ viewed_user.username }}</h1>
-    
-   
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>{{ viewed_user.username }}</h1>
+  </div>
+  
+  <!-- User Info Section -->
+  <div class="profile-card">
+    <div class="profile-card-header">
+      <h2>Profile</h2>
+    </div>
+    <div class="profile-card-body">
+      <div class="profile-info">
+        <div class="profile-info-item">
+          <span class="info-label">Username</span>
+          <span class="info-value">{{ viewed_user.username }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ viewed_user.email|default:"Not provided" }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Role</span>
+          <span class="info-value">{{ viewed_user.role|capfirst }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Phone</span>
+          <span class="info-value">{{ viewed_user.phone_number|default:"Not provided" }}</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="info-label">Location</span>
+          <span class="info-value">{{ viewed_user.address|default:"Not provided" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- User Info Section -->
-    <div class="card mb-5" style="border: 1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); max-width: 600px; margin: 0 auto;">
-        <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
-            <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Profile</h2>
-        </div>
-        <div class="card-body p-4">
-            <dl class="row mb-0">
-                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Username:</dt>
-                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.username }}</dd>
-                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Email:</dt>
-                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.email|default:"Not provided" }}</dd>
-                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Role:</dt>
-                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.role|capfirst }}</dd>
-                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Phone:</dt>
-                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.phone_number|default:"Not provided" }}</dd>
-                <dt class="col-sm-4 fw-bold" style="color: #1a2b4c;">Location:</dt>
-                <dd class="col-sm-8" style="color: #333;">{{ viewed_user.address|default:"Not provided" }}</dd>
-            </dl>
-        </div>
+  <!-- Normal User: Properties Bought and Sold -->
+  {% if viewed_user.role == 'normal' %}
+  <div class="properties-grid">
+    <!-- Properties Bought -->
+    <div class="properties-card">
+      <div class="properties-card-header">
+        <h2>Properties Bought <span class="badge">{{ properties_bought.count }}</span></h2>
+      </div>
+      <div class="properties-card-body">
+        {% if properties_bought %}
+        <ul class="properties-list">
+          {% for transaction in properties_bought %}
+          <li class="property-item">
+            <span class="property-title">{{ transaction.property.title }}</span>
+            <span class="property-price">${{ transaction.amount }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="no-data">No properties bought.</p>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- Normal User: Properties Bought and Sold -->
-    {% if viewed_user.role == 'normal' %}
-    <div class="row g-4 mb-5" style="max-width: 1200px; margin: 0 auto;">
-        <!-- Properties Bought -->
-        <div class="col-md-6">
-            <div class="card" style="border: 1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
-                <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
-                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Properties Bought ({{ properties_bought.count }})</h2>
-                </div>
-                <div class="card-body p-4">
-                    {% if properties_bought %}
-                    <ul class="list-group list-group-flush">
-                        {% for transaction in properties_bought %}
-                        <li class="list-group-item d-flex justify-content-between" style="border: none; padding: 10px 0; color: #333;">
-                            {{ transaction.property.title }}
-                            <span style="color: #d4af37;">${{ transaction.amount }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-muted text-center" style="font-size: 1rem;">No properties bought.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Properties Sold -->
-        <div class="col-md-6">
-            <div class="card" style="border:  1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
-                <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
-                    <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Properties Sold ({{ properties_sold.count }})</h2>
-                </div>
-                <div class="card-body p-4">
-                    {% if properties_sold %}
-                    <ul class="list-group list-group-flush">
-                        {% for property in properties_sold %}
-                        <li class="list-group-item d-flex justify-content-between" style="border: none; padding: 10px 0; color: #333;">
-                            {{ property.title }}
-                            <span style="color: #d4af37;">${{ property.price }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-muted text-center" style="font-size: 1rem;">No properties sold.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+    <!-- Properties Sold -->
+    <div class="properties-card">
+      <div class="properties-card-header">
+        <h2>Properties Sold <span class="badge">{{ properties_sold.count }}</span></h2>
+      </div>
+      <div class="properties-card-body">
+        {% if properties_sold %}
+        <ul class="properties-list">
+          {% for property in properties_sold %}
+          <li class="property-item">
+            <span class="property-title">{{ property.title }}</span>
+            <span class="property-price">${{ property.price }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="no-data">No properties sold.</p>
+        {% endif %}
+      </div>
     </div>
-    {% endif %}
+  </div>
+  {% endif %}
 
-    <!-- Agent: Total Workings -->
-    {% if viewed_user.role == 'agent' %}
-    <div class="card mb-5" style="border:  1px solid #d4af37; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); max-width: 600px; margin: 0 auto;">
-        <div class="card-header text-center" style="background: #1a2b4c; color: #fff; border-radius: 12px 12px 0 0;">
-            <h2 class="fw-semibold mb-0" style="font-size: 1.75rem;">Total Workings: {{ total_workings }}</h2>
-        </div>
-        <div class="card-body p-4">
-            {% if agent_workings %}
-            <ul class="list-group list-group-flush">
-                {% for transaction in agent_workings %}
-                <li class="list-group-item d-flex justify-content-between" style="border: none; padding: 10px 0; color: #333;">
-                    {{ transaction.property.title }}
-                    <span style="color: #d4af37;">${{ transaction.amount }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p class="text-muted text-center" style="font-size: 1rem;">No properties worked on.</p>
-            {% endif %}
-        </div>
+  <!-- Agent: Total Workings -->
+  {% if viewed_user.role == 'agent' %}
+  <div class="agent-card">
+    <div class="agent-card-header">
+      <h2>Total Workings <span class="badge">{{ total_workings }}</span></h2>
     </div>
-    {% endif %}
+    <div class="agent-card-body">
+      {% if agent_workings %}
+      <ul class="properties-list">
+        {% for transaction in agent_workings %}
+        <li class="property-item">
+          <span class="property-title">{{ transaction.property.title }}</span>
+          <span class="property-price">${{ transaction.amount }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="no-data">No properties worked on.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 
-    <!-- Back Button -->
-    <div class="text-center">
-        <a href="{% url 'manage_users' %}" class="btn" style="background: #d4af37; color: #fff; border-radius: 20px; padding: 10px 24px;">Back to Manage Users</a>
-    </div>
+  <!-- Back Button -->
+  <div class="back-button-container">
+    <a href="{% url 'manage_users' %}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back to Manage Users
+    </a>
+  </div>
 </div>
 
 <style>
-    .card-header { padding: 1rem 1.5rem; }
-    .card-body { font-size: 1rem; }
-    .list-group-item:hover { background: #f5f7fa; }
-    .btn {
-        transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  /* Modern Color Palette */
+  :root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --accent: #f59e0b;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --border: #e2e8f0;
+    --text: #334155;
+    --text-light: #64748b;
+    --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Layout & Base Styles */
+  .profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    background-color: var(--light);
+    min-height: 100vh;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .profile-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 0;
+    letter-spacing: -0.025em;
+  }
+
+  /* Card Components */
+  .profile-card,
+  .properties-card,
+  .agent-card {
+    background-color: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .profile-card:hover,
+  .properties-card:hover,
+  .agent-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow);
+  }
+
+  .profile-card {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .properties-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .agent-card {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Card Headers */
+  .profile-card-header,
+  .properties-card-header,
+  .agent-card-header {
+    background-color: var(--primary);
+    color: white;
+    padding: 1.25rem 1.5rem;
+    text-align: center;
+  }
+
+  .profile-card-header h2,
+  .properties-card-header h2,
+  .agent-card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  /* Card Bodies */
+  .profile-card-body,
+  .properties-card-body,
+  .agent-card-body {
+    padding: 1.5rem;
+  }
+
+  /* Profile Info */
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .profile-info-item {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .profile-info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .info-label {
+    flex: 0 0 120px;
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .info-value {
+    flex: 1;
+    color: var(--text);
+  }
+
+  /* Properties Lists */
+  .properties-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .property-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .property-item:last-child {
+    border-bottom: none;
+  }
+
+  .property-title {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .property-price {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    margin-left: 0.5rem;
+  }
+
+  /* No Data */
+  .no-data {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin: 1rem 0;
+  }
+
+  /* Back Button */
+  .back-button-container {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 9999px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .back-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+  }
+
+  .back-button i {
+    margin-right: 0.5rem;
+  }
+
+  /* Responsive Styles */
+  @media (min-width: 768px) {
+    .properties-grid {
+      grid-template-columns: 1fr 1fr;
     }
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .card { background: #fff; }
-    dl dt, dl dd { margin-bottom: 0.75rem; }
+  }
 </style>
 
 {% endblock %}

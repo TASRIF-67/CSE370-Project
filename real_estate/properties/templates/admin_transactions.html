@@ -3,151 +3,384 @@
 {% load static %}
 {% block content %}
 
-<!-- Transaction Table Section -->
+<!-- Ultra Modern Transaction Table Section -->
 <div class="container py-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; font-size: 2.5rem; position: relative;">
-        Transaction History
-        <span style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 100px; height: 3px; background: #d4af37; border-radius: 2px;"></span>
-    </h2>
+    <div class="header-section mb-5">
+        <h2 class="ultra-title">Transaction History</h2>
+    </div>
 
     {% if transactions %}
-    <div class="table-responsive">
-        <table class="table luxury-table text-center align-middle" style="border-radius: 15px; overflow: hidden;">
-            <thead style="background: linear-gradient(135deg, #1a2b4c, #223558); color: #fff;">
-                <tr>
-                    <th scope="col" style="font-weight: 600; padding: 15px;">Property Title</th>
-                    <th scope="col" style="font-weight: 600; padding: 15px;">Status</th>
-                    <th scope="col" style="font-weight: 600; padding: 15px;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for transaction in transactions %}
-                <tr style="background: #fff; transition: background 0.3s ease;">
-                    <td style="color: #1a2b4c; font-weight: 600; font-size: 1rem;">{{ transaction.property.title }}</td>
-                    <td>
-                        <span class="badge luxury-badge" style="background: {% if transaction.payment_status == 'approved' %}#28a745{% else %}#d4af37{% endif %}; color: #fff; font-size: 0.9rem; padding: 6px 15px; border-radius: 20px; font-weight: 600; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-                            {{ transaction.payment_status|capfirst }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{% url 'admin_transaction_detail' transaction.id %}" class="btn luxury-view-btn" style="font-size: 0.9rem; padding: 10px 25px;">View Details</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="ultra-table-container">
+        <div class="ultra-table-header">
+            <div class="row align-items-center g-0">
+                <div class="col-5">
+                    <div class="ultra-th">Property Title</div>
+                </div>
+                <div class="col-4">
+                    <div class="ultra-th">Status</div>
+                </div>
+                <div class="col-3">
+                    <div class="ultra-th">Action</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ultra-table-body">
+            {% for transaction in transactions %}
+            <div class="ultra-table-row">
+                <div class="row align-items-center g-0">
+                    <div class="col-5">
+                        <div class="ultra-td property-title">{{ transaction.property.title }}</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="ultra-td">
+                            <span class="status-indicator {{ transaction.payment_status }}">
+                                {{ transaction.payment_status|capfirst }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="ultra-td">
+                            <a href="{% url 'admin_transaction_detail' transaction.id %}" class="ultra-btn">
+                                <span>Details</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13.75 6.75L19.25 12L13.75 17.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M19 12H4.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% else %}
-    <div class="card p-5 text-center luxury-card" style="border: none; border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); background: linear-gradient(145deg, #ffffff, #f8f9fa); max-width: 600px; margin: 0 auto;">
-        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300; font-style: italic; color: #666;">No transactions available.</p>
+    <div class="empty-state-container">
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19.5 3.75H4.5C4.08579 3.75 3.75 4.08579 3.75 4.5V19.5C3.75 19.9142 4.08579 20.25 4.5 20.25H19.5C19.9142 20.25 20.25 19.9142 20.25 19.5V4.5C20.25 4.08579 19.9142 3.75 19.5 3.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16.5 8.25H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16.5 12H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16.5 15.75H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h4>No Transactions Available</h4>
+            <p>Transaction history will appear here once available.</p>
+        </div>
     </div>
     {% endif %}
 </div>
 
 <style>
-    .luxury-table {
-        border-collapse: separate;
-        border-spacing: 0 12px;
+    /* Ultra Modern Design System */
+    :root {
+        --ultra-bg: #f5f7fa;
+        --ultra-surface: #ffffff;
+        --ultra-primary: #192c53;
+        --ultra-secondary: #e4a951;
+        --ultra-accent: #0ea5e9;
+        --ultra-text: #1a202c;
+        --ultra-text-light: #64748b;
+        --ultra-success: #10b981;
+        --ultra-pending: #f59e0b;
+        --ultra-border: #e2e8f0;
+        --ultra-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --ultra-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --ultra-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+        --ultra-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .luxury-table thead tr {
-        border: none;
+    body {
+        background-color: var(--ultra-bg);
     }
 
-    .luxury-table tbody tr {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-        border-radius: 12px;
-    }
-
-    .luxury-table tbody tr:hover {
-        background: #f9f9f9;
-    }
-
-    .luxury-table td, .luxury-table th {
-        border: none;
-    }
-
-    .luxury-badge {
-        display: inline-block;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .luxury-table tr:hover .luxury-badge {
-        transform: scale(1.05);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .luxury-view-btn {
-        background: linear-gradient(90deg, #d4af37, #b8962e);
-        color: #fff;
-        border: none;
-        border-radius: 30px;
-        padding: 10px 25px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+    /* Header Section */
+    .header-section {
         position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .ultra-title {
+        color: var(--ultra-primary);
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 0;
+        position: relative;
+        display: inline-block;
+    }
+
+    .ultra-title::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: var(--ultra-secondary);
+        border-radius: 2px;
+    }
+
+    /* Ultra Table Design */
+    .ultra-table-container {
+        background: var(--ultra-surface);
+        border-radius: 16px;
         overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        box-shadow: var(--ultra-shadow);
     }
 
-    .luxury-view-btn:hover {
-        background: linear-gradient(90deg, #b8962e, #d4af37);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(212, 175, 55, 0.6);
-        color: #fff;
+    .ultra-table-header {
+        background: var(--ultra-primary);
+        color: white;
+        padding: 1.25rem 1.5rem;
     }
 
-    .luxury-view-btn::before {
+    .ultra-th {
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+        padding: 0 0.5rem;
+    }
+
+    .ultra-table-body {
+        padding: 0.5rem 0;
+    }
+
+    .ultra-table-row {
+        padding: 1.25rem 1.5rem;
+        position: relative;
+        border-bottom: 1px solid var(--ultra-border);
+        transition: var(--ultra-transition);
+    }
+
+    .ultra-table-row:last-child {
+        border-bottom: none;
+    }
+
+    .ultra-table-row:hover {
+        background-color: rgba(25, 44, 83, 0.02);
+    }
+
+    .ultra-table-row::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        background: var(--ultra-secondary);
+        transition: var(--ultra-transition);
+    }
+
+    .ultra-table-row:hover::before {
+        width: 4px;
+    }
+
+    .ultra-td {
+        padding: 0 0.5rem;
+    }
+
+    .property-title {
+        color: var(--ultra-primary);
+        font-weight: 600;
+        font-size: 1.05rem;
+    }
+
+    /* Status Indicator */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 100px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        position: relative;
+        z-index: 1;
+        box-shadow: var(--ultra-shadow-sm);
+    }
+
+    .status-indicator::before {
         content: '';
         position: absolute;
         top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.2);
-        transition: left 0.3s ease;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 100px;
+        z-index: -1;
+        opacity: 0.2;
     }
 
-    .luxury-view-btn:hover::before {
-        left: 100%;
+    .status-indicator.approved {
+        color: var(--ultra-success);
     }
 
-    @media (max-width: 767px) {
-        .luxury-view-btn {
-            padding: 8px 20px;
-            font-size: 0.85rem;
-        }
+    .status-indicator.approved::before {
+        background: var(--ultra-success);
+    }
 
-        .luxury-table thead {
+    .status-indicator.pending {
+        color: var(--ultra-pending);
+    }
+
+    .status-indicator.pending::before {
+        background: var(--ultra-pending);
+    }
+
+    /* Ultra Button */
+    .ultra-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: var(--ultra-primary);
+        color: white;
+        padding: 0.65rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: var(--ultra-transition);
+        border: none;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .ultra-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--ultra-secondary);
+        z-index: -1;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ultra-btn:hover {
+        color: white;
+        box-shadow: var(--ultra-shadow-sm);
+    }
+
+    .ultra-btn:hover::before {
+        transform: scaleX(1);
+    }
+
+    .ultra-btn svg {
+        transition: var(--ultra-transition);
+    }
+
+    .ultra-btn:hover svg {
+        transform: translateX(4px);
+    }
+
+    /* Empty State */
+    .empty-state-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: var(--ultra-surface);
+        border-radius: 16px;
+        box-shadow: var(--ultra-shadow);
+        max-width: 400px;
+    }
+
+    .empty-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: rgba(25, 44, 83, 0.05);
+        border-radius: 50%;
+        color: var(--ultra-text-light);
+    }
+
+    .empty-state h4 {
+        color: var(--ultra-primary);
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-state p {
+        color: var(--ultra-text-light);
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .ultra-table-header {
             display: none;
         }
 
-        .luxury-table, .luxury-table tbody, .luxury-table tr, .luxury-table td {
-            display: block;
+        .ultra-table-row {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--ultra-border);
+            box-shadow: var(--ultra-shadow-sm);
+        }
+
+        .ultra-table-body {
+            padding: 1rem;
+        }
+
+        .ultra-table-container {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .ultra-td {
+            margin-bottom: 1rem;
+            padding: 0;
+        }
+
+        .ultra-td:last-child {
+            margin-bottom: 0;
+        }
+
+        .col-5, .col-4, .col-3 {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .col-3:last-child {
+            margin-bottom: 0;
+        }
+
+        .ultra-btn {
             width: 100%;
         }
 
-        .luxury-table tr {
-            margin-bottom: 15px;
+        .property-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
         }
 
-        .luxury-table td {
-            text-align: right;
-            padding-left: 50%;
-            position: relative;
+        .ultra-table-row::before {
+            width: 0;
+            height: 4px;
+            top: 0;
+            left: 0;
+            right: 0;
         }
 
-        .luxury-table td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 20px;
-            width: 45%;
-            font-weight: bold;
-            color: #1a2b4c;
-            text-align: left;
+        .ultra-table-row:hover::before {
+            width: 100%;
         }
     }
 </style>
