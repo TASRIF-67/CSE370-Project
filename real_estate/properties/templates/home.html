@@ -4,12 +4,22 @@
 {% block content %}
 
 
+
+
 <!-- Hero Section -->
-<div class="hero-section position-relative overflow-hidden" style="height: 90vh; background: linear-gradient(135deg, rgba(14, 22, 40, 0.95), rgba(212, 175, 55, 0.4)), url('{% static "hero-bg.png" %}'); background-size: cover; background-position: center;">
-    <div id="particles-js" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;"></div>
-    
+<div class="hero-section position-relative overflow-hidden" style="height: 90vh;">
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop playsinline id="hero-video">
+            <source src="{% static 'video-bg.mp4' %}" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+   
+    <div id="particles-js" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 2;"></div>
+   
     <!-- Digital circuit lines SVG overlay -->
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="opacity: 0.12; mix-blend-mode: overlay; pointer-events: none;">
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="opacity: 0.12; mix-blend-mode: overlay; pointer-events: none; z-index: 3;">
         <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0,100 L200,100 L250,150 L550,150 L550,250 L700,250 L700,0" stroke="#d4af37" stroke-width="1.5" fill="none"/>
             <path d="M1200,300 L1000,300 L950,250 L650,250 L650,400 L400,400 L400,600" stroke="#d4af37" stroke-width="1.5" fill="none"/>
@@ -25,24 +35,27 @@
             <circle cx="900" cy="600" r="5" fill="#d4af37"/>
         </svg>
     </div>
-    
-    <div class="position-absolute top-50 start-50 translate-middle text-center text-white" style="z-index: 2;">
-        <h1 class="display-3 fw-bold mb-4 animate__animated animate__fadeInDown" style="text-shadow: 0 5px 25px rgba(0, 0, 0, 0.6); letter-spacing: 4px; font-size: 4.5rem; font-weight: 800;">Discover Luxury Living</h1>
+   
+    <div class="position-absolute top-50 start-50 translate-middle text-center text-white" style="z-index: 4;">
+        <h1 class="display-3 fw-bold mb-4 auto-typing-text" style="text-shadow: 0 5px 25px rgba(0, 0, 0, 0.6); letter-spacing: 4px; font-size: 4.5rem; font-weight: 800;">Discover Luxury Living</h1>
         <p class="lead mt-3 mb-5 animate__animated animate__fadeInUp animate__delay-1s" style="text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5); font-size: 1.8rem; font-weight: 300; max-width: 800px; margin: 0 auto;">Your gateway to exquisite properties with Real Estate Pro</p>
-        <a href="#" class="btn btn-primary btn-lg custom-btn animate__animated animate__fadeInUp" data-bs-toggle="modal" data-bs-target="#searchModal" style="background: rgba(212, 175, 55, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); padding: 12px 40px; border-radius: 8px; transition: all 0.3s ease;">Explore Properties</a>
+        <a href="#" class="btn btn-primary btn-lg custom-btn rounded-pill animate__animated animate__fadeInUp" data-bs-toggle="modal" data-bs-target="#searchModal" style="background: rgba(212, 175, 55, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); padding: 12px 40px; transition: all 0.3s ease;">
+            <i class="fas fa-search-location me-2"></i> Explore Properties
+        </a>
     </div>
-    
-    <div class="scroll-down position-absolute bottom-0 start-50 translate-middle-x text-white pb-4" style="font-size: 1.5rem; z-index: 2;">
+   
+    <div class="scroll-down position-absolute bottom-0 start-50 translate-middle-x text-white pb-4" style="font-size: 1.5rem; z-index: 4;">
         <i class="fas fa-chevron-down animate__animated animate__bounce animate__infinite animate__slow"></i>
     </div>
-    
+   
     <!-- Wave divider -->
-    <div class="position-absolute bottom-0 w-100" style="line-height: 0;">
+    <div class="position-absolute bottom-0 w-100" style="line-height: 0; z-index: 4;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" style="width: 100%; height: 60px;">
             <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.92,150.09,65.93,232.74,62.55A183.09,183.09,0,0,1,321.39,56.44Z" style="fill: #ffffff;"></path>
         </svg>
     </div>
 </div>
+
 
 <!-- Want to Work With Us Section -->
 {% if not user.is_authenticated or user.role == 'normal' %}
@@ -50,12 +63,15 @@
     <div class="container text-center">
         <span class="work-with-us" data-aos="fade-up" data-aos-duration="1000" style="color: #1a2b4c; font-weight: 600; font-size: 1.3rem; padding: 18px 35px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.3); display: inline-block; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(248, 249, 250, 0.6); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); transition: all 0.3s ease;">
             Want to work with us?
-            <a href="{% if user.is_authenticated %}{% url 'apply_agent' %}{% else %}{% url 'login' %}{% endif %}" 
-               class="btn btn-primary btn-sm custom-btn ms-3" style="background: #d4af37; border: none; padding: 8px 20px; border-radius: 8px; transition: all 0.3s ease;">Apply Now</a>
+            <a href="{% if user.is_authenticated %}{% url 'apply_agent' %}{% else %}{% url 'login' %}{% endif %}"
+               class="btn btn-primary btn-sm custom-btn rounded-pill ms-3" style="background: #d4af37; border: none; padding: 8px 20px; transition: all 0.3s ease;">
+               <i class="fas fa-user-tie me-2"></i> Apply Now
+            </a>
         </span>
     </div>
 </div>
 {% endif %}
+
 
 <!-- Featured Properties -->
 <div class="container mb-5 py-5">
@@ -64,135 +80,161 @@
             All Listings
             <span style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 100px; height: 3px; background: #d4af37; border-radius: 2px;"></span>
         </h2>
-        
+       
         <!-- Decorative geometric shapes -->
         <div class="position-absolute" style="top: -15px; left: 15%; width: 20px; height: 20px; border: 2px solid #d4af37; border-radius: 50%; opacity: 0.6;"></div>
         <div class="position-absolute" style="bottom: 10px; right: 20%; width: 12px; height: 12px; background: #d4af37; transform: rotate(45deg); opacity: 0.4;"></div>
     </div>
 
+
     <!-- Tabs for switching between property views -->
     <ul class="nav nav-tabs justify-content-center mb-5" id="propertyTabs" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="other-tab" data-bs-toggle="tab" href="#other-properties" role="tab" aria-controls="other-properties" aria-selected="true" style="color: #1a2b4c; font-weight: 600; border-color: #d4af37;">Featured</a>
+            <a class="nav-link active" id="other-tab" data-bs-toggle="tab" href="#other-properties" role="tab" aria-controls="other-properties" aria-selected="true" style="color: #1a2b4c; font-weight: 600; border-color: #d4af37;">
+                <i class="fas fa-star me-2"></i> Featured
+            </a>
         </li>
         {% if user.is_authenticated %}
         <li class="nav-item">
-            <a class="nav-link" id="own-tab" data-bs-toggle="tab" href="#own-properties" role="tab" aria-controls="own-properties" aria-selected="false" style="color: #1a2b4c; font-weight: 600; border-color: #d4af37;">My Properties</a>
+            <a class="nav-link" id="own-tab" data-bs-toggle="tab" href="#own-properties" role="tab" aria-controls="own-properties" aria-selected="false" style="color: #1a2b4c; font-weight: 600; border-color: #d4af37;">
+                <i class="fas fa-home me-2"></i> My Properties
+            </a>
         </li>
         {% endif %}
     </ul>
 
+
     <!-- Tab Content -->
     <div class="tab-content" id="propertyTabContent">
         <!-- Other Properties Tab -->
-        <div class="tab-pane fade show active" id="other-properties" role="tabpanel" aria-labelledby="other-tab">
-            <div class="row g-4" id="featured-properties">
-                {% for property in properties|slice:":6" %}
-                {% if not user.is_authenticated or user != property.seller %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); background: #ffffff; overflow: hidden; position: relative; transition: all 0.4s ease;">
-                        <div class="image-wrapper" style="position: relative; overflow: hidden; border-top-left-radius: 16px; border-top-right-radius: 16px;">
-                            {% if property.images.first %}
-                            <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; transition: transform 0.5s ease;">
-                            <div class="image-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)); transition: opacity 0.4s ease;"></div>
-                            <div class="price-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(212, 175, 55, 0.9); color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);">
-                                ${{ property.price }} - {{ property.city }}
-                            </div>
+     <!-- Other Properties Tab -->
+<div class="tab-pane fade show active" id="other-properties" role="tabpanel" aria-labelledby="other-tab">
+    <div class="row g-4" id="featured-properties">
+        {% for property in properties|slice:":6" %}
+        {% if not user.is_authenticated or user != property.seller %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); background: #ffffff; overflow: hidden; position: relative; transition: all 0.4s ease;">
+                <div class="image-wrapper" style="position: relative; overflow: hidden; border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    {% if property.images.first %}
+                    <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; transition: transform 0.5s ease;">
+                    <div class="image-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)); transition: opacity 0.4s ease;"></div>
+                    <div class="price-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(212, 175, 55, 0.9); color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);">
+                        ${{ property.price }} - {{ property.city }}
+                    </div>
+                    {% else %}
+                    <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; font-style: italic;">No Image Available</div>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                    <h5 class="card-title mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 1.5rem;">
+                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c; transition: color 0.3s ease;">{{ property.title }}</a>
+                    </h5>
+                    <p class="card-text mb-4" style="color: #666; font-size: 1rem; line-height: 1.6;">{{ property.description|truncatewords:15 }}</p>
+                    <div class="d-flex align-items-center mb-4" style="font-size: 0.95rem; color: #555;">
+                        <span class="me-4"><i class="fas fa-bed me-2" style="color: #d4af37;"></i>{{ property.bedrooms }} Beds</span>
+                        <span><i class="fas fa-bath me-2" style="color: #d4af37;"></i>{{ property.bathrooms }} Baths</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
+                        <div class="interest-btn-container" style="width: 140px;">
+                            {% if property.id in interested_property_ids %}
+                            <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn rounded-pill" style="font-size: 0.9rem; padding: 8px 16px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="fas fa-heart-broken me-1"></i> Remove
+                            </a>
                             {% else %}
-                            <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; font-style: italic;">No Image Available</div>
+                            <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn rounded-pill" style="font-size: 0.9rem; padding: 8px 16px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="fas fa-heart me-1"></i> Interested
+                            </a>
                             {% endif %}
                         </div>
-                        <div class="card-body p-4" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
-                            <h5 class="card-title mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 1.5rem;">
-                                <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c; transition: color 0.3s ease;">{{ property.title }}</a>
-                            </h5>
-                            <p class="card-text mb-4" style="color: #666; font-size: 1rem; line-height: 1.6;">{{ property.description|truncatewords:15 }}</p>
-                            <div class="d-flex align-items-center mb-4" style="font-size: 0.95rem; color: #555;">
-                                <span class="me-4"><i class="fas fa-bed me-2" style="color: #d4af37;"></i>{{ property.bedrooms }} Beds</span>
-                                <span><i class="fas fa-bath me-2" style="color: #d4af37;"></i>{{ property.bathrooms }} Baths</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
-                                {% if property.id in interested_property_ids %}
-                                <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px; border-radius: 8px;">Remove Interest</a>
-                                {% else %}
-                                <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px; border-radius: 8px;">Interested</a>
-                                {% endif %}
-                                {% else %}
-                                <div></div>
-                                {% endif %}
-                                <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn" style="font-size: 0.9rem; padding: 10px 25px; border-radius: 8px;">View Details</a>
-                            </div>
-                        </div>
+                        {% else %}
+                        <div style="width: 140px;"></div>
+                        {% endif %}
+                        <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn rounded-pill" style="font-size: 0.9rem; padding: 10px 20px; white-space: nowrap;">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
                     </div>
                 </div>
-                {% endif %}
-                {% empty %}
-                <div class="col-12 mt-4 mb-4">
-                    <div class="card p-5 text-center" data-aos="fade-up" data-aos-duration="1000" style="border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); background: #ffffff; max-width: 600px; margin: 0 auto;">
-                        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300; font-style: italic;">No properties available.</p>
-                    </div>
-                </div>
-                {% endfor %}
-                
-                {% comment %}Check if there are any properties shown in the Other tab{% endcomment %}
-                {% if other_properties_count == 0 and properties|length > 0 %}
-                <div class="col-12 mt-4 mb-4">
-                    <div class="card p-5 text-center" data-aos="fade-up" data-aos-duration="1000" style="border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); background: #ffffff; max-width: 600px; margin: 0 auto;">
-                        <p class="text-muted" style="font-size: 1.3rem; font-weight: 300; font-style: italic;">No other properties available.</p>
-                    </div>
-                </div>
-                {% endif %}
             </div>
-            {% if properties|length > 6 %}
-            <div class="text-center mt-5 mb-4">
-                <button id="show-more-btn" class="btn btn-primary btn-lg custom-btn" data-aos="fade-up" data-aos-duration="1000" style="background: #d4af37; border: none; padding: 12px 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">Show More Properties</button>
-            </div>
-            <div class="row g-4" id="more-properties" style="display: none;">
-                {% for property in properties|slice:"6:12" %}
-                {% if user.is_authenticated and user != property.seller %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); background: #ffffff; overflow: hidden; position: relative; transition: all 0.4s ease;">
-                        <div class="image-wrapper" style="position: relative; overflow: hidden; border-top-left-radius: 16px; border-top-right-radius: 16px;">
-                            {% if property.images.first %}
-                            <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; transition: transform 0.5s ease;">
-                            <div class="image-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)); transition: opacity 0.4s ease;"></div>
-                            <div class="price-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(212, 175, 55, 0.9); color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);">
-                                ${{ property.price }} - {{ property.city }}
-                            </div>
-                            {% else %}
-                            <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; font-style: italic;">No Image Available</div>
-                            {% endif %}
-                        </div>
-                        <div class="card-body p-4" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
-                            <h5 class="card-title mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 1.5rem;">
-                                <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c; transition: color 0.3s ease;">{{ property.title }}</a>
-                            </h5>
-                            <p class="card-text mb-4" style="color: #666; font-size: 1rem; line-height: 1.6;">{{ property.description|truncatewords:15 }}</p>
-                            <div class="d-flex align-items-center mb-4" style="font-size: 0.95rem; color: #555;">
-                                <span class="me-4"><i class="fas fa-bed me-2" style="color: #d4af37;"></i>{{ property.bedrooms }} Beds</span>
-                                <span><i class="fas fa-bath me-2" style="color: #d4af37;"></i>{{ property.bathrooms }} Baths</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
-                                {% if property.id in interested_property_ids %}
-                                <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px; border-radius: 8px;">Remove Interest</a>
-                                {% else %}
-                                <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn" style="font-size: 0.9rem; padding: 8px 20px; border-radius: 8px;">Interested</a>
-                                {% endif %}
-                                {% else %}
-                                <div></div>
-                                {% endif %}
-                                <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn" style="font-size: 0.9rem; padding: 10px 25px; border-radius: 8px;">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endif %}
         </div>
+        {% endif %}
+        {% empty %}
+        <div class="col-12 mt-4 mb-4">
+            <div class="card p-5 text-center" data-aos="fade-up" data-aos-duration="1000" style="border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); background: #ffffff; max-width: 600px; margin: 0 auto;">
+                <p class="text-muted" style="font-size: 1.3rem; font-weight: 300; font-style: italic;">No properties available.</p>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% comment %}Check if there are any properties shown in the Other tab{% endcomment %}
+        {% if other_properties_count == 0 and properties|length > 0 %}
+        <div class="col-12 mt-4 mb-4">
+            <div class="card p-5 text-center" data-aos="fade-up" data-aos-duration="1000" style="border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); background: #ffffff; max-width: 600px; margin: 0 auto;">
+                <p class="text-muted" style="font-size: 1.3rem; font-weight: 300; font-style: italic;">No other properties available.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% if properties|length > 6 %}
+    <div class="text-center mt-5 mb-4">
+        <button id="show-more-btn" class="btn btn-primary btn-lg custom-btn rounded-pill" data-aos="fade-up" data-aos-duration="1000" style="background: #d4af37; border: none; padding: 12px 40px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">
+            <i class="fas fa-plus-circle me-2"></i> Show More Properties
+        </button>
+    </div>
+    <div class="row g-4" id="more-properties" style="display: none;">
+        {% for property in properties|slice:"6:12" %}
+        {% if user.is_authenticated and user != property.seller %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); background: #ffffff; overflow: hidden; position: relative; transition: all 0.4s ease;">
+                <div class="image-wrapper" style="position: relative; overflow: hidden; border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    {% if property.images.first %}
+                    <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; transition: transform 0.5s ease;">
+                    <div class="image-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)); transition: opacity 0.4s ease;"></div>
+                    <div class="price-badge" style="position: absolute; top: 20px; left: 20px; background: rgba(212, 175, 55, 0.9); color: #fff; padding: 8px 18px; border-radius: 8px; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);">
+                        ${{ property.price }} - {{ property.city }}
+                    </div>
+                    {% else %}
+                    <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; font-style: italic;">No Image Available</div>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                    <h5 class="card-title mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 1.5rem;">
+                        <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c; transition: color 0.3s ease;">{{ property.title }}</a>
+                    </h5>
+                    <p class="card-text mb-4" style="color: #666; font-size: 1rem; line-height: 1.6;">{{ property.description|truncatewords:15 }}</p>
+                    <div class="d-flex align-items-center mb-4" style="font-size: 0.95rem; color: #555;">
+                        <span class="me-4"><i class="fas fa-bed me-2" style="color: #d4af37;"></i>{{ property.bedrooms }} Beds</span>
+                        <span><i class="fas fa-bath me-2" style="color: #d4af37;"></i>{{ property.bathrooms }} Baths</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
+                        <div class="interest-btn-container" style="width: 140px;">
+                            {% if property.id in interested_property_ids %}
+                            <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn rounded-pill" style="font-size: 0.9rem; padding: 8px 16px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="fas fa-heart-broken me-1"></i> Remove
+                            </a>
+                            {% else %}
+                            <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn rounded-pill" style="font-size: 0.9rem; padding: 8px 16px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="fas fa-heart me-1"></i> Interested
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div style="width: 140px;"></div>
+                        {% endif %}
+                        <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn rounded-pill" style="font-size: 0.9rem; padding: 10px 20px; white-space: nowrap;">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
 
         <!-- Own Properties Tab -->
         {% if user.is_authenticated %}
@@ -224,7 +266,9 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div></div>
-                                <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn" style="font-size: 0.9rem; padding: 10px 25px; border-radius: 8px;">View Details</a>
+                                <a href="{% url 'property_detail' property.id %}" class="btn luxury-view-btn rounded-pill" style="font-size: 0.9rem; padding: 10px 25px;">
+                                    <i class="fas fa-eye me-2"></i> View Details
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -232,7 +276,7 @@
                 {% endif %}
                 {% endfor %}
             </div>
-            
+           
             <!-- No properties message will be shown by JavaScript if needed -->
             <div id="no-own-properties-message" class="col-12 mt-4 mb-4" style="display: none;">
                 <div class="card p-5 text-center" data-aos="fade-up" data-aos-duration="1000" style="border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); background: #ffffff; max-width: 600px; margin: 0 auto;">
@@ -244,8 +288,10 @@
     </div>
 </div>
 
+
 <!-- Bootstrap JS for tabs functionality (ensure this is included in your base template) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <!-- Add JavaScript for the "Show More" button and property handling -->
 <script>
@@ -253,18 +299,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show More button functionality
     const showMoreBtn = document.getElementById('show-more-btn');
     const moreProperties = document.getElementById('more-properties');
-    
+   
     if(showMoreBtn) {
         showMoreBtn.addEventListener('click', function() {
             moreProperties.style.display = 'flex';
             showMoreBtn.style.display = 'none';
         });
     }
-    
+   
     // Check if user has own properties to show the correct message
     const ownPropertiesContainer = document.getElementById('own-featured-properties');
     const noOwnPropertiesMessage = document.getElementById('no-own-properties-message');
-    
+   
     if(ownPropertiesContainer && noOwnPropertiesMessage) {
         // Check if there are any property cards in the own properties tab
         const ownPropertyCards = ownPropertiesContainer.querySelectorAll('.owner-property');
@@ -272,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
             noOwnPropertiesMessage.style.display = 'block';
         }
     }
-    
+   
     // For the Other Properties tab - calculate if there are any properties shown
     {% if user.is_authenticated %}
     let otherPropertiesCount = 0;
@@ -281,21 +327,21 @@ document.addEventListener('DOMContentLoaded', function() {
     otherPropertiesCount++;
     {% endif %}
     {% endfor %}
-    
+   
     window.otherPropertiesCount = otherPropertiesCount;
     {% endif %}
 });
 </script>
 <!-- List Your Property Section -->
 <div class="position-relative">
-    <!-- Top wave divider -->
-    <div class="position-absolute top-0 w-100" style="line-height: 0; transform: rotate(180deg);">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" style="width: 100%; height: 60px;">
-            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" style="fill: #f8f9fa;"></path>
+    {% comment %} <!-- Top wave divider -->
+    <div class="position-absolute top-0 w-100" style="line-height: 0; transform: rotate(180deg); z-index: 1;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" style="width: 100%; height: 80px; fill: #f8f9fa;">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.92,150.09,65.93,232.74,62.55A183.09,183.09,0,0,1,321.39,56.44Z"></path>
         </svg>
-    </div>
-    
-    <div class="bg-light py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding-top: 80px; padding-bottom: 80px;">
+    </div> {% endcomment %}
+
+    <div class="bg-light py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding-top: 100px; padding-bottom: 80px;">
         <div class="container text-center position-relative">
             <!-- Decorative elements -->
             <div class="position-absolute" style="top: 20%; left: 5%; width: 180px; height: 180px; background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0) 70%); border-radius: 50%;"></div>
@@ -305,68 +351,146 @@ document.addEventListener('DOMContentLoaded', function() {
                 List Your Property Today
                 <span style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 80px; height: 3px; background: #d4af37; border-radius: 2px;"></span>
             </h3>
-            <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200" style="color: #555; font-size: 1.1rem; max-width: 700px; margin: 0 auto; font-weight: 300; line-height: 1.8;">Showcase your exquisite property to a discerning clientele. Partner with Real Estate Pro to find the perfect buyer and elevate your selling experience.</p>
-            <a href="{% if user.is_authenticated %}{% url 'create_property' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary btn-lg mt-4 custom-btn" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400" style="background: #d4af37; border: none; padding: 12px 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">Add Property</a>
+            
+            <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200" style="color: #555; font-size: 1.1rem; max-width: 700px; margin: 0 auto; font-weight: 300; line-height: 1.8;">
+                Showcase your exquisite property to a discerning clientele. Partner with Real Estate Pro to find the perfect buyer and elevate your selling experience.
+            </p>
+            
+            <a href="{% if user.is_authenticated %}{% url 'create_property' %}{% else %}{% url 'login' %}{% endif %}" 
+               class="btn btn-primary btn-lg mt-5 custom-btn rounded-pill" 
+               data-aos="fade-up" 
+               data-aos-duration="1000" 
+               data-aos-delay="400" 
+               style="background: linear-gradient(135deg, #d4af37 0%, #e5c760 100%); 
+                      border: none; 
+                      padding: 14px 45px; 
+                      box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3); 
+                      transition: all 0.3s ease;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    <circle cx="12" cy="7" r="1"></circle>
+                </svg>
+                Add Your Property
+            </a>
+            
+            <!-- Floating geometric elements -->
+            <div class="position-absolute" style="bottom: 20%; left: 15%; width: 15px; height: 15px; background: #d4af37; opacity: 0.5; border-radius: 50%;"></div>
+            <div class="position-absolute" style="top: 30%; right: 18%; width: 10px; height: 10px; border: 2px solid #d4af37; opacity: 0.4;"></div>
+            <div class="position-absolute" style="bottom: 40%; right: 30%; width: 12px; height: 12px; background: #1a2b4c; opacity: 0.2; transform: rotate(45deg);"></div>
         </div>
     </div>
     
     <!-- Bottom decorative element -->
-    <div class="position-absolute bottom-0 start-0 w-100" style="height: 10px; background: linear-gradient(90deg, #d4af37, transparent, #d4af37); opacity: 0.3;"></div>
+    <div class="position-absolute bottom-0 start-0 w-100" style="height: 6px; background: linear-gradient(90deg, #d4af37, transparent, #d4af37); opacity: 0.3;"></div>
 </div>
 
-<script>
-    // Initialize AOS
-    AOS.init();
 
-    // Initialize Particles.js
+<script>
+    // Enhanced Particles.js Configuration
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure video plays properly on mobile
+    const heroVideo = document.getElementById('hero-video');
+    if (heroVideo) {
+        // Force play on some mobile browsers
+        heroVideo.play().catch(function(error) {
+            console.log("Video play failed, showing poster instead:", error);
+            // Could set a background image fallback here
+        });
+    }
+
+
+    // Auto-typing text effect simulation
+    const autoTypingTexts = [
+        "Discover Luxury Living",
+        "Experience Elegance",
+        "Find Your Dream Home",
+        "Invest in Excellence",
+        "Elevate Your Lifestyle"
+    ];
+   
+    let currentTextIndex = 0;
+    const autoTypingElement = document.querySelector('.auto-typing-text');
+   
+    if (autoTypingElement) {
+        setInterval(() => {
+            currentTextIndex = (currentTextIndex + 1) % autoTypingTexts.length;
+           
+            // Fade out
+            autoTypingElement.style.opacity = 0;
+           
+            // Change text and fade in after a brief delay
+            setTimeout(() => {
+                autoTypingElement.textContent = autoTypingTexts[currentTextIndex];
+                autoTypingElement.style.opacity = 1;
+            }, 500);
+        }, 4000);
+    }
+
+
+    // Enhanced particles.js configuration
     particlesJS('particles-js', {
         "particles": {
             "number": {
-                "value": 80,
+                "value": 60,
                 "density": {
                     "enable": true,
-                    "value_area": 800
+                    "value_area": 900
                 }
             },
             "color": {
-                "value": "#d4af37"
+                "value": ["#d4af37", "#ffffff", "#1a2b4c"]
             },
             "shape": {
-                "type": "circle",
+                "type": ["circle", "triangle", "polygon"],
                 "stroke": {
                     "width": 0,
                     "color": "#000000"
+                },
+                "polygon": {
+                    "nb_sides": 5
                 }
             },
             "opacity": {
-                "value": 0.5,
+                "value": 0.4,
                 "random": true,
                 "anim": {
-                    "enable": false
+                    "enable": true,
+                    "speed": 1,
+                    "opacity_min": 0.1,
+                    "sync": false
                 }
             },
             "size": {
                 "value": 3,
                 "random": true,
                 "anim": {
-                    "enable": false
+                    "enable": true,
+                    "speed": 2,
+                    "size_min": 0.1,
+                    "sync": false
                 }
             },
             "line_linked": {
                 "enable": true,
                 "distance": 150,
                 "color": "#d4af37",
-                "opacity": 0.4,
+                "opacity": 0.3,
                 "width": 1
             },
             "move": {
                 "enable": true,
-                "speed": 2,
+                "speed": 1.5,
                 "direction": "none",
-                "random": false,
+                "random": true,
                 "straight": false,
                 "out_mode": "out",
-                "bounce": false
+                "bounce": false,
+                "attract": {
+                    "enable": true,
+                    "rotateX": 600,
+                    "rotateY": 1200
+                }
             }
         },
         "interactivity": {
@@ -374,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
             "events": {
                 "onhover": {
                     "enable": true,
-                    "mode": "repulse"
+                    "mode": "bubble"
                 },
                 "onclick": {
                     "enable": true,
@@ -383,17 +507,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 "resize": true
             },
             "modes": {
+                "grab": {
+                    "distance": 140,
+                    "line_linked": {
+                        "opacity": 1
+                    }
+                },
+                "bubble": {
+                    "distance": 200,
+                    "size": 5,
+                    "duration": 2,
+                    "opacity": 0.8,
+                    "speed": 3
+                },
                 "repulse": {
                     "distance": 100,
                     "duration": 0.4
                 },
                 "push": {
                     "particles_nb": 4
+                },
+                "remove": {
+                    "particles_nb": 2
                 }
             }
         },
         "retina_detect": true
     });
+});
+
 
     // Show More Button
     document.getElementById('show-more-btn')?.addEventListener('click', function() {
@@ -401,11 +543,13 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.display = 'none';
     });
 
+
     // Smooth Scroll to Featured Properties
     document.querySelector('.scroll-down')?.addEventListener('click', function() {
         document.querySelector('#featured-properties').scrollIntoView({ behavior: 'smooth' });
     });
 </script>
+
 
 <style>
     /* General Styles */
@@ -415,6 +559,7 @@ body {
     overflow-x: hidden;
 }
 
+
 .custom-btn {
     transition: all 0.3s ease;
     position: relative;
@@ -422,15 +567,18 @@ body {
     z-index: 1;
 }
 
+
 .custom-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2) !important;
     background: #c39b28 !important;
 }
 
+
 .custom-btn:active {
     transform: translateY(1px);
 }
+
 
 .custom-btn::before {
     content: '';
@@ -444,58 +592,249 @@ body {
     z-index: -1;
 }
 
+
 .custom-btn:hover::before {
     left: 100%;
 }
 
-/* Hero Section */
-.hero-section {
-    position: relative;
+
+/* Video Background Styles */
+.video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     z-index: 1;
 }
 
+
+.video-background video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translateX(-50%) translateY(-50%);
+    object-fit: cover;
+}
+
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(14, 22, 40, 0.85), rgba(26, 43, 76, 0.75)),
+                radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.4) 0%, rgba(0, 0, 0, 0) 50%),
+                radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.3) 0%, rgba(0, 0, 0, 0) 50%);
+    z-index: 1;
+}
+
+
+/* Auto-typing text effect */
+.auto-typing-text {
+    display: inline-block;
+    background: linear-gradient(to right, #ffffff, #d4af37, #ffffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shine 8s linear infinite;
+    background-size: 200% auto;
+    text-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+
+.auto-typing-text::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: linear-gradient(to right, #d4af37, #ffffff, #d4af37);
+    animation: underline 3s ease-in-out infinite;
+}
+
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+
+@keyframes underline {
+    0% {
+        width: 0;
+        opacity: 0;
+    }
+    50% {
+        width: 80%;
+        opacity: 1;
+    }
+    100% {
+        width: 0;
+        opacity: 0;
+    }
+}
+
+
+/* Enhanced Hero Section */
+.hero-section {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+}
+
+
 .hero-section h1 {
     animation-duration: 1.2s;
+    text-transform: uppercase;
+    letter-spacing: 6px;
 }
+
 
 .hero-section p {
     animation-duration: 1.5s;
+    line-height: 1.7;
 }
+
 
 .hero-section .btn {
     animation-duration: 1.8s;
+    border-radius: 30px !important;
+    letter-spacing: 1px;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
+
+
+.hero-section .btn:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 20px 40px rgba(212, 175, 55, 0.3) !important;
+    background: rgba(212, 175, 55, 1) !important;
+}
+
+
+.scroll-down {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+
+.scroll-down:hover {
+    transform: translateY(5px);
+}
+
+
+@keyframes pulse {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(10px);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/* Media Queries */
+@media (max-width: 992px) {
+    .hero-section h1 {
+        font-size: 3.5rem !important;
+        letter-spacing: 4px;
+    }
+   
+    .hero-section p {
+        font-size: 1.5rem !important;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.8rem !important;
+        letter-spacing: 3px;
+    }
+   
+    .hero-section p {
+        font-size: 1.2rem !important;
+    }
+   
+    .video-background video {
+        height: 100%;
+        width: auto;
+    }
+}
+
+
+@media (max-width: 576px) {
+    .hero-section h1 {
+        font-size: 2.2rem !important;
+        letter-spacing: 2px;
+    }
+   
+    .hero-section p {
+        font-size: 1rem !important;
+    }
+   
+    .custom-btn {
+        padding: 10px 30px !important;
+    }
+}
+
 
 .scroll-down {
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
+
 .scroll-down:hover {
     transform: translateY(5px);
 }
+
 
 /* Featured Properties */
 .luxury-card {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+
 .luxury-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12) !important;
 }
 
+
 .luxury-card .image-wrapper:hover img {
     transform: scale(1.05);
 }
+
 
 .luxury-card:hover .image-overlay {
     opacity: 0.7;
 }
 
+
 .card-title a:hover {
     color: #d4af37 !important;
 }
+
 
 .luxury-btn {
     color: #1a2b4c;
@@ -503,12 +842,14 @@ body {
     transition: all 0.3s ease;
 }
 
+
 .luxury-btn:hover {
     background-color: #d4af37;
     color: #fff;
     border-color: #d4af37;
     box-shadow: 0 8px 20px rgba(212, 175, 55, 0.25);
 }
+
 
 .luxury-view-btn {
     background: linear-gradient(to right, #1a2b4c, #2d4571);
@@ -519,6 +860,7 @@ body {
     overflow: hidden;
     z-index: 1;
 }
+
 
 .luxury-view-btn::before {
     content: '';
@@ -532,30 +874,36 @@ body {
     z-index: -1;
 }
 
+
 .luxury-view-btn:hover {
     color: #fff;
     box-shadow: 0 8px 25px rgba(26, 43, 76, 0.25);
 }
 
+
 .luxury-view-btn:hover::before {
     left: 0;
 }
+
 
 /* Work with Us Section */
 .work-with-us {
     transition: all 0.3s ease;
 }
 
+
 .work-with-us:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12) !important;
 }
+
 
 /* List Your Property Section */
 .bg-light {
     position: relative;
     overflow: hidden;
 }
+
 
 /* Animations */
 @keyframes float {
@@ -570,55 +918,60 @@ body {
     }
 }
 
+
 /* Responsive Adjustments */
 @media (max-width: 992px) {
     .hero-section h1 {
         font-size: 3.5rem !important;
     }
-    
+   
     .hero-section p {
         font-size: 1.5rem !important;
     }
 }
 
+
 @media (max-width: 768px) {
     .hero-section h1 {
         font-size: 2.8rem !important;
     }
-    
+   
     .hero-section p {
         font-size: 1.2rem !important;
     }
-    
+   
     .price-badge {
         font-size: 1rem !important;
         padding: 6px 14px !important;
     }
 }
 
+
 @media (max-width: 576px) {
     .hero-section h1 {
         font-size: 2.2rem !important;
     }
-    
+   
     .hero-section p {
         font-size: 1rem !important;
     }
-    
+   
     .custom-btn {
         padding: 10px 30px !important;
     }
-    
+   
     .work-with-us {
         font-size: 1.1rem !important;
         padding: 15px 25px !important;
     }
 }
 
+
 /* Additional Hover Effects */
 .image-wrapper {
     position: relative;
 }
+
 
 .image-wrapper::after {
     content: '';
@@ -632,25 +985,30 @@ body {
     transition: all 0.4s ease;
 }
 
+
 .luxury-card:hover .image-wrapper::after {
     opacity: 1;
 }
+
 
 /* Fancy Hover Effect for Featured Text */
 h2 span {
     transition: all 0.3s ease;
 }
 
+
 h2:hover span {
     width: 150px;
     background: linear-gradient(to right, #d4af37, #1a2b4c);
 }
+
 
 /* Show More Button Animation */
 #show-more-btn {
     position: relative;
     overflow: hidden;
 }
+
 
 #show-more-btn::after {
     content: '';
@@ -659,21 +1017,24 @@ h2:hover span {
     height: 100%;
     top: 0;
     left: -100%;
-    background: linear-gradient(90deg, 
-        rgba(255,255,255,0) 0%, 
-        rgba(255,255,255,0.2) 50%, 
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.2) 50%,
         rgba(255,255,255,0) 100%);
     transition: all 0.5s ease;
 }
+
 
 #show-more-btn:hover::after {
     left: 100%;
 }
 
+
 /* Animation for More Properties */
 #more-properties {
     transition: all 0.5s ease;
 }
+
 
 /* CSS for Tilt.js */
 .js-tilt-glare {
@@ -681,4 +1042,8 @@ h2:hover span {
 }
 </style>
 
+
 {% endblock %}
+
+
+

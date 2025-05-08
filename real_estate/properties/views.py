@@ -87,19 +87,36 @@ def normal_signup(request):
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
 
+
     def form_valid(self, form):
+        # If 'remember me' is unchecked, set session to expire on browser close
+        remember_me = self.request.POST.get('remember_me')
+        if not remember_me:
+            self.request.session.set_expiry(0)  # Expires when browser closes
+        else:
+            self.request.session.set_expiry(1209600)  # 2 weeks
+
+
         response = super().form_valid(form)
-        messages.success(self.request, "Login successful!")
+        messages.success(self.request, f"Welcome back, {self.request.user.username}!")
         return response
 
+
     def form_invalid(self, form):
-        response = super().form_invalid(form)
-        errors = form.errors.get_json_data()
+        # Extract error messages nicely
+        error_list = []
+        for field, errors in form.errors.items():
+            for error in errors:
+                error_list.append(f"{field.capitalize()}: {error}")
         error_msg = "Login failed. Please check your credentials."
-        if errors:
-            error_msg += "\nErrors:\n" + "\n".join([f"{field}: {err[0]['message']}" for field, err in errors.items()])
+        if error_list:
+            error_msg += "\n" + "\n".join(error_list)
         messages.error(self.request, error_msg)
-        return response
+        return super().form_invalid(form)
+
+
+
+
 
 #=========DASHBOARD============
 @login_required
@@ -377,7 +394,7 @@ def property_detail(request, property_id):
         'property': property,
         'has_expressed_interest': has_expressed_interest,
     })
-
+from django.http import JsonResponse
 #=========EXPRESS INTEREST============
 @login_required
 def express_interest(request, property_id):
@@ -401,7 +418,6 @@ def express_interest(request, property_id):
         )
         messages.success(request, "Interest expressed successfully.")
     return redirect('user_interests')
-
 
 #=========CONTACT AGENT============
 @login_required
@@ -1133,6 +1149,7 @@ def remove_interest(request, property_id):
         messages.warning(request, "The property no longer exists.")
 
     return redirect('user_interests')
+
 #=========REQUEST TRANSACTION============
 @login_required
 def request_transaction(request, property_id):

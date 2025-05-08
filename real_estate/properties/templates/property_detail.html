@@ -2,6 +2,7 @@
 {% load django_bootstrap5 %}
 {% block content %}
 
+
 <div class="property-container">
     <!-- Property Carousel -->
     {% if property.images.first %}
@@ -22,7 +23,7 @@
                 <span class="carousel-control-next-icon"></span>
                 <span class="visually-hidden">Next</span>
             </button>
-            
+           
             <!-- Image Counter -->
             <div class="image-counter">
                 <span class="current-image">1</span>/<span class="total-images">{{ property.images.all|length }}</span>
@@ -30,6 +31,7 @@
         </div>
     </div>
     {% endif %}
+
 
     <!-- Property Details Content -->
     <div class="property-content">
@@ -44,7 +46,7 @@
                 <span class="price-value">${{ property.price }}</span>
             </div>
         </div>
-        
+       
         <!-- Quick Stats -->
         <div class="quick-stats">
             <div class="stat-item">
@@ -79,6 +81,7 @@
             {% endif %}
         </div>
 
+
         <!-- Detailed Information -->
         <div class="property-details">
             <div class="details-section">
@@ -92,6 +95,7 @@
                     </div>
                 </div>
             </div>
+
 
             <div class="details-section">
                 <h2 class="section-title">Contacts</h2>
@@ -113,6 +117,7 @@
                 </div>
             </div>
 
+
             <!-- Description -->
             <div class="details-section">
                 <h2 class="section-title">Description</h2>
@@ -120,6 +125,7 @@
                     {{ property.description }}
                 </div>
             </div>
+
 
             <!-- Action Buttons -->
             <div class="action-buttons">
@@ -135,13 +141,13 @@
                         </a>
                     {% endif %}
                 {% endif %}
-            
+           
                 {% if user.role == 'admin' %}
                 <a href="{% url 'admin_delete_property' property.id %}" class="btn btn-outline-danger">
                     <i class="fas fa-trash-alt me-2"></i>Delete Property
                 </a>
                 {% endif %}
-            
+           
                 {% if request.user.role == 'normal' %}
                     <a href="{% url 'user_properties' %}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left me-2"></i>Back to Properties
@@ -156,6 +162,7 @@
         </div>
     </div>
 </div>
+
 
 <style>
     /* Modern Digital Design Style */
@@ -172,13 +179,13 @@
         --border-radius: 14px;
         --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     }
-    
+   
     body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         background-color: #f5f7fa;
         color: var(--dark-text);
     }
-    
+   
     /* Container */
     .property-container {
         max-width: 1200px;
@@ -188,14 +195,14 @@
         gap: 30px;
         padding: 0 20px;
     }
-    
+   
     @media (min-width: 992px) {
         .property-container {
             grid-template-columns: 1fr 1.2fr;
             align-items: start;
         }
     }
-    
+   
     /* Image Gallery */
     .image-gallery {
         position: relative;
@@ -205,17 +212,17 @@
         background: #fff;
         height: 500px;
     }
-    
+   
     .carousel, .carousel-inner, .carousel-item {
         height: 100%;
     }
-    
+   
     .carousel-item img {
         height: 100%;
         width: 100%;
         object-fit: cover;
     }
-    
+   
     .carousel-control-prev, .carousel-control-next {
         width: 50px;
         height: 50px;
@@ -226,15 +233,15 @@
         opacity: 0.9;
         margin: 0 20px;
     }
-    
+   
     .carousel-control-prev-icon, .carousel-control-next-icon {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231a2b4c' viewBox='0 0 16 16'%3E%3Cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
     }
-    
+   
     .carousel-control-next-icon {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231a2b4c' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
     }
-    
+   
     .image-counter {
         position: absolute;
         bottom: 20px;
@@ -246,7 +253,7 @@
         font-size: 0.9rem;
         font-weight: 600;
     }
-    
+   
     /* Property Content */
     .property-content {
         background: white;
@@ -254,7 +261,7 @@
         box-shadow: var(--box-shadow);
         overflow: hidden;
     }
-    
+   
     /* Property Header */
     .property-header {
         padding: 30px;
@@ -264,21 +271,21 @@
         display: flex;
         flex-direction: column;
     }
-    
+   
     .property-title {
         font-size: 2.2rem;
         font-weight: 700;
         margin-bottom: 15px;
         line-height: 1.2;
     }
-    
+   
     .property-tags {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
         margin-bottom: 20px;
     }
-    
+   
     .property-tag {
         padding: 8px 16px;
         border-radius: 30px;
@@ -287,27 +294,27 @@
         letter-spacing: 0.5px;
         text-transform: uppercase;
     }
-    
+   
     .property-type {
         background: rgba(255, 255, 255, 0.2);
         color: white;
     }
-    
+   
     .status-approved {
         background: var(--success-color);
         color: white;
     }
-    
+   
     .status-pending {
         background: var(--accent-color);
         color: white;
     }
-    
+   
     .status-sold {
         background: #e74c3c;
         color: white;
     }
-    
+   
     .property-price {
         margin-top: 5px;
         align-self: flex-start;
@@ -319,7 +326,7 @@
         font-size: 1.5rem;
         box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
     }
-    
+   
     /* Quick Stats */
     .quick-stats {
         display: grid;
@@ -329,7 +336,7 @@
         background: linear-gradient(to right, #f8f9fa, #ffffff);
         border-bottom: 1px solid #eaeaea;
     }
-    
+   
     .stat-item {
         display: flex;
         flex-direction: column;
@@ -341,18 +348,18 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    
+   
     .stat-item:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
     }
-    
+   
     .stat-icon {
         color: var(--accent-color);
         font-size: 1.6rem;
         margin-bottom: 8px;
     }
-    
+   
     .stat-value {
         font-size: 1.5rem;
         font-weight: 700;
@@ -360,23 +367,23 @@
         line-height: 1;
         margin-bottom: 5px;
     }
-    
+   
     .stat-label {
         font-size: 0.8rem;
         color: var(--light-text);
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    
+   
     /* Property Details */
     .property-details {
         padding: 30px;
     }
-    
+   
     .details-section {
         margin-bottom: 30px;
     }
-    
+   
     .section-title {
         position: relative;
         font-size: 1.4rem;
@@ -385,7 +392,7 @@
         margin-bottom: 20px;
         padding-bottom: 10px;
     }
-    
+   
     .section-title::after {
         content: '';
         position: absolute;
@@ -395,13 +402,13 @@
         height: 3px;
         background: var(--accent-color);
     }
-    
+   
     .detail-row {
         display: flex;
         align-items: center;
         margin-bottom: 15px;
     }
-    
+   
     .detail-icon {
         width: 40px;
         height: 40px;
@@ -414,18 +421,18 @@
         margin-right: 15px;
         font-size: 1.2rem;
     }
-    
+   
     .detail-content {
         font-size: 1.1rem;
         color: var(--dark-text);
     }
-    
+   
     .detail-label {
         color: var(--light-text);
         font-weight: 500;
         margin-right: 5px;
     }
-    
+   
     /* Description */
     .property-description {
         color: #555;
@@ -436,7 +443,7 @@
         border-radius: var(--border-radius);
         box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
     }
-    
+   
     /* Action Buttons */
     .action-buttons {
         display: flex;
@@ -445,7 +452,7 @@
         margin-top: 30px;
         justify-content: center;
     }
-    
+   
     .btn {
         padding: 12px 30px;
         font-weight: 600;
@@ -455,105 +462,107 @@
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    
+   
     .btn:hover {
         transform: translateY(-3px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     }
-    
+   
     .btn-primary {
         background: var(--accent-color);
         border-color: var(--accent-color);
         color: white;
     }
-    
+   
     .btn-primary:hover {
         background: #c09c31;
         border-color: #c09c31;
     }
-    
+   
     .btn-secondary {
         background: var(--secondary-color);
         border-color: var(--secondary-color);
         color: white;
     }
-    
+   
     .btn-secondary:hover {
         background: #131f38;
         border-color: #131f38;
     }
-    
+   
     .btn-danger {
         background: var(--danger-color);
         border-color: var(--danger-color);
         color: white;
     }
-    
+   
     .btn-danger:hover {
         background: #d82d58;
         border-color: #d82d58;
     }
-    
+   
     .btn-outline-danger {
         color: var(--danger-color);
         border-color: var(--danger-color);
         background: transparent;
     }
-    
+   
     .btn-outline-danger:hover {
         background: var(--danger-color);
         color: white;
     }
-    
+   
     /* Responsive Design */
     @media (max-width: 991px) {
         .image-gallery {
             height: 400px;
         }
     }
-    
+   
     @media (max-width: 768px) {
         .quick-stats {
             grid-template-columns: repeat(2, 1fr);
         }
-        
+       
         .property-title {
             font-size: 1.8rem;
             margin-bottom: 15px;
         }
-        
+       
         .section-title {
             font-size: 1.3rem;
         }
     }
-    
+   
     @media (max-width: 480px) {
         .property-header {
             padding: 20px;
         }
-        
+       
         .property-title {
             font-size: 1.6rem;
         }
-        
+       
         .property-price {
             padding: 8px 18px;
             font-size: 1.2rem;
         }
-        
+       
         .property-tag {
             padding: 6px 12px;
             font-size: 0.75rem;
         }
     }
-          
+         
+
+
 
 
     /* Script for Image Counter */
     document.addEventListener('DOMContentLoaded', function() {
         const carousel = document.getElementById('propertyCarousel');
         const currentImageElement = document.querySelector('.current-image');
-        
+       
         if (carousel && currentImageElement) {
             carousel.addEventListener('slide.bs.carousel', function(event) {
                 const nextIndex = event.to + 1;
@@ -563,4 +572,8 @@
     });
 </style>
 
+
 {% endblock %}
+
+
+
