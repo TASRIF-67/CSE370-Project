@@ -5,47 +5,65 @@
   <div class="col-12 col-md-8 col-lg-6 col-xl-5">
     <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
       <!-- Wave shape inside the card at the top -->
-      <div class="position-relative bg-primary" style="height: 80px;">
+      <div class="position-relative bg-primary" style="height: 120px;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="position-absolute bottom-0" style="width: 100%;">
           <path fill="#fff" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,128C960,117,1056,75,1152,64C1248,53,1344,75,1392,85.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
         </svg>
+        <!-- Login icon in the wave -->
+        <div class="position-absolute" style="top: 25px; left: 50%; transform: translateX(-50%);">
+          <div class="bg-white rounded-circle p-3 shadow-sm">
+            <i class="fas fa-user-circle text-primary" style="font-size: 2rem;"></i>
+          </div>
+        </div>
       </div>
      
       <div class="card-body p-5 position-relative">
         <!-- Header -->
         <div class="text-center mb-4">
-          <h1 class="fw-bold mb-0">Welcome back</h1>
+          <h1 class="fw-bold mb-1">Welcome back</h1>
           <p class="text-muted">Sign in to continue to your account</p>
         </div>
        
-       <!-- Login form -->
-       <form method="post">
-        {% csrf_token %}
-        <div class="mb-4">
-          {% bootstrap_form form layout="floating" %}
-        </div>
+        <!-- Login form -->
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-4">
+            {% bootstrap_form form layout="floating" %}
+          </div>
 
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <label class="remember-me mb-0">
-            <input type="checkbox" name="remember_me">
-            <span class="checkmark"></span>
-            Remember Me
-          </label>
-        </div>
-
-
-     
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check custom-checkbox">
+              <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+              <label class="form-check-label" for="rememberMe">Remember Me</label>
+            </div>
+            {% comment %} <a href="#" class="text-primary text-decoration-none small fw-bold">Forgot Password?</a> {% endcomment %}
+          </div>
        
-          <!-- Submit button -->
-          <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill mb-3">
+          <!-- Submit button with hover effect -->
+          <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill mb-3 signin-btn">
             <span class="fw-bold">Sign In</span>
           </button>
-        </form>
+          
+          <!-- Social login options -->
+          {% comment %} <div class="text-center my-4">
+            <p class="text-muted small mb-2">Or continue with</p>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="#" class="btn btn-outline-secondary rounded-circle p-2">
+                <i class="fab fa-google"></i>
+              </a>
+              <a href="#" class="btn btn-outline-secondary rounded-circle p-2">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="btn btn-outline-secondary rounded-circle p-2">
+                <i class="fab fa-apple"></i>
+              </a>
+            </div>
+          </div>
+        </form> {% endcomment %}
        
         <!-- Sign up link -->
         <div class="text-center mt-4">
-          <p class="mb-0">Don't have an account? <a href="{% url 'normal_signup' %}" class="fw-bold text-decoration-none">Sign up</a></p>
+          <p class="mb-0">Don't have an account? <a href="{% url 'normal_signup' %}" class="fw-bold text-primary text-decoration-none">Sign up</a></p>
         </div>
        
         <!-- Wave shape inside the card at the bottom -->
@@ -73,76 +91,95 @@
 
 
 <style>
-  /* Container label styling */
-.remember-me {
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 16px;
-    user-select: none;
-    position: relative;
-    padding-left: 30px;
+/* Form field focus effect */
+.form-floating .form-control:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
 }
 
-
-/* Hide the default checkbox */
-.remember-me input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
+/* Custom checkbox styling - Using Bootstrap's built-in form-check */
+.form-check-input {
+  width: 1.25em;
+  height: 1.25em;
+  margin-top: 0.25em;
+  cursor: pointer;
+  border: 1px solid #ced4da;
 }
 
-
-/* Custom checkmark box */
-.remember-me .checkmark {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 20px;
-    width: 20px;
-    background-color: #eee;
-    border-radius: 4px;
-    transition: background-color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.form-check-input:checked {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
 }
 
-
-/* On hover */
-.remember-me:hover .checkmark {
-    background-color: #ccc;
+.form-check-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
 }
 
-
-/* When checked, change background */
-.remember-me input:checked ~ .checkmark {
-    background-color: #4CAF50;
+.form-check-label {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 
-
-/* Checkmark symbol (using ::after pseudo-element) */
-.remember-me .checkmark::after {
-    content: "";
-    position: absolute;
-    display: none;
+/* Sign in button with hover effect */
+.signin-btn {
+  transition: all 0.3s ease;
+  background: linear-gradient(to right, #4f46e5, #6366f1);
+  border: none;
 }
 
-
-/* Show the checkmark when checked */
-.remember-me input:checked ~ .checkmark::after {
-    display: block;
-    left: 7px;
-    top: 3px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+.signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
 }
 
+/* Social login buttons */
+.btn-outline-secondary {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+}
 
+.btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+/* Card animation */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+}
+
+/* Link styling */
+a.text-decoration-none {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+a.text-decoration-none:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #4f46e5;
+  transition: width 0.3s ease;
+}
+
+a.text-decoration-none:hover:after {
+  width: 100%;
+}
 </style>
 {% endblock %}
-

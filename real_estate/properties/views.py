@@ -98,7 +98,7 @@ class CustomLoginView(LoginView):
 
 
         response = super().form_valid(form)
-        messages.success(self.request, f"Welcome back, {self.request.user.username}!")
+        # messages.success(self.request, f"Welcome back, {self.request.user.username}!")
         return response
 
 
@@ -417,7 +417,7 @@ def express_interest(request, property_id):
             status='pending'  # Stays pending until "Contact an Agent"
         )
         messages.success(request, "Interest expressed successfully.")
-    return redirect('user_interests')
+    return redirect('home')
 
 #=========CONTACT AGENT============
 @login_required

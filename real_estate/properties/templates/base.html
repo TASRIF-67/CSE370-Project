@@ -703,8 +703,9 @@ body, html {
                                 {% endif %}
                             </ul>
                         </li>
+                         {% if request.user.role == 'normal' %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'create_property' %}">List Property</a></li>
-                        {% if request.user.role == 'normal' %}
+                       
                         <li class="nav-item"><a class="nav-link" href="{% url 'submit_feedback' %}">Feedback</a></li>
                         {% endif %}
                         <li class="nav-item dropdown">

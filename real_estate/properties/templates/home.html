@@ -7,7 +7,7 @@
 
 
 <!-- Hero Section -->
-<div class="hero-section position-relative overflow-hidden" style="height: 90vh;">
+<div class="hero-section position-relative overflow-hidden w-100" style="width: 100vw !important; max-width: 100vw !important; margin-left: calc(-50vw + 50%) !important; margin-right: calc(-50vw + 50%) !important; height: 80vh;">
     <!-- Video Background -->
     <div class="video-background">
         <video autoplay muted loop playsinline id="hero-video">
@@ -57,21 +57,57 @@
 </div>
 
 
-<!-- Want to Work With Us Section -->
-{% if not user.is_authenticated or user.role == 'normal' %}
+<!-- Want to Work With Us Section --> 
+{% if not user.is_authenticated or user.role == 'normal' %} 
 <div class="py-5">
     <div class="container text-center">
-        <span class="work-with-us" data-aos="fade-up" data-aos-duration="1000" style="color: #1a2b4c; font-weight: 600; font-size: 1.3rem; padding: 18px 35px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.3); display: inline-block; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(248, 249, 250, 0.6); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); transition: all 0.3s ease;">
-            Want to work with us?
-            <a href="{% if user.is_authenticated %}{% url 'apply_agent' %}{% else %}{% url 'login' %}{% endif %}"
-               class="btn btn-primary btn-sm custom-btn rounded-pill ms-3" style="background: #d4af37; border: none; padding: 8px 20px; transition: all 0.3s ease;">
-               <i class="fas fa-user-tie me-2"></i> Apply Now
-            </a>
-        </span>
+        <div class="work-with-us-wrapper" data-aos="fade-up" data-aos-duration="1000"
+             style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,249,250,0.7));
+                    border-radius: 24px;
+                    padding: 30px 40px;
+                    display: inline-block;
+                    border: 1px solid rgba(212, 175, 55, 0.4);
+                    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+                    backdrop-filter: blur(15px);
+                    -webkit-backdrop-filter: blur(15px);
+                    transition: all 0.4s ease;">
+            
+            <div class="d-flex align-items-center justify-content-center flex-wrap">
+                <span style="color: #1a2b4c; 
+                           font-weight: 700; 
+                           font-size: 1.4rem; 
+                           margin-right: 20px;
+                           letter-spacing: 0.3px;">
+                    Want to work with us?
+                </span>
+                
+                <a href="{% if user.is_authenticated %}{% url 'apply_agent' %}{% else %}{% url 'login' %}{% endif %}"
+                   class="btn custom-btn rounded-pill ms-3" 
+                   style="background: linear-gradient(to right, #d4af37, #f0d272);
+                          border: none;
+                          padding: 10px 28px;
+                          color: #1a2b4c;
+                          font-weight: 600;
+                          transition: all 0.3s ease;
+                          box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);">
+                    <i class="fas fa-user-tie me-2"></i> Apply Now
+                </a>
+            </div>
+            
+            <div class="decoration-element" 
+                 style="position: absolute; 
+                        width: 80px; 
+                        height: 80px; 
+                        border-radius: 50%; 
+                        background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, rgba(255,255,255,0) 70%); 
+                        top: -20px; 
+                        right: -20px;
+                        z-index: -1;">
+            </div>
+        </div>
     </div>
 </div>
 {% endif %}
-
 
 <!-- Featured Properties -->
 <div class="container mb-5 py-5">
@@ -553,11 +589,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style>
     /* General Styles */
-body {
-    font-family: 'Poppins', sans-serif;
-    color: #333;
-    overflow-x: hidden;
-}
+    body, html {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        width: 100%;
+    }
 
 
 .custom-btn {
@@ -691,6 +728,7 @@ body {
     position: relative;
     z-index: 1;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    margin-top: -3rem; /* pull under navbar padding */
 }
 
 
