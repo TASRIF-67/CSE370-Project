@@ -128,19 +128,18 @@
 
 
             <!-- Action Buttons -->
+             
             <div class="action-buttons">
-                {% if user.is_authenticated %}
-                {% if user != property.seller and user.role == 'normal' and property.status == 'approved' %}
-                    {% if has_expressed_interest %}
-                        <a href="{% url 'remove_interest' property.id %}" class="btn btn-danger">
-                            <i class="fas fa-heart-broken me-2"></i>Remove Interest
-                        </a>
-                    {% else %}
-                        <a href="{% url 'express_interest' property.id %}" class="btn btn-primary">
-                            <i class="fas fa-heart me-2"></i>Express Interest
-                        </a>
-                    {% endif %}
-                {% endif %}
+               {% if user.is_authenticated %}
+    {% if user != property.seller and user.role == 'normal' and property.status == 'approved' %}
+        <button class="heart-interest-btn" 
+                data-property-id="{{ property.id }}" 
+                data-interested="{{ has_expressed_interest|yesno:'true,false' }}"
+                title="{{ has_expressed_interest|yesno:'Remove Interest,Express Interest' }}">
+            <i class="{{ has_expressed_interest|yesno:'fas text-danger,far' }} fa-heart"></i>
+        </button>
+    {% endif %}
+
            
                 {% if user.role == 'admin' %}
                 <a href="{% url 'admin_delete_property' property.id %}" class="btn btn-outline-danger">
@@ -149,8 +148,8 @@
                 {% endif %}
            
                 {% if request.user.role == 'normal' %}
-                    <a href="{% url 'user_properties' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Properties
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Home
                     </a>
                 {% elif request.user.role == 'admin' %}
                     <a href="{% url 'admin_properties' %}" class="btn btn-secondary">
@@ -162,7 +161,124 @@
         </div>
     </div>
 </div>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Find all heart interest buttons on the page
+    const heartButtons = document.querySelectorAll('.heart-interest-btn');
+    
+    // Add click event listener to each heart button
+    heartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const propertyId = this.dataset.propertyId;
+            const isInterested = this.dataset.interested === 'true';
+            const heartIcon = this.querySelector('i');
+            const heartButtons = document.querySelectorAll(`.heart-interest-btn[data-property-id="${propertyId}"]`);
+            
+            // Determine the URL based on current interest state
+            const url = isInterested 
+                ? `/property/${propertyId}/remove-interest/` 
+                : `/property/${propertyId}/interest/`;
+            
+            // Add temporary visual feedback while processing
+            heartButtons.forEach(btn => {
+                btn.classList.add('processing');
+            });
+            
+            // Send AJAX request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update all instances of this property's heart buttons on the page
+                    heartButtons.forEach(btn => {
+                        const btnIcon = btn.querySelector('i');
+                        
+                        // Toggle the heart icon and interested state
+                        if (isInterested) {
+                            btnIcon.classList.remove('fas', 'text-danger');
+                            btnIcon.classList.add('far');
+                            btn.dataset.interested = 'false';
+                            btn.setAttribute('title', 'Express Interest');
+                        } else {
+                            btnIcon.classList.remove('far');
+                            btnIcon.classList.add('fas', 'text-danger');
+                            btn.dataset.interested = 'true';
+                            btn.setAttribute('title', 'Remove Interest');
+                        }
+                        
+                        btn.classList.remove('processing');
+                    });
+                    
+                    // You can display a toast message if needed
+                    if (data.message) {
+                        showToast(data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Remove processing state and show error
+                heartButtons.forEach(btn => {
+                    btn.classList.remove('processing');
+                });
+                showToast('An error occurred. Please try again.', 'error');
+            });
+        });
+    });
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Simple toast notification function
+    function showToast(message, type = 'success') {
+        // You can replace this with your preferred toast notification system
+        // This is just a basic implementation
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        // Show the toast
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // Hide and remove the toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+});
+</script>
 
 <style>
     /* Modern Digital Design Style */
@@ -241,7 +357,144 @@
     .carousel-control-next-icon {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231a2b4c' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
     }
-   
+  /* Enhanced Heart Button Styling */
+.heart-interest-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Heart icon styling */
+.heart-interest-btn i {
+    font-size: 1.8rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Empty heart styling */
+.heart-interest-btn i.far {
+    color: rgba(108, 117, 125, 0.8);
+}
+
+/* Filled heart styling */
+.heart-interest-btn i.fas.text-danger {
+    color: #e74c3c !important;
+    transform: scale(1.15);
+}
+
+/* Hover effects */
+.heart-interest-btn:hover i.far {
+    color: #6c757d;
+    transform: scale(1.15);
+}
+
+.heart-interest-btn:hover i.fas.text-danger {
+    transform: scale(1.25);
+    filter: drop-shadow(0 3px 6px rgba(231, 76, 60, 0.3));
+}
+
+/* Animation for clicking */
+.heart-interest-btn:active i {
+    transform: scale(0.85);
+}
+
+/* Processing state */
+.heart-interest-btn.processing {
+    pointer-events: none;
+}
+
+.heart-interest-btn.processing i {
+    animation: pulse 1s infinite;
+}
+
+/* Pulse animation for processing state */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Circular background option (uncomment to use) */
+/*
+.heart-interest-btn {
+    background-color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.heart-interest-btn:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+*/
+
+/* Enhanced toast notification styling */
+.toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background-color: white;
+    color: #333;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    min-width: 250px;
+    max-width: 330px;
+    display: flex;
+    align-items: center;
+}
+
+.toast::before {
+    content: '';
+    margin-right: 12px;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(-10px);
+}
+
+.toast-success {
+    border-left: 4px solid #2ecc71;
+}
+
+.toast-success::before {
+    content: '\f00c';
+    color: #2ecc71;
+}
+
+.toast-error {
+    border-left: 4px solid #e74c3c;
+}
+
+.toast-error::before {
+    content: '\f00d';
+    color: #e74c3c;
+}
     .image-counter {
         position: absolute;
         bottom: 20px;

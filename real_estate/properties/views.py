@@ -395,29 +395,38 @@ def property_detail(request, property_id):
         'has_expressed_interest': has_expressed_interest,
     })
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 #=========EXPRESS INTEREST============
 @login_required
+@require_POST  # Ensure this is only accessible via POST for CSRF protection
 def express_interest(request, property_id):
-    # SELECT role FROM properties_customuser WHERE id = <request.user.id>;
+    # Only normal users can express interest
     if request.user.role != 'normal':
-        return redirect('home')
-    # SELECT * FROM properties_property WHERE id = <property_id> AND status = 'approved';
-    property = get_object_or_404(Property, id=property_id, status='approved')
+        return JsonResponse({'success': False, 'message': 'Only normal users can express interest.'})
+    
+    # Get the property and ensure it's approved
+    try:
+        property = get_object_or_404(Property, id=property_id, status='approved')
+    except Property.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Property not found or not approved.'})
+    
+    # Check if user is trying to express interest in their own property
     if request.user == property.seller:
-        messages.error(request, "You cannot express interest in your own property.")
-        return redirect('home')
-    # SELECT EXISTS(SELECT 1 FROM properties_interest WHERE property_id = <property_id> AND user_id = <request.user.id>);
+        return JsonResponse({'success': False, 'message': 'You cannot express interest in your own property.'})
+    
+    # Check if interest already exists to prevent duplicates
     if not Interest.objects.filter(property=property, interested_user=request.user).exists():
-        # INSERT INTO properties_interest (property_id, user_id, assigned_agent_id, status) 
-        # VALUES (<property.id>, <request.user.id>, NULL, 'pending');
+        # Create new interest record
         Interest.objects.create(
             property=property,
             interested_user=request.user,
-            assigned_agent=None,  # No agent assigned here
-            status='pending'  # Stays pending until "Contact an Agent"
+            assigned_agent=None,
+            status='pending'
         )
-        messages.success(request, "Interest expressed successfully.")
-    return redirect('home')
+        return JsonResponse({'success': True, 'message': 'Interest expressed successfully.'})
+    else:
+        # Interest already exists
+        return JsonResponse({'success': False, 'message': 'You have already expressed interest in this property.'})
 
 #=========CONTACT AGENT============
 @login_required
@@ -1129,26 +1138,21 @@ def admin_agent_assignments(request):
 
 #=========REMOVE INTEREST============
 @login_required
+@require_POST  # Ensure this is only accessible via POST for CSRF protection
 def remove_interest(request, property_id):
-    # Only normal users can remove their own interests
+    # Only normal users can remove interest
     if request.user.role != 'normal':
-        messages.error(request, "Only normal users can remove interests.")
-        return redirect('user_interests')
-
-    # Try to find the interest for this user and property
+        return JsonResponse({'success': False, 'message': 'Only normal users can remove interests.'})
+    
+    # Try to find and delete the interest
     try:
         interest = Interest.objects.get(property__id=property_id, interested_user=request.user)
-        # DELETE FROM properties_interest WHERE property_id = <property_id> AND interested_user_id = <request.user.id>;
         interest.delete()
-        messages.success(request, "Interest removed successfully.")
+        return JsonResponse({'success': True, 'message': 'Interest removed successfully.'})
     except Interest.DoesNotExist:
-        # If no interest exists (possibly because the property was deleted), inform the user
-        messages.warning(request, "The property no longer exists or you haven't expressed interest in it.")
+        return JsonResponse({'success': False, 'message': 'You have not expressed interest in this property.'})
     except Property.DoesNotExist:
-        # This case is unlikely since we're querying Interest, but handle it just in case
-        messages.warning(request, "The property no longer exists.")
-
-    return redirect('user_interests')
+        return JsonResponse({'success': False, 'message': 'The property no longer exists.'})
 
 #=========REQUEST TRANSACTION============
 @login_required

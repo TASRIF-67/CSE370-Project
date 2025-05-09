@@ -143,13 +143,13 @@
     <!-- Tab Content -->
     <div class="tab-content" id="propertyTabContent">
         <!-- Other Properties Tab -->
-     <!-- Other Properties Tab -->
+
 <div class="tab-pane fade show active" id="other-properties" role="tabpanel" aria-labelledby="other-tab">
     <div class="row g-4" id="featured-properties">
         {% for property in properties|slice:":6" %}
         {% if not user.is_authenticated or user != property.seller %}
         <div class="col-md-4 mb-4">
-            <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); background: #ffffff; overflow: hidden; position: relative; transition: all 0.4s ease;">
+            <div class="card h-100 luxury-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2" data-aos="{% cycle 'fade-right' 'fade-up' 'fade-left' %}" data-aos-duration="1000" style="border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); background: #ffffff; overflow: hidden; position: relative; transition: all 0.4s ease; display: flex; flex-direction: column;">
                 <div class="image-wrapper" style="position: relative; overflow: hidden; border-top-left-radius: 16px; border-top-right-radius: 16px;">
                     {% if property.images.first %}
                     <img src="{{ property.images.first.image.url }}" class="card-img-top" alt="{{ property.title }}" style="height: 280px; object-fit: cover; transition: transform 0.5s ease;">
@@ -161,7 +161,7 @@
                     <div class="card-img-top bg-light" style="height: 280px; display: flex; align-items: center; justify-content: center; color: #1a2b4c; font-size: 1.2rem; font-style: italic;">No Image Available</div>
                     {% endif %}
                 </div>
-                <div class="card-body p-4" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                <div class="card-body p-4 d-flex flex-column" style="position: relative; z-index: 1; background: #fff; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; flex-grow: 1;">
                     <h5 class="card-title mb-3" style="color: #1a2b4c; font-weight: 700; font-size: 1.5rem;">
                         <a href="{% url 'property_detail' property.id %}" class="text-decoration-none" style="color: #1a2b4c; transition: color 0.3s ease;">{{ property.title }}</a>
                     </h5>
@@ -170,18 +170,15 @@
                         <span class="me-4"><i class="fas fa-bed me-2" style="color: #d4af37;"></i>{{ property.bedrooms }} Beds</span>
                         <span><i class="fas fa-bath me-2" style="color: #d4af37;"></i>{{ property.bathrooms }} Baths</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
                         {% if user.is_authenticated and user != property.seller and user.role == 'normal' %}
-                        <div class="interest-btn-container" style="width: 140px;">
-                            {% if property.id in interested_property_ids %}
-                            <a href="{% url 'remove_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn rounded-pill" style="font-size: 0.9rem; padding: 8px 16px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="fas fa-heart-broken me-1"></i> Remove
-                            </a>
-                            {% else %}
-                            <a href="{% url 'express_interest' property.id %}" class="btn btn-outline-primary btn-sm luxury-btn rounded-pill" style="font-size: 0.9rem; padding: 8px 16px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="fas fa-heart me-1"></i> Interested
-                            </a>
-                            {% endif %}
+                        <div class="interest-btn-container">
+                            <button class="heart-interest-btn" 
+                                    data-property-id="{{ property.id }}" 
+                                    data-interested="{% if property.id in interested_property_ids %}true{% else %}false{% endif %}"
+                                    title="{% if property.id in interested_property_ids %}Remove Interest{% else %}Express Interest{% endif %}">
+                                <i class="{% if property.id in interested_property_ids %}fas text-danger{% else %}far{% endif %} fa-heart"></i>
+                            </button>
                         </div>
                         {% else %}
                         <div style="width: 140px;"></div>
@@ -201,6 +198,7 @@
             </div>
         </div>
         {% endfor %}
+ 
         
         {% comment %}Check if there are any properties shown in the Other tab{% endcomment %}
         {% if other_properties_count == 0 and properties|length > 0 %}
@@ -423,6 +421,123 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Find all heart interest buttons on the page
+    const heartButtons = document.querySelectorAll('.heart-interest-btn');
+    
+    // Add click event listener to each heart button
+    heartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const propertyId = this.dataset.propertyId;
+            const isInterested = this.dataset.interested === 'true';
+            const heartIcon = this.querySelector('i');
+            const heartButtons = document.querySelectorAll(`.heart-interest-btn[data-property-id="${propertyId}"]`);
+            
+            // Determine the URL based on current interest state
+            const url = isInterested 
+                ? `/property/${propertyId}/remove-interest/` 
+                : `/property/${propertyId}/interest/`;
+            
+            // Add temporary visual feedback while processing
+            heartButtons.forEach(btn => {
+                btn.classList.add('processing');
+            });
+            
+            // Send AJAX request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update all instances of this property's heart buttons on the page
+                    heartButtons.forEach(btn => {
+                        const btnIcon = btn.querySelector('i');
+                        
+                        // Toggle the heart icon and interested state
+                        if (isInterested) {
+                            btnIcon.classList.remove('fas', 'text-danger');
+                            btnIcon.classList.add('far');
+                            btn.dataset.interested = 'false';
+                            btn.setAttribute('title', 'Express Interest');
+                        } else {
+                            btnIcon.classList.remove('far');
+                            btnIcon.classList.add('fas', 'text-danger');
+                            btn.dataset.interested = 'true';
+                            btn.setAttribute('title', 'Remove Interest');
+                        }
+                        
+                        btn.classList.remove('processing');
+                    });
+                    
+                    // You can display a toast message if needed
+                    if (data.message) {
+                        showToast(data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Remove processing state and show error
+                heartButtons.forEach(btn => {
+                    btn.classList.remove('processing');
+                });
+                showToast('An error occurred. Please try again.', 'error');
+            });
+        });
+    });
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Simple toast notification function
+    function showToast(message, type = 'success') {
+        // You can replace this with your preferred toast notification system
+        // This is just a basic implementation
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        // Show the toast
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // Hide and remove the toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+});
+
     // Enhanced Particles.js Configuration
 document.addEventListener('DOMContentLoaded', function() {
     // Ensure video plays properly on mobile
@@ -633,7 +748,144 @@ document.addEventListener('DOMContentLoaded', function() {
 .custom-btn:hover::before {
     left: 100%;
 }
+/* Enhanced Heart Button Styling */
+.heart-interest-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
 
+/* Heart icon styling */
+.heart-interest-btn i {
+    font-size: 1.8rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Empty heart styling */
+.heart-interest-btn i.far {
+    color: rgba(108, 117, 125, 0.8);
+}
+
+/* Filled heart styling */
+.heart-interest-btn i.fas.text-danger {
+    color: #e74c3c !important;
+    transform: scale(1.15);
+}
+
+/* Hover effects */
+.heart-interest-btn:hover i.far {
+    color: #6c757d;
+    transform: scale(1.15);
+}
+
+.heart-interest-btn:hover i.fas.text-danger {
+    transform: scale(1.25);
+    filter: drop-shadow(0 3px 6px rgba(231, 76, 60, 0.3));
+}
+
+/* Animation for clicking */
+.heart-interest-btn:active i {
+    transform: scale(0.85);
+}
+
+/* Processing state */
+.heart-interest-btn.processing {
+    pointer-events: none;
+}
+
+.heart-interest-btn.processing i {
+    animation: pulse 1s infinite;
+}
+
+/* Pulse animation for processing state */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Circular background option (uncomment to use) */
+/*
+.heart-interest-btn {
+    background-color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.heart-interest-btn:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+*/
+
+/* Enhanced toast notification styling */
+.toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background-color: white;
+    color: #333;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    min-width: 250px;
+    max-width: 330px;
+    display: flex;
+    align-items: center;
+}
+
+.toast::before {
+    content: '';
+    margin-right: 12px;
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(-10px);
+}
+
+.toast-success {
+    border-left: 4px solid #2ecc71;
+}
+
+.toast-success::before {
+    content: '\f00c';
+    color: #2ecc71;
+}
+
+.toast-error {
+    border-left: 4px solid #e74c3c;
+}
+
+.toast-error::before {
+    content: '\f00d';
+    color: #e74c3c;
+}
 
 /* Video Background Styles */
 .video-background {

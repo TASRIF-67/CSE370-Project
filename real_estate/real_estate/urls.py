@@ -23,7 +23,7 @@ urlpatterns = [
     path('property/<int:property_id>/delete/', views.delete_property, name='delete_property'),
     path('property/<int:property_id>/admin/edit/', views.admin_edit_property, name='admin_edit_property'),
     path('property/<int:property_id>/admin/delete/', views.admin_delete_property, name='admin_delete_property'),
-    path('property/<int:property_id>/interest/', views.express_interest, name='express_interest'),
+   path('property/<int:property_id>/interest/', views.express_interest, name='express_interest'),
     path('property/<int:property_id>/confirm/', views.confirm_transaction, name='confirm_transaction'),
     path('property/<int:property_id>/status/', views.update_property_status, name='update_property_status'),
     path('feedback/', views.submit_feedback, name='submit_feedback'),
@@ -42,7 +42,8 @@ urlpatterns = [
     path('admin/reject-transaction/<int:transaction_id>/', views.admin_reject_transaction, name='admin_reject_transaction'),
 
     path('property/<int:property_id>/express-interest/', views.express_interest, name='express_interest'),
-    path('property/<int:property_id>/remove-interest/', views.remove_interest, name='remove_interest'),
+       path('property/<int:property_id>/remove-interest/', views.remove_interest, name='remove_interest'),
+
     path('interest/<int:interest_id>/contact-agent/', views.contact_agent, name='contact_agent'),
     path('property/<int:property_id>/approve/', views.approve_property, name='approve_property'),
     path('property/<int:property_id>/sold/', views.mark_sold, name='mark_sold'),
