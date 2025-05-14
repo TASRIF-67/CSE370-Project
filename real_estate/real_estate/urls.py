@@ -11,7 +11,12 @@ urlpatterns = [
     path('about/', views.about_us, name='about_us'),
     path('agent/interests/', views.agent_interests, name='agent_interests'),
     path('signup/', views.normal_signup, name='normal_signup'),
-    path('dashboard/', views.dashboard, name='dashboard'),
+
+    # Dashboard landing pages by claude
+    path('dashboard/user/', views.user_dashboard, name='user_dashboard'),
+    path('dashboard/agent/', views.agent_dashboard, name='agent_dashboard'),
+    path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
+
     path('property/create/', views.create_property, name='create_property'),
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/property/<int:property_id>/view/', views.admin_view_property, name='admin_view_property'),

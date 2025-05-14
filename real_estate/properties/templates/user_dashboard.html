@@ -1,83 +1,413 @@
-<!-- user_dashboard.html -->
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
 {% load django_bootstrap5 %}
-{% block content %}
-<div class="container mt-5">
+
+{% block dashboard_content %}
+<div class="container py-4">
     <h2 class="text-center mb-4">User Dashboard</h2>
-    <div class="row">
-        <!-- Existing Properties and Transactions -->
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4">
-                <h3>Your Properties</h3>
-                <table class="table table-hover">
-                    <thead><tr><th>Title</th><th>Status</th></tr></thead>
-                    <tbody>
-                        {% for property in properties %}
-                        <tr><td>{{ property.title }}</td><td>{{ property.status|title }}</td></tr>
-                        {% empty %}
-                        <tr><td colspan="2">No properties listed.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    
+    <!-- Statistics Overview -->
+      <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-header properties">
+        <h1 class="stat-number">{{ properties|length }}</h1>
+        <h3 class="stat-title">Properties</h3>
+        <div class="stat-icon">🏠</div>
+      </div>
+      <div class="stat-body">
+        <p class="stat-description">Total properties in your portfolio</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-header transactions">
+        <h1 class="stat-number">{{ transactions|length }}</h1>
+        <h3 class="stat-title">Transactions</h3>
+        <div class="stat-icon">💰</div>
+      </div>
+      <div class="stat-body">
+        <p class="stat-description">Completed real estate transactions</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-header interests">
+        <h1 class="stat-number">{{ interests|length }}</h1>
+        <h3 class="stat-title">Interests</h3>
+        <div class="stat-icon">🔍</div>
+      </div>
+      <div class="stat-body">
+        <p class="stat-description">Client property interests registered</p>
+      </div>
+    </div>
+    
+    
+
+  
+    <!-- Main Dashboard Content -->
+    <div class="row mt-5">
+        <!-- Your Properties Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-home me-2"></i>Your Properties</h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if properties %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for property in properties %}
+                                <tr>
+                                    <td><strong>{{ property.title }}</strong></td>
+                                    <td>
+                                        {% if property.status == 'active' %}
+                                        <span class="badge bg-success">{{ property.status|title }}</span>
+                                        {% elif property.status == 'pending' %}
+                                        <span class="badge bg-warning">{{ property.status|title }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ property.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Details</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-home fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">No properties listed yet.</p>
+                        <a href="#" class="btn btn-primary">Add a Property</a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4">
-                <h3>Your Transactions</h3>
-                <table class="table table-hover">
-                    <thead><tr><th>Property</th><th>Agent</th><th>Amount</th><th>Date</th></tr></thead>
-                    <tbody>
-                        {% for transaction in transactions %}
-                        <tr>
-                            <td>{{ transaction.property.title }}</td>
-                            <td>{{ transaction.agent.username|default:"N/A" }}</td>
-                            <td>${{ transaction.amount }}</td>
-                            <td>{{ transaction.date|date:"Y-m-d" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4">No transactions.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+        <!-- Your Transactions Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Your Transactions</h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Agent</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td>{{ transaction.property.title }}</td>
+                                    <td>{{ transaction.agent.username|default:"N/A" }}</td>
+                                    <td class="text-end">${{ transaction.amount }}</td>
+                                    <td>{{ transaction.date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-exchange-alt fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">No transactions recorded yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        <!-- New Interested Properties -->
-        <div class="col-md-12 mt-4">
-            <div class="card shadow-sm p-4">
-                <h3>Properties You're Interested In</h3>
-                <table class="table table-hover">
-                    <thead><tr><th>Property</th><th>Assigned Agent</th><th>Date</th></tr></thead>
-                    <tbody>
-                        {% for interest in interests %}
-                        <tr>
-                            <td>{{ interest.property.title }}</td>
-                            <td>{{ interest.assigned_agent.username|default:"Not Assigned" }}</td>
-                            <td>{{ interest.created_at|date:"Y-m-d" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="3">No interests expressed.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+        <!-- Properties You're Interested In Section -->
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-heart me-2"></i>Properties You're Interested In</h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">Find More</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if interests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Assigned Agent</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for interest in interests %}
+                                <tr>
+                                    <td><strong>{{ interest.property.title }}</strong></td>
+                                    <td>
+                                        {% if interest.assigned_agent %}
+                                        <span class="d-flex align-items-center">
+                                            <img src="{{ interest.assigned_agent.profile_pic|default:'#' }}" alt="Agent" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                                            {{ interest.assigned_agent.username }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">Not Assigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ interest.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-info">Active</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-outline-secondary">Details</a>
+                                            <a href="#" class="btn btn-outline-danger">Remove</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-heart fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">You haven't expressed interest in any properties yet.</p>
+                        <a href="#" class="btn btn-primary">Browse Properties</a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
+
+        <!-- Your Feedback Section -->
         {% if feedbacks %}
-        <div class="col-md-12 mt-4">
-            <div class="card shadow-sm p-4">
-                <h3>Your Feedback</h3>
-                <table class="table table-hover">
-                    <thead><tr><th>Comment</th><th>Date</th></tr></thead>
-                    <tbody>
-                        {% for feedback in feedbacks %}
-                        <tr><td>{{ feedback.comment }}</td><td>{{ feedback.created_at|date:"Y-m-d" }}</td></tr>
-                        {% empty %}
-                        <tr><td colspan="2">No feedback submitted.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Your Feedback</h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">Add Feedback</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Comment</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feedback in feedbacks %}
+                                <tr>
+                                    <td>{{ feedback.comment }}</td>
+                                    <td>{{ feedback.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No feedback submitted yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         {% endif %}
     </div>
+
+    <!-- Recent Activity Timeline -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+                </div>
+                <div class="card-body pb-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-start pb-3 pt-3">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">New property viewed</div>
+                                You viewed "Modern Downtown Apartment"
+                            </div>
+                            <span class="text-muted">2 hours ago</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start pb-3 pt-3">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Transaction completed</div>
+                                Payment for "Suburban Family Home" was processed
+                            </div>
+                            <span class="text-muted">Yesterday</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start pb-3 pt-3">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">New agent assigned</div>
+                                John Doe was assigned to your property interest
+                            </div>
+                            <span class="text-muted">3 days ago</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white text-center">
+                    <a href="#" class="btn btn-sm btn-link">View All Activity</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script>
+    // This would normally include animation for number counting
+    // but we'll keep it simple for demonstration
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Dashboard statistics loaded');
+    });
+  </script>
+
+<style>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Dashboard Statistics</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    
+    .stats-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    
+    .stat-card {
+      width: 230px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    
+    .stat-header {
+      padding: 20px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        135deg, 
+        rgba(255,255,255,0.15) 0%, 
+        rgba(255,255,255,0) 50%
+      );
+      transform: rotate(45deg);
+      z-index: 1;
+    }
+    
+    .properties { background: linear-gradient(135deg, #4a6ad9, #2f4bb5); }
+    .transactions { background: linear-gradient(135deg, #34c759, #28a745); }
+    .interests { background: linear-gradient(135deg, #5ac8fa, #0a84ff); }
+    .feedback { background: linear-gradient(135deg, #ff9500, #ff2d55); }
+    
+    .stat-number {
+      font-size: 48px;
+      font-weight: 700;
+      margin: 0;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .stat-title {
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 10px 0 0;
+      opacity: 0.9;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .stat-icon {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      opacity: 0.2;
+      font-size: 54px;
+      z-index: 1;
+    }
+    
+    .stat-body {
+      background: white;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .stat-description {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    @keyframes countUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .stat-number {
+      animation: countUp 1s ease-out forwards;
+    }
+    
+    @media (max-width: 768px) {
+      .stat-card {
+        width: 100%;
+      }
+    }
+  </style>
 {% endblock %}

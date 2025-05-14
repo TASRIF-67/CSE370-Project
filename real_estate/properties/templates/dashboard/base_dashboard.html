@@ -1,0 +1,562 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<!-- Add animate.css for badge animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<style>
+    /* Main container styles */
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(90vh - 56px - 108px); /* Adjust based on navbar and footer height */
+    }
+    
+    /* Top navigation styles */
+    .top-nav {
+        background-color: #d4af37; /* Gold background color */
+        color: #212529;
+        position: sticky;
+        top: 56px; /* Height of main navbar */
+        width: 100%;
+        z-index: 999;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+    
+    .top-nav-header {
+        padding: 10px 20px;
+        background: rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .top-nav-header h4 {
+        margin: 0;
+        color: #212529;
+        font-weight: 600;
+    }
+    
+    .user-info {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        color: #212529;
+    }
+    
+    .top-nav-content {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        justify-content: center; /* Center items when fewer than 5 */
+    }
+    
+    .top-nav-item {
+        padding: 12px 15px;
+        color: #212529;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        border-bottom: 3px solid transparent;
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    .badge-counter {
+        display: inline-flex;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background-color: #8b0000;
+        color: white;
+        border-radius: 0.75rem;
+        margin-left: 5px;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.2rem;
+    }
+    
+    .top-nav-item:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: #000;
+    }
+    
+    .top-nav-item.active {
+        color: #000;
+        border-bottom: 3px solid #8b0000; /* Deep red accent for active item */
+        font-weight: 500;
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .nav-icon {
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+    }
+    
+    /* Content area styles */
+    .content-area {
+        flex: 1;
+        padding: 20px;
+        background-color: #f8f9fa;
+        margin-top: 0; /* Remove fixed margin since we're using sticky positioning */
+    }
+    
+    /* Enhanced dashboard styles */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .stat-title {
+        font-size: 16px;
+        color: #666;
+        margin: 0;
+    }
+    
+    .stat-icon {
+        width: 36px;
+        height: 36px;
+        background-color: rgba(212, 175, 55, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d4af37;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+        color: #212529;
+    }
+    
+    .stat-change {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .stat-change.positive {
+        color: #28a745;
+    }
+    
+    .stat-change.negative {
+        color: #dc3545;
+    }
+    
+    .recent-activity {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 8px;
+        color: #d4af37;
+    }
+    
+    /* Mobile menu styles */
+    .mobile-nav-toggle {
+        display: none;
+        background: #343a40;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        align-items: center;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .top-nav-content {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            justify-content: flex-start; /* Reset to flex-start on mobile */
+        }
+        
+        .top-nav-content.active {
+            display: flex;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            background-color: #d4af37;
+        }
+        
+        .top-nav-item {
+            border-bottom: none;
+            border-left: 3px solid transparent;
+        }
+        
+        .top-nav-item.active {
+            border-bottom: none;
+            border-left: 3px solid #8b0000;
+        }
+        
+        .mobile-nav-toggle {
+            display: flex;
+        }
+    }
+    
+    /* Multi-row navigation for desktop */
+    @media (min-width: 769px) {
+        /* Auto-adjusting width for items based on count */
+        .nav-items-5 .top-nav-item {
+            flex-basis: 20%; /* 5 items per row */
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .nav-items-many .top-nav-item {
+            /* For many items, let them wrap naturally with reasonable min-width */
+            min-width: 140px;
+            flex: 1 0 auto;
+        }
+        
+        /* When items wrap to second row, ensure proper styling */
+        .top-nav-content::after {
+            content: "";
+            flex: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Top Navigation - Sticky below main navbar -->
+    <div class="top-nav">
+        <div class="top-nav-header">
+            <h4>Dashboard</h4>
+            <span class="user-info">Welcome, {{ request.user.get_full_name|default:request.user.username }}</span>
+            <button class="mobile-nav-toggle" id="mobileNavToggle">
+                <i class="fas fa-bars mr-2"></i> Menu
+            </button>
+        </div>
+        
+        <div class="top-nav-content" id="topNavContent">
+            {% if request.user.role == 'normal' %}
+                <a href="{% url 'user_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
+                    <i class="fas fa-home nav-icon"></i> Home
+                </a>
+                <a href="{% url 'user_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'user_properties' %}active{% endif %}">
+                    <i class="fas fa-building nav-icon"></i> My Properties 
+                    {% if user_properties_count > 0 %}<span class="badge-counter">{{ user_properties_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'user_transactions' %}" class="top-nav-item {% if request.resolver_match.url_name == 'user_transactions' %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave nav-icon"></i> Transactions
+                    {% if user_transactions_count > 0 %}<span class="badge-counter">{{ user_transactions_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'user_interests' %}" class="top-nav-item {% if request.resolver_match.url_name == 'user_interests' %}active{% endif %}">
+                    <i class="fas fa-heart nav-icon"></i> Interests
+                    {% if user_interests_count > 0 %}<span class="badge-counter">{{ user_interests_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'update_profile' %}" class="top-nav-item {% if request.resolver_match.url_name == 'update_profile' %}active{% endif %}">
+                    <i class="fas fa-user-edit nav-icon"></i> Profile
+                </a>
+            {% elif request.user.role == 'agent' %}
+                <a href="{% url 'agent_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'agent_dashboard' %}active{% endif %}">
+                    <i class="fas fa-home nav-icon"></i>  Home
+                </a>
+                <a href="{% url 'agent_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'agent_properties' %}active{% endif %}">
+                    <i class="fas fa-building nav-icon"></i> Properties
+                    {% if agent_properties_count > 0 %}<span class="badge-counter">{{ agent_properties_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'agent_transactions' %}" class="top-nav-item {% if request.resolver_match.url_name == 'agent_transactions' %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave nav-icon"></i> Transactions
+                    {% if agent_transactions_count > 0 %}<span class="badge-counter">{{ agent_transactions_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'agent_interests' %}" class="top-nav-item {% if request.resolver_match.url_name == 'agent_interests' %}active{% endif %}">
+                    <i class="fas fa-check-circle nav-icon"></i> Completed
+                    {% if agent_completed_count > 0 %}<span class="badge-counter">{{ agent_completed_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'agent_ratings' %}" class="top-nav-item {% if request.resolver_match.url_name == 'agent_ratings' %}active{% endif %}">
+                    <i class="fas fa-star nav-icon"></i> Ratings
+                    {% if agent_ratings_count > 0 %}<span class="badge-counter">{{ agent_ratings_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'update_profile' %}" class="top-nav-item {% if request.resolver_match.url_name == 'update_profile' %}active{% endif %}">
+                    <i class="fas fa-user-edit nav-icon"></i> Profile
+                </a>
+            {% elif request.user.role == 'admin' %}
+                <a href="{% url 'admin_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                    <i class="fas fa-home nav-icon"></i>  Home
+                </a>
+                <a href="{% url 'admin_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_properties' %}active{% endif %}">
+                    <i class="fas fa-building nav-icon"></i> Properties
+                    {% if admin_properties_count > 0 %}<span class="badge-counter">{{ admin_properties_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'manage_users' %}" class="top-nav-item {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">
+                    <i class="fas fa-users nav-icon"></i> Users
+                    {% if admin_users_count > 0 %}<span class="badge-counter">{{ admin_users_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'admin_pending_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_pending_properties' %}active{% endif %}">
+                    <i class="fas fa-clock nav-icon"></i> Pending
+                    {% if admin_pending_properties_count > 0 %}<span class="badge-counter">{{ admin_pending_properties_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'admin_agent_requests' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_agent_requests' %}active{% endif %}">
+                    <i class="fas fa-user-tie nav-icon"></i> Agents
+                    {% if admin_agent_requests_count > 0 %}<span class="badge-counter">{{ admin_agent_requests_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'admin_interests' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_interests' %}active{% endif %}">
+                    <i class="fas fa-heart nav-icon"></i> Interests
+                    {% if admin_interests_count > 0 %}<span class="badge-counter">{{ admin_interests_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'admin_feedbacks' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_feedbacks' %}active{% endif %}">
+                    <i class="fas fa-comment-alt nav-icon"></i> Feedback
+                    {% if admin_feedbacks_count > 0 %}<span class="badge-counter">{{ admin_feedbacks_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'admin_transactions' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_transactions' %}active{% endif %}">
+                    <i class="fas fa-history nav-icon"></i> History
+                    {% if admin_transactions_count > 0 %}<span class="badge-counter">{{ admin_transactions_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'admin_pending_transactions' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_pending_transactions' %}active{% endif %}">
+                    <i class="fas fa-hourglass-half nav-icon"></i> Pending Trans.
+                    {% if admin_pending_transactions_count > 0 %}<span class="badge-counter">{{ admin_pending_transactions_count }}</span>{% endif %}
+                </a>
+                <a href="{% url 'update_profile' %}" class="top-nav-item {% if request.resolver_match.url_name == 'update_profile' %}active{% endif %}">
+                    <i class="fas fa-user-edit nav-icon"></i> Profile
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-area">
+        <div class="container-fluid">
+            {% block dashboard_content %}
+                {% if dashboard_example %}
+                <!-- Example Dashboard Content - You can remove this -->
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h5 class="stat-title">Total Properties</h5>
+                            <div class="stat-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value">{{ total_properties|default:"24" }}</h3>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 15% from last month
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h5 class="stat-title">Pending Transactions</h5>
+                            <div class="stat-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value">{{ pending_transactions|default:"7" }}</h3>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 3% from last month
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h5 class="stat-title">New Interests</h5>
+                            <div class="stat-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value">{{ new_interests|default:"12" }}</h3>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 8% from last month
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h5 class="stat-title">Average Rating</h5>
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <h3 class="stat-value">{{ avg_rating|default:"4.7" }}</h3>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 0.2 from last month
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-activity">
+                    <h4 class="section-title"><i class="fas fa-clock"></i> Recent Activity</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Activity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in recent_activities %}
+                                <tr>
+                                    <td>{{ activity.date }}</td>
+                                    <td>{{ activity.description }}</td>
+                                    <td>{{ activity.status }}</td>
+                                    <td>
+                                        <a href="{{ activity.action_url }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <!-- Example data if no activities -->
+                                <tr>
+                                    <td>{{ current_date|default:"May 7, 2025" }}</td>
+                                    <td>New property interest received</td>
+                                    <td><span class="badge badge-warning">Pending</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ current_date|default:"May 6, 2025" }}</td>
+                                    <td>Property inspection scheduled</td>
+                                    <td><span class="badge badge-info">Scheduled</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ current_date|default:"May 5, 2025" }}</td>
+                                    <td>Transaction completed</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile navigation toggle
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const topNavContent = document.getElementById('topNavContent');
+        
+        if (mobileNavToggle) {
+            mobileNavToggle.addEventListener('click', function() {
+                topNavContent.classList.toggle('active');
+            });
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideNav = topNavContent.contains(event.target) || 
+                                    mobileNavToggle.contains(event.target);
+            
+            if (!isClickInsideNav && topNavContent.classList.contains('active')) {
+                topNavContent.classList.remove('active');
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && topNavContent.classList.contains('active')) {
+                topNavContent.classList.remove('active');
+            }
+        });
+        
+        // Add class based on number of menu items
+        const navItems = document.querySelectorAll('.top-nav-item');
+        if (navItems.length <= 5) {
+            topNavContent.classList.add('nav-items-5');
+        } else {
+            topNavContent.classList.add('nav-items-many');
+        }
+        
+        // Force equal width for menu items based on count
+        // This ensures they all have the same width
+        const setEqualWidths = () => {
+            if (window.innerWidth > 768) {
+                const firstRowItemCount = Math.min(
+                    Math.floor(topNavContent.offsetWidth / 140), // Approximate min-width per item
+                    navItems.length
+                );
+                
+                if (firstRowItemCount > 0) {
+                    const itemWidth = (100 / firstRowItemCount) + '%';
+                    navItems.forEach(item => {
+                        item.style.flex = '0 0 ' + itemWidth;
+                        item.style.maxWidth = itemWidth;
+                    });
+                }
+            } else {
+                // On mobile, reset the widths
+                navItems.forEach(item => {
+                    item.style.flex = '1';
+                    item.style.maxWidth = '100%';
+                });
+            }
+        };
+        
+        // Call immediately and on resize
+        setEqualWidths();
+        window.addEventListener('resize', setEqualWidths);
+        
+        // Add animation to badge counters
+        const badges = document.querySelectorAll('.badge-counter');
+        badges.forEach(badge => {
+            badge.classList.add('animate__animated', 'animate__pulse', 'animate__infinite', 'animate__slower');
+        });
+    });
+</script>
+{% endblock %}

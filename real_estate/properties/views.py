@@ -11,6 +11,23 @@ from django.forms import modelformset_factory
 from .forms import PropertyForm, PropertyImageForm
 from django.core.paginator import Paginator
 
+def user_dashboard(request):
+    # Get dashboard summary data
+    properties_count = Property.objects.filter(owner=request.user).count()
+    transactions_count = Transaction.objects.filter(user=request.user).count()
+    interests_count = Interest.objects.filter(user=request.user).count()
+    recent_properties = Property.objects.filter(owner=request.user).order_by('-created_at')[:5]
+    # notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:5]
+    
+    context = {
+        'properties_count': properties_count,
+        'transactions_count': transactions_count,
+        'interests_count': interests_count,
+        'recent_properties': recent_properties,
+        # 'notifications': notifications,
+    }
+    return render(request, 'dashboard/user/dashboard.html', context)
+
 def about_us(request):
     return render(request, 'about_us.html')
 
@@ -83,10 +100,10 @@ def normal_signup(request):
         form = NormalUserSignUpForm()
     return render(request, 'signup.html', {'form': form, 'role': 'Normal User'})
 
+from django.urls import reverse_lazy
 #=========CUSTOM LOGIN VIEW============
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
-
 
     def form_valid(self, form):
         # If 'remember me' is unchecked, set session to expire on browser close
@@ -96,14 +113,9 @@ class CustomLoginView(LoginView):
         else:
             self.request.session.set_expiry(1209600)  # 2 weeks
 
-
-        response = super().form_valid(form)
-        # messages.success(self.request, f"Welcome back, {self.request.user.username}!")
-        return response
-
+        return super().form_valid(form)
 
     def form_invalid(self, form):
-        # Extract error messages nicely
         error_list = []
         for field, errors in form.errors.items():
             for error in errors:
@@ -114,6 +126,14 @@ class CustomLoginView(LoginView):
         messages.error(self.request, error_msg)
         return super().form_invalid(form)
 
+    def get_success_url(self):
+        user = self.request.user
+        if user.role == "admin":
+            return reverse_lazy('admin_dashboard') 
+        elif user.role == "agent":
+            return reverse_lazy("agent_dashboard") 
+        else:# Replace with your actual dashboard URL name
+            return reverse_lazy('home')  # Default redirect for other users
 
 
 
@@ -335,7 +355,7 @@ def create_property(request):
                     # VALUES (<property.id>, <image_form.cleaned_data['image']>);
                     PropertyImage.objects.create(property=property, image=image_form.cleaned_data['image'])
             messages.success(request, "Property listed successfully. Awaiting admin approval.")
-            return redirect('dashboard')
+            return redirect('home')
     else:
         form = PropertyForm()
         formset = ImageFormSet(queryset=PropertyImage.objects.none())
@@ -1148,7 +1168,7 @@ def remove_interest(request, property_id):
     try:
         interest = Interest.objects.get(property__id=property_id, interested_user=request.user)
         interest.delete()
-        return JsonResponse({'success': True, 'message': 'Interest removed successfully.'})
+        return JsonResponse({'success': True, 'message': 'Removed!'})
     except Interest.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'You have not expressed interest in this property.'})
     except Property.DoesNotExist:

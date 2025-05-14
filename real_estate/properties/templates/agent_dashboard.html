@@ -1,79 +1,523 @@
-<!-- agent_dashboard.html -->
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
 {% load django_bootstrap5 %}
-{% block content %}
-<div class="container mt-5">
+
+{% block dashboard_content %}
+<div class="container py-4">
     <h2 class="text-center mb-4">Agent Dashboard</h2>
+    
+     <div class="stats-container">
+        <div class="stats-row">
+            <!-- Properties Card -->
+            <div class="stat-card properties-card">
+                <div class="stat-card-inner">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-value">{{ properties|length }}</div>
+                    <div class="stat-title">Assigned Properties</div>
+                    <div class="digital-dots"></div>
+                    <div class="digital-line" style="animation-delay: 0s;"></div>
+                </div>
+            </div>
+            
+            <!-- Transactions Card -->
+            <div class="stat-card transactions-card">
+                <div class="stat-card-inner">
+                    <div class="stat-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ transactions|length }}</div>
+                    <div class="stat-title">Transactions</div>
+                    <div class="digital-dots"></div>
+                    <div class="digital-line" style="animation-delay: 0.5s;"></div>
+                </div>
+            </div>
+            
+            <!-- Interests Card -->
+            <div class="stat-card interests-card">
+                <div class="stat-card-inner">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value">{{ interests|length }}</div>
+                    <div class="stat-title">New Interests</div>
+                    <div class="digital-dots"></div>
+                    <div class="digital-line" style="animation-delay: 1s;"></div>
+                </div>
+            </div>
+            
+      
+    <!-- Main Dashboard Content -->
     <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4">
-                <h3>Assigned Properties</h3>
-                <table class="table table-hover">
-                    <thead><tr><th>Title</th><th>Status</th><th>Action</th></tr></thead>
-                    <tbody>
-                        {% for property in properties %}
-                        <tr>
-                            <td>{{ property.title }}</td>
-                            <td>{{ property.status|title }}</td>
-                            <td><a href="{% url 'update_property_status' property.id %}" class="btn btn-primary btn-sm">Update Status</a></td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="3">No properties assigned.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- Assigned Properties Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-building me-2"></i>Assigned Properties</h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if properties %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Client</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for property in properties %}
+                                <tr>
+                                    <td><strong>{{ property.title }}</strong></td>
+                                    <td>
+                                        {% if property.status == 'active' %}
+                                        <span class="badge bg-success">{{ property.status|title }}</span>
+                                        {% elif property.status == 'pending' %}
+                                        <span class="badge bg-warning">{{ property.status|title }}</span>
+                                        {% elif property.status == 'sold' %}
+                                        <span class="badge bg-info">{{ property.status|title }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ property.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ property.owner.username|default:"Unknown" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'update_property_status' property.id %}" class="btn btn-primary">Update Status</a>
+                                            <a href="#" class="btn btn-outline-secondary">Details</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-building fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">No properties assigned to you yet.</p>
+                        <a href="#" class="btn btn-primary">Check Available Properties</a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4">
-                <h3>Your Transactions</h3>
-                <table class="table table-hover">
-                    <thead><tr><th>Property</th><th>Buyer</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-                    <tbody>
-                        {% for transaction in transactions %}
-                        <tr>
-                            <td>{{ transaction.property.title }}</td>
-                            <td>{{ transaction.buyer.username }}</td>
-                            <td>{{ transaction.amount }}</td>
-                            <td>{{ transaction.payment_status|title }}</td>
-                            <td>
-                                {% if transaction.payment_status == 'pending' %}
-                                <form method="post" class="d-inline">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="transaction_id" value="{{ transaction.id }}">
-                                    <button type="submit" class="btn btn-success btn-sm">Approve Payment</button>
-                                </form>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="5">No transactions.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+        <!-- Your Transactions Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Your Transactions</h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Buyer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td>{{ transaction.property.title }}</td>
+                                    <td>
+                                        <span class="d-flex align-items-center">
+                                            <img src="{{ transaction.buyer.profile_pic|default:'#' }}" alt="Buyer" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                                            {{ transaction.buyer.username }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">${{ transaction.amount }}</td>
+                                    <td>
+                                        {% if transaction.payment_status == 'completed' %}
+                                        <span class="badge bg-success">{{ transaction.payment_status|title }}</span>
+                                        {% elif transaction.payment_status == 'pending' %}
+                                        <span class="badge bg-warning">{{ transaction.payment_status|title }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ transaction.payment_status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if transaction.payment_status == 'pending' %}
+                                        <form method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="transaction_id" value="{{ transaction.id }}">
+                                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                        </form>
+                                        {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>Approved</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-money-bill-wave fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">No transactions recorded yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-       <!-- Replace Interested Buyers section -->
-<div class="col-md-12 mt-4">
-    <div class="card shadow-sm p-4">
-        <h3>Newly Assigned Interested Buyers</h3>
-        <table class="table table-hover">
-            <thead><tr><th>Property</th><th>Interested User</th><th>Date</th></tr></thead>
-            <tbody>
-                {% for interest in interests %}
-                <tr>
-                    <td>{{ interest.property.title }}</td>
-                    <td>{{ interest.interested_user.username }}</td>
-                    <td>{{ interest.created_at|date:"Y-m-d" }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="3">No new interested buyers assigned.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p><a href="{% url 'agent_interests' %}" class="btn btn-primary">View All Interested Buyers</a></p>
+
+        <!-- Newly Assigned Interested Buyers Section -->
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-user-check me-2"></i>Newly Assigned Interested Buyers</h5>
+                        <a href="{% url 'agent_interests' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if interests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Interested User</th>
+                                    <th>Contact</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for interest in interests %}
+                                <tr>
+                                    <td><strong>{{ interest.property.title }}</strong></td>
+                                    <td>
+                                        <span class="d-flex align-items-center">
+                                            <img src="{{ interest.interested_user.profile_pic|default:'#' }}" alt="User" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                                            {{ interest.interested_user.username }}
+                                        </span>
+                                    </td>
+                                    <td>{{ interest.interested_user.email|default:"N/A" }}</td>
+                                    <td>{{ interest.created_at|date:"M d, Y" }}</td>
+                                    <td><span class="badge bg-info">New</span></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="#" class="btn btn-primary">Contact</a>
+                                            <a href="#" class="btn btn-outline-secondary">Details</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-user-check fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">No new interested buyers assigned to you.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Features -->
+    <div class="row">
+        <!-- Commission Analytics -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Commission Analytics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">This Month</h6>
+                                    <h3 class="mb-0">$5,230</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">YTD</h6>
+                                    <h3 class="mb-0">$32,450</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <!-- Placeholder for chart -->
+                        <div style="height: 150px; background-color: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <p class="text-muted">Commission Trend Chart</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Manager -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Your Tasks</h5>
+                        <a href="#" class="btn btn-sm btn-outline-primary">Add Task</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="task1">
+                                <label class="form-check-label" for="task1">
+                                    Follow up with John regarding Downtown Loft
+                                </label>
+                            </div>
+                            <span class="badge bg-danger rounded-pill">Today</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="task2">
+                                <label class="form-check-label" for="task2">
+                                    Schedule open house for Riverside Property
+                                </label>
+                            </div>
+                            <span class="badge bg-warning rounded-pill">Tomorrow</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="task3">
+                                <label class="form-check-label" for="task3">
+                                    Prepare contracts for Hillside Apartment sale
+                                </label>
+                            </div>
+                            <span class="badge bg-info rounded-pill">May 12</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="task4">
+                                <label class="form-check-label" for="task4">
+                                    Submit commission report for April
+                                </label>
+                            </div>
+                            <span class="badge bg-info rounded-pill">May 15</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white text-center">
+                    <a href="#" class="btn btn-sm btn-link">View All Tasks</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Overview -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Schedule</h5>
+                        <div class="btn-group btn-group-sm">
+                            <a href="#" class="btn btn-outline-secondary">Week</a>
+                            <a href="#" class="btn btn-outline-primary active">Month</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="card border-left-primary h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="text-primary">Property Viewing</h6>
+                                        <span class="badge bg-primary">10:00 AM</span>
+                                    </div>
+                                    <p class="mb-0 text-muted">Suburban Family Home with Sarah Johnson</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-success h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="text-success">Contract Signing</h6>
+                                        <span class="badge bg-success">2:30 PM</span>
+                                    </div>
+                                    <p class="mb-0 text-muted">Lakeside Condo with Michael Brown</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-info h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="text-info">Open House</h6>
+                                        <span class="badge bg-info">Tomorrow</span>
+                                    </div>
+                                    <p class="mb-0 text-muted">Modern Downtown Apartment, 1-4 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-warning h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="text-warning">Property Inspection</h6>
+                                        <span class="badge bg-warning">Thu, 11:00 AM</span>
+                                    </div>
+                                    <p class="mb-0 text-muted">Colonial House with Thomas Wilson</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center">
+                    <a href="#" class="btn btn-sm btn-link">View Full Calendar</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-    </div>
-</div>
+ <style>
+        .stats-container {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            padding: 1.5rem;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.75rem;
+            justify-content: space-between;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 220px;
+            margin: 0.75rem;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
+        }
+        
+        .stat-card-inner {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        .stat-title {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.75rem;
+        }
+        
+        .stat-icon {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            opacity: 0.2;
+            font-size: 2rem;
+        }
+        
+        /* Card Color Themes */
+        .properties-card::before {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        }
+        
+        .transactions-card::before {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+        
+        .interests-card::before {
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+        }
+        
+        .highest-card::before {
+            background: linear-gradient(135deg, #f6d365, #fda085);
+        }
+        
+        /* Digital Elements */
+        .digital-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .digital-line {
+            position: absolute;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            width: 50%;
+            bottom: 0;
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { width: 10%; opacity: 0.5; }
+            50% { width: 70%; opacity: 0.8; }
+            100% { width: 10%; opacity: 0.5; }
+        }
+    </style>
 {% endblock %}

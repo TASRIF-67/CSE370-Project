@@ -1,85 +1,336 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/base_dashboard.html' %}
 {% load django_bootstrap5 %}
-{% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-5" style="color: #1a2b4c; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">Your Interests</h2>
-    <div class="card shadow-lg p-4" style="border-radius: 15px; background: linear-gradient(135deg, #fff, #f8f9fa);">
-        <table class="table table-hover">
-            <thead style="background: #1a2b4c; color: #f8f9fa;">
-                <tr>
-                    <th>Property</th>
-                    <th>Property Status</th>
-                    <th>Agent Status</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for interest in interests %}
-                <tr {% if interest.property.id in bought_properties %}class="bought-property"{% elif interest.property.status == 'sold' %}class="unavailable-property"{% endif %}>
-                    <td style="font-weight: 500;">
-                        {{ interest.property.title }}
-                        {% if interest.property.id in bought_properties %}
-                            <br><small class="text-success">Bought</small>
-                        {% elif interest.property.status == 'sold' %}
-                            <br><small class="text-muted">Sorry, the property is unavailable</small>
-                        {% else %}
-                            <br><small class="text-primary">Available</small>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if interest.property.id in bought_properties %}
-                            <span class="badge bg-success" style="padding: 6px 12px; font-size: 0.9rem;">Bought</span>
-                        {% elif interest.property.status == 'sold' %}
-                            <span class="badge bg-danger" style="padding: 6px 12px; font-size: 0.9rem;">Sold</span>
-                        {% else %}
-                            <span class="badge bg-primary" style="padding: 6px 12px; font-size: 0.9rem;">Approved</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if interest.status == 'pending' %}
-                            <span class="badge bg-secondary" style="padding: 6px 12px; font-size: 0.9rem;">Pending</span>
-                        {% elif interest.status == 'assigning' %}
-                            <span class="badge bg-warning text-dark" style="padding: 6px 12px; font-size: 0.9rem;">Assigning…</span>
-                        {% elif interest.status == 'assigned' %}
-                            <span class="badge bg-success" style="padding: 6px 12px; font-size: 0.9rem;">{{ interest.assigned_agent.username }}</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ interest.created_at|date:"Y-m-d" }}</td>
-                    <td>
-                        <a href="{% url 'property_detail' interest.property.id %}" class="btn btn-info btn-sm" style="border-radius: 20px; padding: 6px 14px; margin-right: 5px;">View Details</a>
-                        <a href="{% url 'remove_interest' interest.property.id %}" class="btn btn-danger btn-sm" style="border-radius: 20px; padding: 6px 14px;">Remove</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="5" class="text-center text-muted" style="padding: 2rem;">No interests expressed yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+{% block dashboard_content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold mb-0">My Interests</h2>
+            <p class="text-muted">Manage your saved properties</p>
+        </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr class="bg-light">
+                        <th class="px-4 py-3 text-dark fw-semibold">Property</th>
+                        <th class="py-3 text-dark fw-semibold">Property Status</th>
+                        <th class="py-3 text-dark fw-semibold">Agent Status</th>
+                        <th class="py-3 text-dark fw-semibold">Date</th>
+                        <th class="py-3 text-dark fw-semibold text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interest in interests %}
+                    <tr id="interest-row-{{ interest.property.id }}" 
+                        class="{% if interest.property.id in bought_properties %}property-bought{% elif interest.property.status == 'sold' %}property-unavailable{% endif %}">
+                        <td class="px-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="property-img-container me-3">
+                                   {% with interest.property.images.first as main_image %}
+    {% if main_image %}
+        <img src="{{ main_image.image.url }}" class="property-thumbnail" alt="{{ interest.property.title }}">
+    {% else %}
+        <div class="property-thumbnail-placeholder"></div>
+    {% endif %}
+{% endwith %}
+
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">{{ interest.property.title }}</h6>
+                                    {% if interest.property.id in bought_properties %}
+                                        <span class="badge bg-success-subtle text-success">Purchased</span>
+                                    {% elif interest.property.status == 'sold' %}
+                                        <span class="badge bg-secondary-subtle text-secondary">No Longer Available</span>
+                                    {% else %}
+                                        <span class="badge bg-primary-subtle text-primary">Available</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3">
+                            {% if interest.property.id in bought_properties %}
+                                <span class="status-indicator success"></span>
+                                <span class="ms-2">Purchased</span>
+                            {% elif interest.property.status == 'sold' %}
+                                <span class="status-indicator danger"></span>
+                                <span class="ms-2">Sold</span>
+                            {% else %}
+                                <span class="status-indicator primary"></span>
+                                <span class="ms-2">Approved</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3">
+                            {% if interest.status == 'pending' %}
+                                <span class="status-indicator secondary"></span>
+                                <span class="ms-2">Pending</span>
+                            {% elif interest.status == 'assigning' %}
+                                <span class="status-indicator warning"></span>
+                                <span class="ms-2">Assigning...</span>
+                            {% elif interest.status == 'assigned' %}
+                                <div class="d-flex align-items-center">
+                                    <div class="agent-avatar">{{ interest.assigned_agent.username|first|upper }}</div>
+                                    <span class="ms-2">{{ interest.assigned_agent.username }}</span>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="py-3">
+                            <span class="text-muted">{{ interest.created_at|date:"M d, Y" }}</span>
+                        </td>
+                        <td class="py-3 text-end pe-4">
+                            <a href="{% url 'property_detail' interest.property.id %}" 
+                               class="btn btn-sm btn-outline-primary me-2">
+                                View Details
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger remove-interest-btn" 
+                                    data-url="{% url 'remove_interest' interest.property.id %}" 
+                                    data-row-id="interest-row-{{ interest.property.id }}">
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="empty-state">
+                                <i class="bi bi-heart fs-1 text-muted mb-3"></i>
+                                <h5>No saved properties</h5>
+                                <p class="text-muted">You haven't expressed interest in any properties yet.</p>
+                                <a href="{% url 'home' %}" class="btn btn-primary mt-2">Browse Properties</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+<!-- Toast notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast-message" class="toast align-items-center border-0 rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center">
+                <i class="bi bi-check-circle me-2"></i>
+                <span id="toast-text">Success!</span>
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 <style>
-    .table-hover tr:hover {
-        background: #e9ecef;
-        transition: background 0.3s;
-    }
-    .bought-property {
-        background: #e6f4ea;
-        color: #155724;
-    }
-    .bought-property:hover {
-        background: #d4edda !important;
-    }
-    .unavailable-property {
-        background: #f1f1f1;
-        color: #6c757d;
-        opacity: 0.7;
-    }
-    .unavailable-property:hover {
-        background: #e0e0e0 !important;
-    }
-    .unavailable-property .btn, .bought-property .btn {
-        opacity: 1; /* Ensure buttons remain fully visible */
-    }
+/* Typography & Base Styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    color: #212529;
+}
+
+/* Property Row Styles */
+.property-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.property-thumbnail-placeholder {
+    width: 60px;
+    height: 60px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+}
+
+.property-bought {
+    background-color: rgba(25, 135, 84, 0.04);
+}
+
+.property-unavailable {
+    background-color: rgba(173, 181, 189, 0.07);
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-indicator.primary {
+    background-color: #0d6efd;
+}
+
+.status-indicator.success {
+    background-color: #198754;
+}
+
+.status-indicator.danger {
+    background-color: #dc3545;
+}
+
+.status-indicator.warning {
+    background-color: #ffc107;
+}
+
+.status-indicator.secondary {
+    background-color: #6c757d;
+}
+
+/* Agent Avatar */
+.agent-avatar {
+    width: 28px;
+    height: 28px;
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: rgba(13, 110, 253, 0.04);
+    color: #0d6efd;
+}
+
+.btn-outline-danger:hover {
+    background-color: rgba(220, 53, 69, 0.04);
+    color: #dc3545;
+}
+
+/* Toast Styles */
+.toast {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.toast.bg-success {
+    background-color: #198754 !important;
+    color: white;
+}
+
+.toast.bg-danger {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+.toast.bg-info {
+    background-color: #0dcaf0 !important;
+    color: white;
+}
+
+/* Table enhancements */
+.table > :not(caption) > * > * {
+    padding: 0.75rem 1rem;
+    border-bottom-width: 1px;
+}
+
+.table > thead {
+    border-bottom: 1px solid #dee2e6;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize toast
+    const toastEl = document.getElementById('toast-message');
+    const toast = new bootstrap.Toast(toastEl, {
+        delay: 3000,
+        animation: true
+    });
+    
+    // Handle remove interest buttons
+    document.querySelectorAll('.remove-interest-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            const rowId = this.getAttribute('data-row-id');
+            
+            // Add loading state to button
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Removing...';
+            this.disabled = true;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Fade out and remove the row
+                    const row = document.getElementById(rowId);
+                    if(row) {
+                        row.style.transition = 'opacity 0.3s ease';
+                        row.style.opacity = '0';
+                        setTimeout(() => {
+                            row.remove();
+                            
+                            // Check if table is now empty
+                            const tbody = document.querySelector('table tbody');
+                            if (tbody.children.length === 0) {
+                                // Add empty state
+                                const emptyRow = document.createElement('tr');
+                                emptyRow.innerHTML = `
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="bi bi-heart fs-1 text-muted mb-3"></i>
+                                            <h5>No saved properties</h5>
+                                            <p class="text-muted">You haven't expressed interest in any properties yet.</p>
+                                            <a href="{% url 'home' %}" class="btn btn-primary mt-2">Browse Properties</a>
+                                        </div>
+                                    </td>
+                                `;
+                                tbody.appendChild(emptyRow);
+                            }
+                        }, 300);
+                    }
+                    showToast(data.message, 'success');
+                } else {
+                    this.innerHTML = 'Remove';
+                    this.disabled = false;
+                    showToast(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                this.innerHTML = 'Remove';
+                this.disabled = false;
+                showToast('An error occurred. Please try again.', 'danger');
+            });
+        });
+    });
+    
+    function showToast(message, type = 'success') {
+        const toastText = document.getElementById('toast-text');
+        toastText.textContent = message;
+        
+        toastEl.classList.remove('bg-success', 'bg-danger', 'bg-info');
+        toastEl.classList.add(`bg-${type}`);
+        
+        toast.show();
+    }
+});
+</script>
 {% endblock %}
