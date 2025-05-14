@@ -11,6 +11,12 @@ urlpatterns = [
     path('about/', views.about_us, name='about_us'),
     path('agent/interests/', views.agent_interests, name='agent_interests'),
     path('signup/', views.normal_signup, name='normal_signup'),
+    
+    #Chat System
+    path('chat/<int:receiver_id>/', views.fetch_messages, name='fetch_messages'),
+    path('chat/send/', views.send_message, name='send_message'),
+    path('chat/view/<int:receiver_id>/', views.chat_view, name='chat_view'),
+
 
     # Dashboard landing pages by claude
     path('dashboard/user/', views.user_dashboard, name='user_dashboard'),

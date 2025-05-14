@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h3>Chat with {{ receiver.username }}</h3>
+    </div>
+    
+    <div id="chat-box" class="chat-messages"></div>
+    
+    <div class="chat-input-container">
+        <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
+        <button id="send-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+        background-color: #fff;
+    }
+    
+    .chat-header {
+        padding: 15px 20px;
+        background-color: #5c6bc0;
+        color: white;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .chat-header h3 {
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .message {
+        max-width: 70%;
+        margin-bottom: 15px;
+        padding: 10px 15px;
+        border-radius: 18px;
+        position: relative;
+        word-wrap: break-word;
+    }
+    
+    .message-incoming {
+        align-self: flex-start;
+        background-color: #e9e9eb;
+        color: #333;
+        border-bottom-left-radius: 5px;
+    }
+    
+    .message-outgoing {
+        align-self: flex-end;
+        background-color: #5c6bc0;
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .message-meta {
+        font-size: 0.7em;
+        margin-top: 5px;
+        opacity: 0.7;
+    }
+    
+    .chat-input-container {
+        display: flex;
+        padding: 15px;
+        background-color: #fff;
+        border-top: 1px solid #eaeaea;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    #chat-input {
+        flex: 1;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 24px;
+        outline: none;
+        font-size: 1rem;
+        transition: border 0.3s ease;
+    }
+    
+    #chat-input:focus {
+        border-color: #5c6bc0;
+    }
+    
+    #send-btn {
+        width: 45px;
+        height: 45px;
+        margin-left: 10px;
+        background-color: #5c6bc0;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+    
+    #send-btn:hover {
+        background-color: #3f51b5;
+    }
+    
+    #send-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .chat-container {
+            height: 90vh;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        
+        .chat-header, .chat-input-container {
+            border-radius: 0;
+        }
+        
+        .message {
+            max-width: 85%;
+        }
+    }
+</style>
+
+<script>
+    const receiverId = {{ receiver.id }};
+    const chatBox = document.getElementById("chat-box");
+    const chatInput = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    let lastMessageId = 0;
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let c of cookies) {
+                c = c.trim();
+                if (c.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(c.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function loadMessages() {
+        fetch(`/chat/${receiverId}/`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.messages.length === 0) return;
+                
+                // Check if we have new messages
+                const newMessages = data.messages.filter(m => !document.getElementById(`msg-${m.id}`));
+                if (newMessages.length === 0) return;
+                
+                // Add only new messages
+                newMessages.forEach(m => {
+                    const isOutgoing = m.sender === '{{ request.user.username }}';
+                    const messageDiv = document.createElement('div');
+                    messageDiv.id = `msg-${m.id}`;
+                    messageDiv.className = `message ${isOutgoing ? 'message-outgoing' : 'message-incoming'}`;
+                    
+                    messageDiv.innerHTML = `
+                        <div class="message-content">${m.content}</div>
+                        <div class="message-meta">
+                            ${formatTime(m.timestamp)}
+                        </div>
+                    `;
+                    
+                    chatBox.appendChild(messageDiv);
+                    lastMessageId = Math.max(lastMessageId, m.id);
+                });
+                
+                // Scroll to bottom
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+    }
+    
+    function sendMessage() {
+        const content = chatInput.value;
+        if (content.trim() === '') return;
+        
+        // Disable input while sending
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        
+        fetch('/chat/send/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                receiver_id: receiverId,
+                content: content
+            })
+        }).then(response => {
+            if (response.ok) {
+                chatInput.value = '';
+                loadMessages();
+            } else {
+                console.error('Failed to send message');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        }).finally(() => {
+            // Re-enable input
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+            chatInput.focus();
+        });
+    }
+    
+    // Event listeners
+    sendBtn.addEventListener("click", sendMessage);
+    
+    chatInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    });
+    
+    // Load messages immediately and then every 2 seconds
+    loadMessages();
+    setInterval(loadMessages, 2000);
+    
+    // Focus input on load
+    window.onload = function() {
+        chatInput.focus();
+    };
+</script>
+{% endblock %}

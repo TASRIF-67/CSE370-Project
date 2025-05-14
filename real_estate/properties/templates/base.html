@@ -682,7 +682,7 @@ body, html {
                             <a class="nav-link dropdown-toggle" href="#" id="dashboardDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-tachometer-alt"></i> Dashboards {% endcomment %}
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
+                            <ul class="dropdown-menu" aria-labeledby="dashboardDropdown">
                                 {% if request.user.role == 'normal' %}
                                 <li><a class="dropdown-item" href="{% url 'user_properties' %}">My Properties</a></li>
                                 <li><a class="dropdown-item" href="{% url 'user_transactions' %}">My Transactions</a></li>

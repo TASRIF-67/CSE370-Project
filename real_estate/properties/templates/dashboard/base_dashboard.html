@@ -276,6 +276,17 @@
                 <a href="{% url 'user_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
                     <i class="fas fa-home nav-icon"></i> Home
                 </a>
+                                       <a href="{% url 'chat_list' %}" 
+   class="top-nav-item {% if request.resolver_match.url_name == 'chat_list' %}active{% endif %}">
+    <i class="fas fa-comments nav-icon"></i> Chats
+    {% if user_properties_count > 0 %}
+        <span class="badge-counter">{{ user_properties_count }}</span>
+    {% endif %}
+</a>
+                <a href="{% url 'user_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'user_properties' %}active{% endif %}">
+                    <i class="fas fa-building nav-icon"></i> My Properties 
+                    {% if user_properties_count > 0 %}<span class="badge-counter">{{ user_properties_count }}</span>{% endif %}
+                </a>
                 <a href="{% url 'user_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'user_properties' %}active{% endif %}">
                     <i class="fas fa-building nav-icon"></i> My Properties 
                     {% if user_properties_count > 0 %}<span class="badge-counter">{{ user_properties_count }}</span>{% endif %}
@@ -295,6 +306,13 @@
                 <a href="{% url 'agent_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'agent_dashboard' %}active{% endif %}">
                     <i class="fas fa-home nav-icon"></i>  Home
                 </a>
+                                       <a href="{% url 'chat_list' %}" 
+   class="top-nav-item {% if request.resolver_match.url_name == 'chat_list' %}active{% endif %}">
+    <i class="fas fa-comments nav-icon"></i> Chats
+    {% if user_properties_count > 0 %}
+        <span class="badge-counter">{{ user_properties_count }}</span>
+    {% endif %}
+</a>
                 <a href="{% url 'agent_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'agent_properties' %}active{% endif %}">
                     <i class="fas fa-building nav-icon"></i> Properties
                     {% if agent_properties_count > 0 %}<span class="badge-counter">{{ agent_properties_count }}</span>{% endif %}
@@ -318,6 +336,14 @@
                 <a href="{% url 'admin_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
                     <i class="fas fa-home nav-icon"></i>  Home
                 </a>
+                         <a href="{% url 'chat_list' %}" 
+   class="top-nav-item {% if request.resolver_match.url_name == 'chat_list' %}active{% endif %}">
+    <i class="fas fa-comments nav-icon"></i> Chats
+    {% if user_properties_count > 0 %}
+        <span class="badge-counter">{{ user_properties_count }}</span>
+    {% endif %}
+</a>
+
                 <a href="{% url 'admin_properties' %}" class="top-nav-item {% if request.resolver_match.url_name == 'admin_properties' %}active{% endif %}">
                     <i class="fas fa-building nav-icon"></i> Properties
                     {% if admin_properties_count > 0 %}<span class="badge-counter">{{ admin_properties_count }}</span>{% endif %}

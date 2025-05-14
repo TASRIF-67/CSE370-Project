@@ -39,6 +39,15 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+class ChatMessage(models.Model):
+    sender = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.sender} -> {self.receiver}: {self.content[:30]}'
 
 class Property(models.Model):
     PROPERTY_TYPES = (
@@ -172,3 +181,4 @@ class AgentRating(models.Model):
 
     class Meta:
         unique_together = ('transaction', 'user')  # Prevent multiple ratings per user per transaction
+

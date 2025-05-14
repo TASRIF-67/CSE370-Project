@@ -10,23 +10,99 @@ from .models import Property, PropertyImage, Interest, Transaction, CustomUser, 
 from django.forms import modelformset_factory
 from .forms import PropertyForm, PropertyImageForm
 from django.core.paginator import Paginator
+from django.urls import reverse_lazy
+from .models import ChatMessage
+from django.views.decorators.csrf import csrf_exempt
+import json
 
-def user_dashboard(request):
-    # Get dashboard summary data
-    properties_count = Property.objects.filter(owner=request.user).count()
-    transactions_count = Transaction.objects.filter(user=request.user).count()
-    interests_count = Interest.objects.filter(user=request.user).count()
-    recent_properties = Property.objects.filter(owner=request.user).order_by('-created_at')[:5]
-    # notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:5]
+#=============================================================
+@login_required
+def chat_list(request):
+    user = request.user
+    contacts = CustomUser.objects.none()  # Empty queryset default
+
+    if user.role == 'admin':
+        # Admin can message all agents
+        contacts = CustomUser.objects.filter(role='agent', agent_application_status='approved')
+
+    elif user.role == 'agent':
+        # Agent can message users who have been assigned to them via Interest or Transaction
+        interest_users = CustomUser.objects.filter(
+            interests__assigned_agent=user
+        )
+        transaction_users = CustomUser.objects.filter(
+            purchases__agent=user
+        )
+        admin_users = CustomUser.objects.filter(role='admin')
+        contacts = (interest_users | transaction_users | admin_users).distinct()
+
+    elif user.role == 'normal':
+        # Normal user can message the assigned agent from an interest or transaction
+        agents_from_interest = CustomUser.objects.filter(
+            leads__interested_user=user,
+            leads__status='assigned'
+        )
+        agents_from_transaction = CustomUser.objects.filter(
+            sales__buyer=user
+        )
+        contacts = (agents_from_interest | agents_from_transaction).distinct()
+
+    return render(request, 'chat/chat_list.html', {'contacts': contacts})
+
+
+@login_required
+def chat_view(request, receiver_id):
+    receiver = get_object_or_404(CustomUser, id=receiver_id)
+    return render(request, 'chat/chat.html', {'receiver': receiver})
+
+@login_required
+def fetch_messages(request, receiver_id):
+    messages = ChatMessage.objects.filter(
+        sender=request.user, receiver_id=receiver_id
+    ) | ChatMessage.objects.filter(
+        sender_id=receiver_id, receiver=request.user
+    )
+    messages = messages.order_by('timestamp')
+    data = [{
+        'sender': m.sender.username,
+        'content': m.content,
+        'timestamp': m.timestamp.strftime('%b %d, %Y %H:%M')  # Improved date format
+    } for m in messages]
+    return JsonResponse({'messages': data})
+
+@login_required
+def send_message(request, receiver_id):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        receiver = get_object_or_404(CustomUser, id=receiver_id)
+        
+        message = ChatMessage.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            content=content
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': {
+                'sender': message.sender.username,
+                'content': message.content,
+                'timestamp': message.timestamp.strftime('%b %d, %Y %H:%M')
+            }
+        })
     
-    context = {
-        'properties_count': properties_count,
-        'transactions_count': transactions_count,
-        'interests_count': interests_count,
-        'recent_properties': recent_properties,
-        # 'notifications': notifications,
-    }
-    return render(request, 'dashboard/user/dashboard.html', context)
+    return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        receiver_id = data.get('receiver_id')
+        content = data.get('content')
+        ChatMessage.objects.create(sender=request.user, receiver_id=receiver_id, content=content)
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'msg': 'Invalid request'}, status=400)
 
 def about_us(request):
     return render(request, 'about_us.html')
@@ -100,7 +176,7 @@ def normal_signup(request):
         form = NormalUserSignUpForm()
     return render(request, 'signup.html', {'form': form, 'role': 'Normal User'})
 
-from django.urls import reverse_lazy
+
 #=========CUSTOM LOGIN VIEW============
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
@@ -493,7 +569,7 @@ def update_profile(request):
             # UPDATE properties_customuser SET <form_fields> WHERE id = <request.user.id>;
             form.save()
             messages.success(request, "Profile updated.")
-            return redirect('dashboard')
+            return redirect('home')
     else:
         form = UserProfileForm(instance=request.user)
     return render(request, 'update_profile.html', {'form': form})
@@ -835,19 +911,12 @@ def user_transactions(request):
     if request.user.role != 'normal':
         return redirect('home')
     
-    # Fetch transactions where the user is the buyer or seller
-    # SELECT t.* FROM properties_transaction t 
-    # JOIN properties_property p ON t.property_id = p.id 
-    # JOIN properties_customuser b ON t.buyer_id = b.id 
-    # JOIN properties_customuser a ON t.agent_id = a.id 
-    # WHERE t.buyer_id = <request.user.id>
-    # UNION
-    # SELECT t.* FROM properties_transaction t 
-    # JOIN properties_property p ON t.property_id = p.id 
-    # JOIN properties_customuser s ON p.seller_id = s.id 
-    # JOIN properties_customuser b ON t.buyer_id = b.id 
-    # JOIN properties_customuser a ON t.agent_id = a.id 
-    # WHERE p.seller_id = <request.user.id>;
+    # SELECT * FROM properties_transaction 
+    # WHERE buyer_id = <request.user.id>
+    # OR property_id IN (
+    #    SELECT id FROM properties_property WHERE seller_id = <request.user.id>
+    # )
+
     transactions = (
         Transaction.objects.filter(buyer=request.user) | 
         Transaction.objects.filter(property__seller=request.user)
